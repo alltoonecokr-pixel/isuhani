@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fdfbf5"/>
+      <stop offset="1" stop-color="#f1ede4"/>
+    </linearGradient>
+    <linearGradient id="herb" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a4a45"/>
+      <stop offset="1" stop-color="#053330"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Warm paper background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- 좌측 herb green panel -->
+  <rect x="0" y="0" width="380" height="630" fill="url(#herb)"/>
+
+  <!-- Brand mark — 醫 -->
+  <rect x="76" y="76" width="84" height="84" rx="14" fill="none" stroke="#fdfbf5" stroke-width="2"/>
+  <text x="118" y="138" font-family="'Noto Serif KR', serif" font-size="48" font-weight="900" fill="#fdfbf5" text-anchor="middle">醫</text>
+
+  <!-- 좌측 panel 라벨 -->
+  <text x="76" y="490" font-family="sans-serif" font-size="18" font-weight="700" fill="#fdfbf5" letter-spacing="6" opacity="0.85">SINCE 1986</text>
+  <text x="76" y="528" font-family="sans-serif" font-size="18" font-weight="700" fill="#fdfbf5" letter-spacing="6" opacity="0.85">SADANG-DONG</text>
+  <text x="76" y="566" font-family="sans-serif" font-size="18" font-weight="700" fill="#fdfbf5" letter-spacing="6" opacity="0.85">SEOUL · KOREA</text>
+
+  <!-- 우측 마스트헤드 -->
+  <text x="430" y="220" font-family="sans-serif" font-size="20" font-weight="700" fill="#5c5751" letter-spacing="6">ISUHANI · EDITORIAL</text>
+  <text x="430" y="320" font-family="'Noto Serif KR', serif" font-size="84" font-weight="900" fill="#1a1410" letter-spacing="-2">이수한의원</text>
+  <text x="430" y="400" font-family="'Noto Serif KR', serif" font-size="38" font-weight="700" fill="#33302b" letter-spacing="-1">매일의 건강 이야기</text>
+
+  <!-- 헤어라인 -->
+  <line x1="430" y1="450" x2="1100" y2="450" stroke="#bdb9b1" stroke-width="1"/>
+
+  <text x="430" y="500" font-family="sans-serif" font-size="22" fill="#5c5751">남성역 1번 출구 · 원장 3인이 직접 쓰는 칼럼 1,042편</text>
+  <text x="430" y="560" font-family="sans-serif" font-size="20" font-weight="700" fill="#0a4a45" letter-spacing="4">02 · 584 · 1075</text>
+</svg>

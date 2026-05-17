@@ -1,0 +1,28 @@
+# dependencies
+node_modules/
+**/node_modules/
+
+# build / output
+frontend/.next/
+frontend/out/
+.work/
+infra/cms-api/.work/
+
+# env (환경별, 비밀 가능)
+.env
+.env.local
+.env*.local
+
+# 배포 산출물 / 대용량 생성물
+*.zip
+infra/lambda-chat.zip
+frontend/src/data/blog/embeddings.json
+
+# 비밀
+**/cms-password.txt
+
+# OS / 에디터
+.DS_Store
+*.log
+.idea/
+.vscode/
