@@ -90,6 +90,10 @@ export function sanitizeBody(body: string): string {
   out = out.replace(/<script[\s\S]*?<\/script>/gi, "");
   out = out.replace(/<style[\s\S]*?<\/style>/gi, "");
 
+  // 네이버 SE 에디터가 삽입하는 invisible Unicode 문자 제거 (zero-width space 등)
+  // 이 문자가 <p> 안에 남으면 빈 줄처럼 보이는 단락이 과도하게 생성됨
+  out = out.replace(/[​‌‍﻿­]/g, "");
+
   // 네이버 SE 구조 속성 제거 — class / id / data-* / 인라인 style (img는 위에서 처리됨)
   // data-* 는 여러 개 붙어있을 수 있어 변화가 없을 때까지 반복
   const ATTR_RE = [
@@ -149,6 +153,18 @@ export function sanitizeBody(body: string): string {
   out = out.replace(
     /<p>(?:<(?:span|b|strong)[^>]*>)*(Q\d+[.．、][^<]{4,120})(?:<\/(?:strong|b|span)>)*<\/p>/gi,
     "<h2>$1</h2>",
+  );
+
+  // 숫자. 로 시작하는 섹션 제목형 단락 → h2
+  // "1. 정품 사향이 들어갔는가" 형태. 조건: 2-30자, 마침표 미종결, 콤마 1개 이하
+  out = out.replace(
+    /<p>(?:<(?:span|b|strong)[^>]*>)*(\d{1,2}[.．]\s*[^<]{2,30})(?:<\/(?:strong|b|span)>)*<\/p>/gi,
+    (_m, text) => {
+      const t = text.trim();
+      if (/[.。]$/.test(t)) return `<p>${t}</p>`;
+      if ((t.match(/,/g) || []).length >= 2) return `<p>${t}</p>`;
+      return `<h2>${t}</h2>`;
+    },
   );
 
   return out;
