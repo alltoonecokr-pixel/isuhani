@@ -73,9 +73,9 @@ export function Header({ recentPosts = [] }: { recentPosts?: RecentPost[] }) {
 
         {/* 중: 데스크톱 네비 */}
         <nav className="hidden md:flex items-center gap-1 mx-auto">
-          <NavLink label="건강 저널" href="/" active={isJournal} />
-          <NavDropdown label="진료 영역" items={TREATMENT_ITEMS} active={pathname.startsWith("/treatment")} />
           <NavLink label="병원 소개" href="/home" active={pathname === "/home"} />
+          <NavDropdown label="진료 영역" items={TREATMENT_ITEMS} active={pathname.startsWith("/treatment")} />
+          <NavLink label="건강 저널" href="/journal" active={isJournal} />
           <NavLink label="첫 방문" href="/visit-guide" active={pathname.startsWith("/visit-guide")} />
           <NavLink label="쑤 상담" href="/ask" active={pathname.startsWith("/ask")} badge />
         </nav>
@@ -111,9 +111,9 @@ export function Header({ recentPosts = [] }: { recentPosts?: RecentPost[] }) {
       {open && (
         <div className="md:hidden border-t border-ink-100 bg-white max-h-[80vh] overflow-y-auto">
           <nav className="max-w-container mx-auto px-4 py-2 flex flex-col">
-            <MobileLink label="홈" href="/" onClick={() => setOpen(false)} active={pathname === "/"} />
-            <MobileGroup label="진료 영역" items={TREATMENT_ITEMS} onNavigate={() => setOpen(false)} />
             <MobileLink label="병원 소개" href="/home" onClick={() => setOpen(false)} active={pathname === "/home"} />
+            <MobileGroup label="진료 영역" items={TREATMENT_ITEMS} onNavigate={() => setOpen(false)} />
+            <MobileLink label="건강 저널" href="/journal" onClick={() => setOpen(false)} active={isJournal} />
             <MobileLink label="첫 방문" href="/visit-guide" onClick={() => setOpen(false)} active={pathname.startsWith("/visit-guide")} />
             <MobileLink label="쑤 상담" href="/ask" onClick={() => setOpen(false)} active={pathname.startsWith("/ask")} badge />
             <a
