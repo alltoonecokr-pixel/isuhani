@@ -67,9 +67,12 @@ export function sanitizeBody(body: string): string {
       .replace(/\swidth="[^"]*"/gi, "")
       .replace(/\sheight="[^"]*"/gi, "")
       .replace(/\sstyle="[^"]*"/gi, "")
+      .replace(/\sclass="[^"]*"/gi, "")
+      .replace(/\sid="[^"]*"/gi, "")
       .replace(/\sdata-width="[^"]*"/gi, "")
       .replace(/\sdata-height="[^"]*"/gi, "")
-      .replace(/\sdata-align="[^"]*"/gi, "");
+      .replace(/\sdata-align="[^"]*"/gi, "")
+      .replace(/\sdata-(?!lazy-src)[a-z][a-z0-9\-]*="[^"]*"/gi, "");
     if (w) a += ` style="width:${w}"`;
     if (align) a += ` data-align="${align}"`;
     return `<img${a} referrerpolicy="no-referrer" loading="lazy">`;
@@ -81,6 +84,24 @@ export function sanitizeBody(body: string): string {
   // script / style 제거
   out = out.replace(/<script[\s\S]*?<\/script>/gi, "");
   out = out.replace(/<style[\s\S]*?<\/style>/gi, "");
+
+  // 네이버 SE 구조 속성 제거 — class / id / data-* / 인라인 style (img는 위에서 처리됨)
+  // data-* 는 여러 개 붙어있을 수 있어 변화가 없을 때까지 반복
+  const ATTR_RE = [
+    /\s+class="[^"]*"/gi,
+    /\s+id="[^"]*"/gi,
+    /\s+style="[^"]*"/gi,
+    /\s+data-[a-z][a-z0-9\-]*="[^"]*"/gi,
+  ];
+  out = out.replace(/<((?!img\b)[a-z][a-z0-9]*)(\b[^>]*)>/gi, (_m, tag, attrs) => {
+    let a = attrs;
+    let prev: string;
+    do {
+      prev = a;
+      for (const re of ATTR_RE) a = a.replace(re, "");
+    } while (a !== prev);
+    return `<${tag}${a}>`;
+  });
 
   // 빈 element 제거 (SE2 빈 줄 누적 → 큰 공백)
   for (let i = 0; i < 5; i++) {
