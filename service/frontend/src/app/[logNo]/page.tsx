@@ -171,7 +171,7 @@ export default function PostPage({ params }: { params: { logNo: string } }) {
       )}
       <BlogCategoryBar active={post.category} categories={getCategories()} />
       <article className="bg-white">
-        <div className="max-w-4xl mx-auto px-5 md:px-8 pt-12 md:pt-16 pb-10">
+        <div className="max-w-4xl mx-auto px-5 md:px-8 pt-12 md:pt-16 pb-0">
           <div className="flex items-center justify-between text-[12px] tracking-[0.2em] uppercase">
             <Link
               href="/journal"

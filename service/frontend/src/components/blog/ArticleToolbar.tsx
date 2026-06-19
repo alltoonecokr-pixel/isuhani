@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Facebook, Twitter, Linkedin, Link2, Sparkles, ChevronDown, Printer } from 'lucide-react';
+import { Facebook, Twitter, Linkedin, Link2, Check, Sparkles, ChevronDown, Printer } from 'lucide-react';
 
 interface Props {
   url: string;
@@ -24,7 +24,7 @@ export function ArticleToolbar({ url, title, summaryPoints }: Props) {
   const handleCopy = async () => {
     try { await navigator.clipboard.writeText(url); } catch {}
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), 2200);
   };
 
   const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
@@ -33,90 +33,76 @@ export function ArticleToolbar({ url, title, summaryPoints }: Props) {
 
   return (
     <>
-      {/* ── 툴바 행 ── */}
-      <div
-        className="article-toolbar-row flex items-center justify-between gap-4 py-3 border-y overflow-x-auto my-6"
-        style={{ borderColor: '#e3e8e5', scrollbarWidth: 'none' }}
-      >
-        {/* 왼쪽: 공유 + Summary */}
-        <div className="flex items-center gap-3 whitespace-nowrap">
-          <div className="flex items-center gap-2.5">
-            <a href={fbUrl} target="_blank" rel="noopener noreferrer" className="tbar-btn" title="Facebook">
-              <Facebook size={16} />
-            </a>
-            <a href={twUrl} target="_blank" rel="noopener noreferrer" className="tbar-btn" title="Twitter / X">
-              <Twitter size={16} />
-            </a>
-            <a href={liUrl} target="_blank" rel="noopener noreferrer" className="tbar-btn" title="LinkedIn">
-              <Linkedin size={16} />
-            </a>
-            <button onClick={handleCopy} className="tbar-btn relative" title={copied ? '복사됨!' : '링크 복사'}>
-              <Link2 size={16} />
-              {copied && (
-                <span className="absolute -top-8 left-1/2 -translate-x-1/2 text-[11px] bg-[#2d6e5a] text-white px-2 py-0.5 rounded whitespace-nowrap pointer-events-none">
-                  복사됨!
-                </span>
-              )}
-            </button>
-          </div>
+      {/* ── 툴바 ── */}
+      <div className="article-toolbar-row">
+        {/* 왼쪽 */}
+        <div className="tbar-left">
+          {/* 링크 복사 — 아이콘 스왑으로 잘림 없이 피드백 */}
+          <button
+            onClick={handleCopy}
+            className={`tbar-icon-btn${copied ? ' tbar-icon-btn--active' : ''}`}
+            title="링크 복사"
+            aria-label="링크 복사"
+          >
+            {copied ? <Check size={15} strokeWidth={2.5} /> : <Link2 size={15} />}
+          </button>
+
+          <span className="tbar-sep" />
+
+          {/* 소셜 공유 */}
+          <a href={fbUrl} target="_blank" rel="noopener noreferrer" className="tbar-icon-btn" title="Facebook 공유">
+            <Facebook size={15} />
+          </a>
+          <a href={twUrl} target="_blank" rel="noopener noreferrer" className="tbar-icon-btn" title="X(트위터) 공유">
+            <Twitter size={15} />
+          </a>
+          <a href={liUrl} target="_blank" rel="noopener noreferrer" className="tbar-icon-btn" title="LinkedIn 공유">
+            <Linkedin size={15} />
+          </a>
 
           {hasSummary && (
             <>
-              <span className="text-[#ddd] select-none">|</span>
+              <span className="tbar-sep" />
               <button
                 onClick={() => setSummaryOpen(v => !v)}
-                className="tbar-btn flex items-center gap-1.5"
+                className={`tbar-summary-btn${summaryOpen ? ' open' : ''}`}
                 aria-expanded={summaryOpen}
-                aria-label="AI Summary"
+                aria-label="요약 보기"
               >
-                <Sparkles size={15} />
-                <span className="text-[13px] font-medium">Summary</span>
-                <ChevronDown
-                  size={15}
-                  style={{
-                    transform: summaryOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                    transition: 'transform 0.2s ease',
-                  }}
-                />
+                <Sparkles size={13} />
+                <span>요약</span>
+                <ChevronDown size={13} className="tbar-chevron" />
               </button>
             </>
           )}
         </div>
 
-        {/* 오른쪽: 폰트 크기 + 인쇄 */}
-        <div className="flex items-center gap-2 whitespace-nowrap">
-          <div
-            className="flex items-center border rounded overflow-hidden"
-            style={{ borderColor: '#e3e8e5' }}
-          >
+        {/* 오른쪽 */}
+        <div className="tbar-right">
+          <div className="tbar-fontsize">
             {[0, 1, 2].map((i) => (
               <button
                 key={i}
                 onClick={() => setFs(i)}
-                className="px-2 py-1 transition-colors"
-                style={{
-                  fontSize: ['11px', '13px', '15px'][i],
-                  color: fs === i ? '#2d6e5a' : '#bbb',
-                  fontWeight: fs === i ? 700 : 400,
-                }}
+                className={`tbar-fs-btn${fs === i ? ' active' : ''}`}
                 title={['작게', '보통', '크게'][i]}
                 aria-label={['Small font size', 'Medium font size', 'Large font size'][i]}
+                style={{ fontSize: ['11px', '13px', '16px'][i] }}
               >A</button>
             ))}
           </div>
           <button
             onClick={() => window.print()}
-            className="tbar-btn p-1.5 border rounded"
-            style={{ borderColor: '#e3e8e5' }}
+            className="tbar-icon-btn"
             title="인쇄"
-            aria-label="Print article"
+            aria-label="인쇄"
           >
             <Printer size={15} />
           </button>
         </div>
       </div>
 
-      {/* ── 핵심 요약 박스 (Summary 버튼으로 토글) ── */}
+      {/* ── 요약 박스 ── */}
       {hasSummary && summaryOpen && (
         <div className="article-summary" aria-label="핵심 요약">
           <div className="article-summary-label">이 글의 핵심</div>

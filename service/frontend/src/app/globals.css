@@ -484,62 +484,151 @@ a {
   flex-shrink: 0;
 }
 
-/* ── 아티클 툴바 — naver-body serif 상속 차단 ── */
+/* ── 아티클 툴바 ── */
+/* naver-body serif 상속 차단 */
 .naver-body .article-toolbar-row,
 .naver-body .article-toolbar-row * {
   font-family: var(--font-noto-kr), "Noto Sans KR", sans-serif !important;
   letter-spacing: 0 !important;
-  line-height: 1.4 !important;
+  line-height: 1 !important;
 }
-.tbar-btn {
+.article-toolbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.625rem 0;
+  margin: 1rem 0 1.25rem;
+  border-top: 1px solid #e8e4df;
+  border-bottom: 1px solid #e8e4df;
+}
+.tbar-left  { display: flex; align-items: center; gap: 0.5rem; }
+.tbar-right { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+
+/* 구분선 */
+.tbar-sep {
+  display: inline-block;
+  width: 1px;
+  height: 14px;
+  background: #ddd8d2;
+  margin: 0 0.25rem;
+  flex-shrink: 0;
+}
+
+/* 아이콘 버튼 공통 */
+.tbar-icon-btn {
   display: inline-flex;
   align-items: center;
-  color: #999;
-  transition: color 0.15s;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  color: #b0a89e;
+  transition: color 0.15s, background 0.15s;
 }
-.tbar-btn:hover { color: #2d6e5a; }
+.tbar-icon-btn:hover { color: #2d6e5a; background: #f0f7f4; }
+.tbar-icon-btn--active { color: #2d6e5a !important; }
+
+/* 요약 버튼 */
+.tbar-summary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem 0.3rem 0.6rem;
+  border-radius: 99px;
+  border: 1px solid #d4e4dc;
+  background: #f5fbf8;
+  color: #4a8c72;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.tbar-summary-btn:hover { background: #e8f5ee; border-color: #b0d4c0; color: #2d6e5a; }
+.tbar-summary-btn.open  { background: #2d6e5a; border-color: #2d6e5a; color: #fff; }
+.tbar-summary-btn.open:hover { background: #246058; }
+.tbar-chevron {
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tbar-summary-btn.open .tbar-chevron { transform: rotate(180deg); }
+
+/* 폰트 크기 컨트롤 */
+.tbar-fontsize {
+  display: flex;
+  align-items: baseline;
+  gap: 0.1rem;
+  padding: 0 0.25rem;
+}
+.tbar-fs-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 5px;
+  color: #c8c0b8;
+  font-weight: 500;
+  transition: color 0.15s, background 0.15s;
+}
+.tbar-fs-btn:hover { color: #4a8c72; }
+.tbar-fs-btn.active { color: #2d6e5a; font-weight: 700; }
 
 /* ── 핵심 요약 박스 ── */
 .article-summary {
-  margin: 0 0 2.75rem;
-  padding: 1.375rem 1.625rem 1.375rem 1.75rem;
+  margin: 0 0 2.5rem;
+  padding: 1.25rem 1.5rem 1.25rem 1.375rem;
+  border: 1px solid #d8ede3;
   border-left: 3px solid #2d6e5a;
-  background: linear-gradient(135deg, #f3f8f5 0%, #f9fdfb 100%);
-  border-radius: 0 10px 10px 0;
+  background: #f6fbf8;
+  border-radius: 0 8px 8px 0;
 }
 .article-summary-label {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
   font-size: 0.6875rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   color: #2d6e5a;
-  margin-bottom: 0.875rem;
+  margin-bottom: 0.75rem;
   font-family: var(--font-noto-kr), sans-serif !important;
+}
+.article-summary-label::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 1px;
+  background: #2d6e5a;
+  flex-shrink: 0;
 }
 .article-summary ul {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 .article-summary li {
   position: relative;
-  padding: 0.3rem 0 0.3rem 1.25rem;
-  font-size: 0.9375rem;
-  line-height: 1.65;
-  color: #222;
+  padding: 0.45rem 0 0.45rem 1.125rem;
+  font-size: 0.9125rem;
+  line-height: 1.6;
+  color: #2a2a2a;
   font-family: var(--font-noto-serif-kr), serif !important;
+  border-bottom: 1px solid rgba(45, 110, 90, 0.07);
 }
-.article-summary li + li {
-  border-top: 1px solid rgba(45, 110, 90, 0.08);
-}
+.article-summary li:last-child { border-bottom: none; }
 .article-summary li::before {
   content: "";
   position: absolute;
   left: 0;
-  top: 0.72rem;
-  width: 5px;
-  height: 5px;
+  top: 0.78rem;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
   background: #2d6e5a;
+  opacity: 0.7;
 }
 
