@@ -294,6 +294,7 @@ function BlogIndexView({
                 <p className="mt-2 text-[15px] text-ink-500">{categoryTagline(activeCat)}</p>
               </header>
               {showHero && main && <CleanHero post={main} />}
+              {showHero && gridItems.length > 0 && <GridDivider count={catItems.length} />}
               <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ${gridGap}`}>
                 {gridItems.map((p) => (
                   <CleanCard key={p.logNo} post={p} />
@@ -404,6 +405,7 @@ function BlogIndexView({
         <section className="bg-white">
           <div className="max-w-container mx-auto px-4 md:px-8 py-10 md:py-14">
             {showHero && main && <CleanHero post={main} />}
+            {showHero && pageItems.length > 0 && <GridDivider count={gridPosts.length} />}
             <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ${gridGap}`}>
               {pageItems.map((p) => (
                 <CleanCard key={p.logNo} post={p} />
@@ -770,45 +772,45 @@ function CategorySection({
   );
 }
 
-/* ── signals식 카테고리 칩 (v2) ── */
+/* ── 카테고리 칩 — 배경 없이 텍스트만 (Toss/Japanese premium) ── */
 function CategoryChip({ label }: { label: string }) {
   return (
-    <span className="inline-flex items-center self-start rounded-md px-2.5 py-1 text-[11px] font-semibold tracking-[0.01em] bg-herb-50 text-herb-700">
+    <span className="text-[10.5px] font-bold tracking-[0.14em] text-herb-600 uppercase">
       {label}
     </span>
   );
 }
 
-/* ── signals식 피처 히어로 (v2) — 이미지 60% + 텍스트 40% 가로 ── */
+/* ── 피처 히어로 — 이미지 58% + 텍스트 42% ── */
 function CleanHero({ post }: { post: IndexPost }) {
   return (
-    <article className="group mb-10 md:mb-12">
+    <article className="group mb-8 md:mb-10">
       <Link
         href={`/${post.logNo}`}
-        className="flex flex-col md:flex-row gap-6 md:gap-8 rounded-3xl overflow-hidden"
+        className="flex flex-col md:flex-row gap-6 md:gap-10"
       >
         {post.thumbnail && (
-          <div className="w-full md:w-[58%] aspect-[3/2] overflow-hidden rounded-2xl bg-ink-50">
+          <div className="w-full md:w-[58%] aspect-[16/10] overflow-hidden rounded-2xl bg-ink-50">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={post.thumbnail}
               alt={post.title}
               referrerPolicy="no-referrer"
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
               loading="eager"
               decoding="async"
             />
           </div>
         )}
-        <div className="w-full md:w-[42%] flex flex-col justify-center">
+        <div className="w-full md:w-[42%] flex flex-col justify-center py-2">
           <CategoryChip label={post.category} />
-          <h2 className="mt-4 font-serif text-[24px] md:text-[30px] font-bold tracking-[-0.025em] text-ink-900 group-hover:text-herb-700 transition-colors leading-[1.3]">
+          <h2 className="mt-3 font-serif text-[22px] md:text-[28px] font-bold tracking-[-0.025em] text-ink-900 group-hover:text-herb-700 transition-colors leading-[1.32]">
             {post.title}
           </h2>
-          <p className="mt-3 text-[14px] md:text-[15px] text-ink-600 leading-[1.7] line-clamp-3">
+          <p className="mt-3 text-[13.5px] text-ink-500 leading-[1.75] line-clamp-4">
             {post.excerpt}
           </p>
-          <div className="mt-5 text-[12px] text-ink-400 tabular-nums">
+          <div className="mt-5 text-[11.5px] text-ink-400 tabular-nums">
             {post.dateLabel}
           </div>
         </div>
@@ -817,16 +819,27 @@ function CleanHero({ post }: { post: IndexPost }) {
   );
 }
 
-/* ── signals식 contained 카드 (v2 공용) — 둥근 모서리·옅은 섀도·hover 리프트 ── */
+/* ── 그리드 구분선 — 히어로 아래, 카드 목록 위 ── */
+function GridDivider({ count }: { count: number }) {
+  return (
+    <div className="flex items-center gap-3 mb-7 mt-1 border-t border-ink-100 pt-7">
+      <span className="text-[10px] font-bold tracking-[0.22em] text-ink-400 uppercase shrink-0">최신 칼럼</span>
+      <div className="flex-1 h-px bg-ink-100" />
+      <span className="text-[10px] text-ink-300 tabular-nums shrink-0">{count}편</span>
+    </div>
+  );
+}
+
+/* ── 카드 — 테두리 없이 shadow only, hover 리프트 ── */
 function CleanCard({ post }: { post: IndexPost }) {
   return (
     <article className="group h-full">
       <Link
         href={`/${post.logNo}`}
-        className="flex flex-col h-full rounded-2xl bg-white overflow-hidden border border-ink-200 hover:border-herb-500 shadow-[0_2px_12px_0_rgba(26,20,16,0.05)] hover:shadow-[0_10px_28px_0_rgba(26,20,16,0.10)] transition-all duration-300"
+        className="flex flex-col h-full rounded-xl bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.05),0_4px_16px_rgba(0,0,0,0.04)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.10)] transition-shadow duration-300"
       >
         {post.thumbnail ? (
-          <div className="aspect-[3/2] overflow-hidden bg-ink-50">
+          <div className="aspect-[16/10] overflow-hidden bg-ink-50">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={post.thumbnail}
@@ -837,19 +850,19 @@ function CleanCard({ post }: { post: IndexPost }) {
             />
           </div>
         ) : (
-          <div className="aspect-[3/2] flex items-center justify-center bg-herb-50">
-            <span className="font-serif text-6xl font-black text-herb-200">醫</span>
+          <div className="aspect-[16/10] flex items-center justify-center bg-herb-50">
+            <span className="font-serif text-5xl font-black text-herb-200">醫</span>
           </div>
         )}
-        <div className="flex flex-1 flex-col p-5">
+        <div className="flex flex-1 flex-col p-4 md:p-5">
           <CategoryChip label={post.category} />
-          <h3 className="mt-3 font-serif text-[18px] font-bold tracking-[-0.02em] text-ink-900 group-hover:text-herb-700 transition-colors leading-[1.35] line-clamp-2">
+          <h3 className="mt-2 font-serif text-[17px] font-bold tracking-[-0.02em] text-ink-900 group-hover:text-herb-700 transition-colors leading-[1.38] line-clamp-2">
             {post.title}
           </h3>
-          <p className="mt-2 text-[13px] text-ink-600 leading-[1.65] line-clamp-2 flex-1">
+          <p className="mt-2 text-[12.5px] text-ink-500 leading-[1.65] line-clamp-2 flex-1">
             {post.excerpt}
           </p>
-          <div className="mt-4 text-[12px] text-ink-400 tabular-nums">
+          <div className="mt-4 text-[11.5px] text-ink-400 tabular-nums">
             {post.dateLabel}
           </div>
         </div>
