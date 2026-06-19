@@ -93,6 +93,37 @@ export function sanitizeBody(body: string): string {
     "",
   );
 
+  // ── oglink 카드 처리 ─────────────────────────────────────────────────────────
+  // ATTR_RE 전에 class 감지 → HTML 주석 플레이스홀더로 변환 → ATTR_RE 후 최종 HTML 삽입
+  // (플레이스홀더는 ATTR_RE 대상이 아닌 HTML 주석이라 class가 보존됨)
+
+  // 1단계: oglink 직전의 중복 URL 텍스트 단락 제거 (작성자가 URL을 텍스트+카드 두 번 삽입한 경우)
+  out = out.replace(
+    /<p\b[^>]*>\s*(?:<span\b[^>]*>\s*)?<a\b[^>]*class="se-link"[^>]*>https?:\/\/[^<]{3,300}<\/a>\s*(?:<\/span>\s*)?<\/p>/gi,
+    (whole) => {
+      // 이 단락 뒤에 (최대 1500자 내) oglink 컴포넌트가 있으면 단락 제거
+      const afterP = out.indexOf(whole);
+      const tail = afterP >= 0 ? out.slice(afterP + whole.length, afterP + whole.length + 1500) : "";
+      return /class="[^"]*se-oglink/.test(tail) ? "" : whole;
+    },
+  );
+
+  // 2단계: oglink 컴포넌트 → 주석 플레이스홀더 (ATTR_RE가 class를 지우기 전에 데이터 추출)
+  out = out.replace(
+    /<div[^>]+class="[^"]*se-component[^"]*se-oglink[^"]*"[\s\S]*?<\/script>\s*<\/div>/gi,
+    (m) => {
+      const hrefRaw = (m.match(/\bhref="([^"]+)"/) || [])[1];
+      if (!hrefRaw) return "";
+      const titleRaw = (m.match(/class="se-oglink-title"[^>]*>([\s\S]*?)<\/(?:strong|p|div)>/i) || [])[1] || "";
+      const title = titleRaw.replace(/<[^>]+>/g, "").trim();
+      const domainRaw = (m.match(/class="se-oglink-url"[^>]*>([^<]+)</) || [])[1] || "";
+      const domain = domainRaw.trim();
+      const label = title || domain || hrefRaw;
+      // 데이터를 URI 인코딩해 주석에 저장 (ATTR_RE에서 안전)
+      return `<!--OGLINK:${encodeURIComponent(hrefRaw)}:${encodeURIComponent(label)}:${encodeURIComponent(domain)}-->`;
+    },
+  );
+
   // script / style 제거
   out = out.replace(/<script[\s\S]*?<\/script>/gi, "");
   out = out.replace(/<style[\s\S]*?<\/style>/gi, "");
@@ -142,18 +173,6 @@ export function sanitizeBody(body: string): string {
     "",
   );
 
-  // 외부 링크 카드(oglink) → 깔끔한 anchor로 교체
-  out = out.replace(
-    /<div[^>]*class="[^"]*se-oglink[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>/gi,
-    (m) => {
-      const titleMatch = m.match(/class="se-oglink-title"[^>]*>([^<]+)</);
-      const urlMatch = m.match(/href="([^"]+)"/);
-      if (titleMatch && urlMatch)
-        return `<p><a href="${urlMatch[1]}" target="_blank" rel="noopener">${titleMatch[1]}</a></p>`;
-      return "";
-    },
-  );
-
   // Q숫자. 로 시작하는 단락 → h2 (헤딩 구조 + Google 추천 스니펫 최적화)
   // Naver HTML은 Q1. 텍스트가 <p><span><b>Q1. ...</b></span></p> 구조로 오므로
   // 내부 인라인 태그(span/b/strong)를 통과하는 패턴 사용
@@ -171,6 +190,18 @@ export function sanitizeBody(body: string): string {
       if (/[.。]$/.test(t)) return `<p>${t}</p>`;
       if ((t.match(/,/g) || []).length >= 2) return `<p>${t}</p>`;
       return `<h2>${t}</h2>`;
+    },
+  );
+
+  // 마지막 단계: oglink 플레이스홀더 → 최종 link-card HTML (ATTR_RE 이후라 class 보존됨)
+  out = out.replace(
+    /<!--OGLINK:([^:>]*):([^:>]*):([^->]*)-->/g,
+    (_m, hrefEnc, labelEnc, domainEnc) => {
+      const hrefRaw = decodeURIComponent(hrefEnc);
+      const label = decodeURIComponent(labelEnc);
+      const domain = decodeURIComponent(domainEnc);
+      if (!hrefRaw) return "";
+      return `<div class="link-card"><a href="${hrefRaw}" target="_blank" rel="noopener noreferrer"><span class="link-card-label">${label}</span>${domain ? `<span class="link-card-domain">${domain}</span>` : ""}</a></div>`;
     },
   );
 
