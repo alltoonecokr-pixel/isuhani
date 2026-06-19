@@ -75,6 +75,11 @@ export function sanitizeBody(body: string): string {
       .replace(/\sdata-(?!lazy-src)[a-z][a-z0-9\-]*="[^"]*"/gi, "");
     if (w) a += ` style="width:${w}"`;
     if (align) a += ` data-align="${align}"`;
+    // alt 없거나 빈값이면 기본 설명 삽입 (Google 이미지 검색 최적화)
+    if (!/\salt="[^"]+"/i.test(a)) {
+      a = a.replace(/\salt=""/gi, "");
+      a += ` alt="이수한의원 건강 칼럼 이미지"`;
+    }
     return `<img${a} referrerpolicy="no-referrer" loading="lazy">`;
   });
 
@@ -138,5 +143,42 @@ export function sanitizeBody(body: string): string {
     },
   );
 
+  // Q숫자. 로 시작하는 단락 → h2 (헤딩 구조 + Google 추천 스니펫 최적화)
+  // Naver HTML은 Q1. 텍스트가 <p><span><b>Q1. ...</b></span></p> 구조로 오므로
+  // 내부 인라인 태그(span/b/strong)를 통과하는 패턴 사용
+  out = out.replace(
+    /<p>(?:<(?:span|b|strong)[^>]*>)*(Q\d+[.．、][^<]{4,120})(?:<\/(?:strong|b|span)>)*<\/p>/gi,
+    "<h2>$1</h2>",
+  );
+
   return out;
+}
+
+/**
+ * 본문 HTML에서 Q숫자. / A : 패턴의 FAQ 쌍을 추출한다.
+ * FAQPage JSON-LD 생성에 사용.
+ */
+export function extractFAQs(body: string): Array<{ question: string; answer: string }> {
+  const text = body
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&[a-z#0-9]+;/gi, (m) => HTML_ENTITIES[m] ?? " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const parts = text.split(/\bQ\d+[.．、]\s*/);
+  const faqs: Array<{ question: string; answer: string }> = [];
+
+  for (let i = 1; i < parts.length; i++) {
+    const part = parts[i];
+    const aIdx = part.search(/\bA\s*[:：]\s*/);
+    if (aIdx === -1) continue;
+    const q = part.slice(0, aIdx).trim();
+    const rawA = part.slice(aIdx).replace(/\bA\s*[:：]\s*/, "").trim();
+    const a = rawA.split(/\bQ\d+[.．、]/)[0].trim().slice(0, 500);
+    if (q.length > 3 && a.length > 10) {
+      faqs.push({ question: q, answer: a });
+    }
+  }
+  return faqs;
 }

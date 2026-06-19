@@ -7,7 +7,7 @@ import { cleanImageUrl, extractThumbnail } from "./images";
 import { decodeEntities } from "./sanitize";
 
 export { cleanImageUrl } from "./images";
-export { sanitizeBody, decodeEntities } from "./sanitize";
+export { sanitizeBody, decodeEntities, extractFAQs } from "./sanitize";
 
 // ── 타입 ─────────────────────────────────────────────────────────────────────
 

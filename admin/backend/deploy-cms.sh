@@ -332,7 +332,7 @@ ensure_lambda_env() {
 
   "${AWS[@]}" lambda update-function-configuration \
     --function-name "$LAMBDA_NAME" \
-    --environment "Variables={BUCKET=$DATA_BUCKET,BUILD_PROJECT=$BUILD_PROJECT,POSTS_TABLE=$POSTS_TABLE,CMS_USER=$CMS_USER,CMS_PASSWORD=$pw}" \
+    --environment "Variables={BUCKET=$DATA_BUCKET,WEB_BUCKET=$SITE_BUCKET,BUILD_PROJECT=$BUILD_PROJECT,POSTS_TABLE=$POSTS_TABLE,CMS_USER=$CMS_USER,CMS_PASSWORD=$pw}" \
     >/dev/null
   "${AWS[@]}" lambda wait function-updated --function-name "$LAMBDA_NAME"
 }

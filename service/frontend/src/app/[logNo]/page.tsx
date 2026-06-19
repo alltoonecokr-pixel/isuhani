@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowLeft, ExternalLink } from "lucide-react";
-import { getAllPosts, getCategories, getPostByLogNo, makeExcerpt, sanitizeBody } from "@/lib/blog";
+import { getAllPosts, getCategories, getPostByLogNo, makeExcerpt, sanitizeBody, extractFAQs } from "@/lib/blog";
 import { BlogCategoryBar } from "@/components/blog/BlogCategoryBar";
 import { SITE_URL } from "@/lib/site";
 
@@ -55,7 +55,7 @@ export function generateMetadata({ params }: { params: { logNo: string } }): Met
   const excerpt = (post.ogDesc as string | undefined) || makeExcerpt(post, 160);
   const publishedTime = post.date ? `${post.date}T00:00:00+09:00` : undefined;
   return {
-    title: `${post.title} — 이수한의원`,
+    title: post.title,
     description: excerpt,
     alternates: { canonical: url },
     openGraph: {
@@ -133,6 +133,17 @@ export default function PostPage({ params }: { params: { logNo: string } }) {
     ],
   };
 
+  const faqs = post.body ? extractFAQs(post.body) : [];
+  const faqLd = faqs.length >= 2 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map(({ question, answer }) => ({
+      "@type": "Question",
+      name: question,
+      acceptedAnswer: { "@type": "Answer", text: answer },
+    })),
+  } : null;
+
   return (
     <>
       <script
@@ -143,6 +154,12 @@ export default function PostPage({ params }: { params: { logNo: string } }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
+      {faqLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        />
+      )}
       <BlogCategoryBar active={post.category} categories={getCategories()} />
       <article className="bg-white">
         <div className="max-w-4xl mx-auto px-5 md:px-8 pt-12 md:pt-16 pb-10">
