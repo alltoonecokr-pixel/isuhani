@@ -128,6 +128,12 @@ export function sanitizeBody(body: string): string {
   out = out.replace(/<script[\s\S]*?<\/script>/gi, "");
   out = out.replace(/<style[\s\S]*?<\/style>/gi, "");
 
+  // 네이버 SE-TEXT 주석 제거 (<!-- SE-TEXT { --> · <!-- } SE-TEXT -->)
+  out = out.replace(/<!--\s*(?:SE-TEXT \{|\} SE-TEXT)\s*-->/g, "");
+
+  // **text** → <strong>text</strong> (마크다운 볼드가 HTML로 미변환된 경우)
+  out = out.replace(/\*\*([^*\n]{1,200})\*\*/g, "<strong>$1</strong>");
+
   // 네이버 SE 에디터가 삽입하는 invisible Unicode 문자 제거 (zero-width space 등)
   // 이 문자가 <p> 안에 남으면 빈 줄처럼 보이는 단락이 과도하게 생성됨
   out = out.replace(/[​‌‍﻿­]/g, "");
