@@ -288,18 +288,19 @@ export function ChatDock() {
             )}
           </div>
 
-          {/* 입력 영역 — 둥근 알약 */}
-          <div className="px-4 pb-4 pt-2 bg-paper border-t border-ink-100">
+          {/* 입력 영역 */}
+          <div className="px-4 pb-5 pt-3 bg-white border-t border-ink-100">
             <a
               href="tel:0285841075"
-              className="flex items-center justify-center gap-1.5 mb-3 text-[11px] tracking-[0.2em] uppercase text-herb-700 hover:text-ink-900 font-bold transition-colors"
+              className="flex items-center justify-center gap-1.5 mb-3 text-[11px] text-ink-400 hover:text-herb-700 font-medium transition-colors"
             >
               <Phone size={11} />
               직접 통화 02-584-1075
             </a>
+            {/* border 항상 존재 → focus 시 색만 변경, layout shift 없음 */}
             <form
               onSubmit={onSubmit}
-              className="relative flex items-center bg-paper-100 rounded-full pr-1.5 pl-5 focus-within:ring-2 focus-within:ring-herb-700 transition-all"
+              className="flex items-center gap-2 bg-ink-50 rounded-2xl px-4 border border-ink-100 focus-within:border-herb-600 transition-colors"
             >
               <input
                 ref={inputRef}
@@ -307,15 +308,15 @@ export function ChatDock() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="쑤에게 무엇이든 물어보세요"
-                className="flex-1 bg-transparent outline-none border-0 py-3 text-[14px] text-ink-900 placeholder:text-ink-400"
+                className="flex-1 bg-transparent outline-none border-0 py-3.5 text-[14px] text-ink-900 placeholder:text-ink-400 min-w-0"
               />
               <button
                 type="submit"
                 aria-label="보내기"
                 disabled={!input.trim() || pending}
-                className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-ink-900 text-white hover:bg-herb-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
+                className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-ink-900 text-white hover:bg-herb-700 transition-colors disabled:opacity-25 disabled:cursor-not-allowed shrink-0 my-1.5"
               >
-                <ArrowUp size={16} strokeWidth={2.5} />
+                <ArrowUp size={15} strokeWidth={2.5} />
               </button>
             </form>
           </div>
