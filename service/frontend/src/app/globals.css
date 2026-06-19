@@ -229,6 +229,27 @@ a {
   }
 }
 
+/* ── 읽기 진행 바 (CSS scroll timeline) ── */
+@keyframes reading-fill {
+  to { transform: scaleX(1); }
+}
+.reading-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  transform-origin: left center;
+  transform: scaleX(0);
+  background: linear-gradient(to right, #2d6e5a, #7ec8a0);
+  z-index: 300;
+  animation: reading-fill linear;
+  animation-timeline: scroll(root block);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reading-progress-bar { display: none; }
+}
+
 /* ── 본문 이미지 스크롤 reveal 모션 ── */
 @keyframes img-rise {
   from { opacity: 0; transform: translateY(20px) scale(0.98); }
@@ -245,10 +266,26 @@ a {
 
 /* ── 네이버 블로그 본문 정제 ── */
 .naver-body {
+  font-family: var(--font-noto-serif-kr), "Noto Serif KR", Georgia, serif;
   font-size: 18px;
-  line-height: 1.85;
-  letter-spacing: -0.005em;
-  color: #1f1f1f;
+  line-height: 1.9;
+  letter-spacing: 0em;
+  color: #1e1e1e;
+}
+/* 드롭캡 + 리드 문단 */
+.naver-body p.article-lead {
+  font-size: 1.1rem;
+  line-height: 2;
+  color: #1a1a1a;
+}
+.naver-body p.article-lead::first-letter {
+  float: left;
+  font-size: 4.25rem;
+  line-height: 0.78;
+  margin: 0.06em 0.14em 0 0;
+  font-family: var(--font-noto-serif-kr), serif;
+  font-weight: 900;
+  color: #2d6e5a;
 }
 .naver-body video,
 .naver-body iframe {

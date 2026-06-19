@@ -153,6 +153,7 @@ export default function PostPage({ params }: { params: { logNo: string } }) {
 
   return (
     <>
+      <div className="reading-progress-bar" aria-hidden="true" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

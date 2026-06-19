@@ -211,6 +211,9 @@ export function sanitizeBody(body: string): string {
     },
   );
 
+  // 첫 번째 텍스트 단락에 article-lead 클래스 추가 (드롭캡·리드인용, ATTR_RE 이후라 class 보존)
+  out = out.replace(/<p>/, '<p class="article-lead">');
+
   return out;
 }
 
