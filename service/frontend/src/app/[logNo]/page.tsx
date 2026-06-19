@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowLeft, ExternalLink } from "lucide-react";
-import { getAllPosts, getCategories, getPostByLogNo, makeExcerpt, sanitizeBody, extractFAQs } from "@/lib/blog";
+import { getAllPosts, getCategories, getPostByLogNo, makeExcerpt, sanitizeBody, extractFAQs, extractSummaryPoints } from "@/lib/blog";
 import { BlogCategoryBar } from "@/components/blog/BlogCategoryBar";
 import { SITE_URL } from "@/lib/site";
 
@@ -209,7 +209,23 @@ export default function PostPage({ params }: { params: { logNo: string } }) {
 
         {post.body ? (
           <div className="max-w-4xl mx-auto px-5 md:px-8 pb-16 md:pb-24 naver-body article-leadin">
-            <div dangerouslySetInnerHTML={{ __html: sanitizeBody(post.body) }} />
+            {(() => {
+              const html = sanitizeBody(post.body);
+              const points = extractSummaryPoints(html);
+              return (
+                <>
+                  {points.length >= 2 && (
+                    <div className="article-summary" aria-label="핵심 요약">
+                      <div className="article-summary-label">이 글의 핵심</div>
+                      <ul>
+                        {points.map((pt, i) => <li key={i}>{pt}</li>)}
+                      </ul>
+                    </div>
+                  )}
+                  <div dangerouslySetInnerHTML={{ __html: html }} />
+                </>
+              );
+            })()}
           </div>
         ) : (
           <div className="max-w-4xl mx-auto px-5 md:px-8 pb-16 text-ink-500">

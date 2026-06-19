@@ -218,6 +218,34 @@ export function sanitizeBody(body: string): string {
 }
 
 /**
+ * 정제된 HTML에서 핵심 요약 포인트를 추출한다.
+ * 1순위: h2 헤딩 목록 (Q1./숫자. 패턴 등 자동 변환된 것)
+ * 2순위: 첫 단락 주요 문장 2-3개
+ */
+export function extractSummaryPoints(sanitizedHtml: string): string[] {
+  // h2 헤딩 추출
+  const headings: string[] = [];
+  const h2Re = /<h2>([\s\S]*?)<\/h2>/gi;
+  let m: RegExpExecArray | null;
+  while ((m = h2Re.exec(sanitizedHtml)) !== null && headings.length < 6) {
+    const text = m[1].replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+    if (text.length >= 4) headings.push(text);
+  }
+  if (headings.length >= 2) return headings.slice(0, 5);
+
+  // fallback: 첫 단락 문장 분리
+  const pMatch = sanitizedHtml.match(/<p[^>]*>([\s\S]*?)<\/p>/i);
+  if (!pMatch) return [];
+  const raw = pMatch[1].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  // 마침표·느낌표·물음표 기준으로 문장 분리
+  const parts = raw.split(/(?<=[.。!?！？])\s+/);
+  return parts
+    .map((s) => s.trim())
+    .filter((s) => s.length >= 15)
+    .slice(0, 3);
+}
+
+/**
  * 본문 HTML에서 Q숫자. / A : 패턴의 FAQ 쌍을 추출한다.
  * FAQPage JSON-LD 생성에 사용.
  */
