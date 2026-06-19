@@ -43,6 +43,7 @@ export type BlogPost = {
   thumbnail: string | null;
   images: string[];
   externalUrl: string;
+  summary?: string[] | null;
 };
 
 // ── 카테고리 매핑 (네이버 레거시 categoryNo → 표시 이름) ────────────────────
@@ -118,6 +119,7 @@ export function getAllPosts(): BlogPost[] {
           ogDesc: raw.meta?.ogDesc || null,
           images: raw.images || [],
           externalUrl: `https://blog.naver.com/isuhani/${raw.logNo}`,
+          summary: (raw.meta as Record<string, unknown>)?.summary as string[] | null ?? null,
         } as BlogPost;
       } catch {
         return null;

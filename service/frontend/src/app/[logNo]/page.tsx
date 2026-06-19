@@ -212,7 +212,9 @@ export default function PostPage({ params }: { params: { logNo: string } }) {
           <div className="max-w-4xl mx-auto px-5 md:px-8 pb-16 md:pb-24 naver-body article-leadin">
             {(() => {
               const html = sanitizeBody(post.body);
-              const points = extractSummaryPoints(html);
+              const points = (post.summary && post.summary.length >= 2)
+                ? post.summary
+                : extractSummaryPoints(html);
               return (
                 <>
                   <ArticleToolbar url={postUrl} title={post.title} summaryPoints={points} />
