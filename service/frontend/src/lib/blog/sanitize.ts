@@ -86,6 +86,13 @@ export function sanitizeBody(body: string): string {
   // 빈 src 이미지 제거
   out = out.replace(/<img[^>]+src=""[^>]*>/gi, "");
 
+  // 구형 Naver 이미지(2010~2015 날짜경로, 예: /20101122_96/...) 제거
+  // 이 URL들은 Naver CDN에서 삭제돼 ~1KB 에러 이미지 반환 — 제거가 낫다
+  out = out.replace(
+    /<img[^>]+src="https?:\/\/[a-z0-9.\-]*pstatic\.net\/20\d{6}_[^"]*"[^>]*>/gi,
+    "",
+  );
+
   // script / style 제거
   out = out.replace(/<script[\s\S]*?<\/script>/gi, "");
   out = out.replace(/<style[\s\S]*?<\/style>/gi, "");
