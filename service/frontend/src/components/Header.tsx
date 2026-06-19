@@ -146,12 +146,20 @@ function NavLink({
     <Link
       href={href}
       className={[
-        "inline-flex items-center h-16 px-3 text-[13.5px] font-semibold tracking-[-0.01em] transition-colors",
+        "relative inline-flex items-center h-16 px-3 text-[13.5px] font-semibold tracking-[-0.01em] transition-colors",
         active ? "text-ink-900" : "text-ink-600 hover:text-ink-900",
       ].join(" ")}
     >
-      <span className={active ? "border-b-2 border-herb-700 pb-px" : ""}>{label}</span>
+      {label}
       {badge && <NewPing />}
+      {/* 텍스트와 독립된 absolute 언더라인 — 텍스트 위치 절대 불변 */}
+      <span
+        aria-hidden
+        className={[
+          "absolute bottom-0 left-0 right-0 h-[2px] rounded-full transition-opacity duration-200",
+          active ? "bg-herb-700 opacity-100" : "opacity-0",
+        ].join(" ")}
+      />
     </Link>
   );
 }
@@ -171,12 +179,19 @@ function NavDropdown({
       <button
         type="button"
         className={[
-          "inline-flex items-center gap-1 h-16 px-3 text-[13.5px] font-semibold tracking-[-0.01em] transition-colors",
+          "relative inline-flex items-center gap-1 h-16 px-3 text-[13.5px] font-semibold tracking-[-0.01em] transition-colors",
           active ? "text-ink-900" : "text-ink-600 group-hover:text-ink-900",
         ].join(" ")}
       >
         {label}
         <ChevronDown size={14} className="transition-transform duration-300 group-hover:rotate-180" />
+        <span
+          aria-hidden
+          className={[
+            "absolute bottom-0 left-0 right-0 h-[2px] rounded-full transition-opacity duration-200",
+            active ? "bg-herb-700 opacity-100" : "opacity-0",
+          ].join(" ")}
+        />
       </button>
       <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 invisible opacity-0 translate-y-1 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 z-50">
         <div className="absolute top-[3px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-white rotate-45 border-l border-t border-ink-100" />
