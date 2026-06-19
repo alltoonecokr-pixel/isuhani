@@ -1,0 +1,47 @@
+# 이수한의원 v1 — CMS "발행" 트리거되는 CodeBuild 작업
+# 1) S3 source zip을 자동 압축 해제 (CodeBuild source 기능)
+# 2) 클라우드의 CMS 포스트(JSON)를 로컬 data 디렉토리로 sync
+# 3) Next.js 정적 export 빌드
+# 4) isuhani-clinic-web S3에 sync + CloudFront invalidate
+#
+# 환경변수 (CodeBuild project에서 주입)
+#   CMS_BUCKET            (예: isuhani-clinic-data)       — CMS 포스트가 저장된 버킷
+#   SITE_BUCKET           (예: isuhani-clinic-web)        — 정적 사이트 버킷
+#   CF_DISTRIBUTION_ID    (예: ENI986CTR7J51)             — CloudFront 배포 ID
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - node --version
+      - npm --version
+      - aws --version
+
+  pre_build:
+    commands:
+      - echo "▸ CMS 포스트 sync — S3가 단일 출처. 로컬 데이터 비우고 받음"
+      - rm -rf service/frontend/src/data/blog/posts && mkdir -p service/frontend/src/data/blog/posts
+      - aws s3 sync "s3://$CMS_BUCKET/posts/" service/frontend/src/data/blog/posts/ --exclude "*" --include "*.json"
+      - COUNT=$(ls service/frontend/src/data/blog/posts/*.json 2>/dev/null | wc -l)
+      - echo "  포스트 ${COUNT}개"
+      - test "$COUNT" -gt 100 || (echo "포스트가 너무 적음 — 마이그레이션 누락 의심" && exit 1)
+      - echo "▸ npm install (service/frontend)"
+      - cd service/frontend && npm install --no-audit --no-fund && cd ../..
+
+  build:
+    commands:
+      - echo "▸ next build (static export)"
+      - cd service/frontend && rm -rf .next out && NEXT_EXPORT=1 npm run build && cd ../..
+      - test -d service/frontend/out || (echo "out/ 누락" && exit 1)
+
+  post_build:
+    commands:
+      - echo "▸ S3 업로드 (long-cache, immutable assets)"
+      - aws s3 sync service/frontend/out/_next/static "s3://$SITE_BUCKET/_next/static" --delete --cache-control "public, max-age=31536000, immutable"
+      - echo "▸ S3 업로드 (HTML — short cache). /admin은 deploy-admin-frontend가 단독 관리 → --delete 보호"
+      - aws s3 sync service/frontend/out "s3://$SITE_BUCKET" --delete --cache-control "public, max-age=60, must-revalidate" --exclude "_next/static/*" --exclude "admin/*"
+      - echo "▸ CloudFront invalidate"
+      - aws cloudfront create-invalidation --distribution-id "$CF_DISTRIBUTION_ID" --paths "/*"
+      - echo "✓ 배포 완료"

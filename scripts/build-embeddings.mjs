@@ -13,8 +13,8 @@ import {
 } from "@aws-sdk/client-bedrock-runtime";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const POSTS_DIR = path.resolve(__dirname, "../frontend/src/data/blog/posts");
-const OUT_FILE = path.resolve(__dirname, "../frontend/src/data/blog/embeddings.json");
+const POSTS_DIR = path.resolve(__dirname, "../service/frontend/src/data/blog/posts");
+const OUT_FILE = path.resolve(__dirname, "../service/frontend/src/data/blog/embeddings.json");
 
 const REGION = process.env.AWS_REGION || "us-east-1";
 const MODEL_ID = "cohere.embed-multilingual-v3";
