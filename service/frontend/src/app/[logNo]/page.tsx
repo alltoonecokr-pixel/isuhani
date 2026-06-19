@@ -6,6 +6,13 @@ import { getAllPosts, getCategories, getPostByLogNo, makeExcerpt, sanitizeBody, 
 import { BlogCategoryBar } from "@/components/blog/BlogCategoryBar";
 import { SITE_URL } from "@/lib/site";
 
+const DEFAULT_OG = `${SITE_URL}/og.png`;
+// 네이버 기본 아이콘(og_270x270 등)은 의미 없으므로 사이트 기본 이미지로 교체
+const resolveOgImage = (url?: string | null) =>
+  url && !url.includes("static/blog/icon") && !url.includes("og_270x270")
+    ? url
+    : DEFAULT_OG;
+
 // 카테고리 → 담당 원장 (GEO 저자 권위도)
 const PHYSICIAN_BY_CATEGORY: Record<string, { name: string; jobTitle: string; knowsAbout: string[] }> = {
   "체형 · 척추 · 관절통증": {
@@ -65,13 +72,13 @@ export function generateMetadata({ params }: { params: { logNo: string } }): Met
       description: excerpt,
       publishedTime,
       modifiedTime: publishedTime,
-      images: post.ogImage ? [{ url: post.ogImage }] : undefined,
+      images: [{ url: resolveOgImage(post.ogImage) }],
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
       description: excerpt,
-      images: post.ogImage ? [post.ogImage] : undefined,
+      images: [resolveOgImage(post.ogImage)],
     },
   };
 }

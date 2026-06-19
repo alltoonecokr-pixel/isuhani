@@ -49,6 +49,8 @@ if [ "$FAST" != "1" ]; then
   echo "▸ next build (static export)"
   rm -rf .next out
   NEXT_EXPORT=1 npm run build
+  echo "▸ image-sitemap.xml 생성"
+  node scripts/generate-image-sitemap.mjs
 fi
 
 [ -d out ] || { echo "✗ out/ 없음 — 빌드 먼저" >&2; exit 1; }
