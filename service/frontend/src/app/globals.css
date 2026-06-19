@@ -484,6 +484,21 @@ a {
   flex-shrink: 0;
 }
 
+/* ── 아티클 툴바 — naver-body serif 상속 차단 ── */
+.naver-body .article-toolbar-row,
+.naver-body .article-toolbar-row * {
+  font-family: var(--font-noto-kr), "Noto Sans KR", sans-serif !important;
+  letter-spacing: 0 !important;
+  line-height: 1.4 !important;
+}
+.tbar-btn {
+  display: inline-flex;
+  align-items: center;
+  color: #999;
+  transition: color 0.15s;
+}
+.tbar-btn:hover { color: #2d6e5a; }
+
 /* ── 핵심 요약 박스 ── */
 .article-summary {
   margin: 0 0 2.75rem;

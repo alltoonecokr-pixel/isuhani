@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { getAllPosts, getCategories, getPostByLogNo, makeExcerpt, sanitizeBody, extractFAQs, extractSummaryPoints } from "@/lib/blog";
 import { BlogCategoryBar } from "@/components/blog/BlogCategoryBar";
+import { ArticleToolbar } from "@/components/blog/ArticleToolbar";
 import { SITE_URL } from "@/lib/site";
 
 const DEFAULT_OG = `${SITE_URL}/og.png`;
@@ -214,14 +215,7 @@ export default function PostPage({ params }: { params: { logNo: string } }) {
               const points = extractSummaryPoints(html);
               return (
                 <>
-                  {points.length >= 2 && (
-                    <div className="article-summary" aria-label="핵심 요약">
-                      <div className="article-summary-label">이 글의 핵심</div>
-                      <ul>
-                        {points.map((pt, i) => <li key={i}>{pt}</li>)}
-                      </ul>
-                    </div>
-                  )}
+                  <ArticleToolbar url={postUrl} title={post.title} summaryPoints={points} />
                   <div dangerouslySetInnerHTML={{ __html: html }} />
                 </>
               );
