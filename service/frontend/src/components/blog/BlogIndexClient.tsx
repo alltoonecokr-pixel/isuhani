@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, Suspense } from "react";
+import { useMemo, Suspense, useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { BlogCategoryBar } from "./BlogCategoryBar";
@@ -25,14 +25,32 @@ const PAGE_SIZE = 30;
 const V2_PAGE_SIZE = 9;
 
 export function BlogIndexClient({
-  posts,
-  categories,
+  posts: initialPosts,
+  categories: initialCategories,
   videos = [],
 }: {
   posts: IndexPost[];
   categories: { name: string; count: number }[];
   videos?: VideoItem[];
 }) {
+  const [posts, setPosts] = useState(initialPosts);
+  const [categories, setCategories] = useState(initialCategories);
+
+  useEffect(() => {
+    fetch("/live-index.json", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!Array.isArray(data?.posts) || !data.posts.length) return;
+        setPosts(data.posts);
+        const map = new Map<string, number>();
+        for (const p of data.posts as IndexPost[]) {
+          map.set(p.category, (map.get(p.category) || 0) + 1);
+        }
+        setCategories([...map.entries()].map(([name, count]) => ({ name, count })));
+      })
+      .catch(() => {});
+  }, []);
+
   // useSearchParams는 Suspense fallback을 정적 HTML로 내보낸다(output: export).
   // fallback을 "기본 홈 화면(전체)" 자체로 렌더해야 히어로·카드·이미지가
   // 빌드 시 HTML에 박혀 첫 접속에도 보인다. 클라이언트는 그 위에서 cat/q/page로 덮어쓴다.

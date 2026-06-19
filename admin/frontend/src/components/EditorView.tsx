@@ -36,7 +36,6 @@ export function EditorView({
   const [title, setTitle] = useState(post?.title || "");
   const [category, setCategory] = useState(wantCat);
   const [date, setDate] = useState(post?.meta?.date || isoToday());
-  const [excerpt, setExcerpt] = useState(post?.meta?.ogDesc || "");
   const [bodyHtml, setBodyHtml] = useState(
     cleanForEditor(post?.body || "<p></p>"),
   );
@@ -59,7 +58,6 @@ export function EditorView({
       title: title.trim(),
       addDate: isoToAddDate(date),
       category,
-      excerpt: excerpt.trim(),
       body: cleanForSave(bodyHtml),
     };
     await onSave(input, publish);
@@ -158,18 +156,6 @@ export function EditorView({
               value={date}
               onChange={(e) => {
                 setDate(e.target.value);
-                markDirty();
-              }}
-            />
-          </div>
-          <div>
-            <span className="field-label">요약 (선택)</span>
-            <input
-              type="text"
-              placeholder="목록 카드 1~2줄"
-              value={excerpt}
-              onChange={(e) => {
-                setExcerpt(e.target.value);
                 markDirty();
               }}
             />

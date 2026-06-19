@@ -4,7 +4,7 @@
 import { CATEGORY_MAP, PARENT_CATEGORY_MAP } from "../constants.mjs";
 import { cleanImageUrl } from "../utils/images.mjs";
 import { parseAddDate } from "../utils/date.mjs";
-import { readPostIndex, writePostIndex } from "./s3.mjs";
+import { readPostIndex, writePostIndex, writeWebIndex } from "./s3.mjs";
 
 // ── 포스트 도메인 헬퍼 ────────────────────────────────────────────────────────
 
@@ -52,6 +52,20 @@ function sortIndexPosts(posts) {
   posts.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
 }
 
+function toWebEntry(e) {
+  const d = e.date;
+  return {
+    logNo: e.logNo,
+    title: e.title,
+    date: typeof d === "object" ? d.iso : (d || ""),
+    dateLabel: typeof d === "object" ? d.label : (e.addDate || ""),
+    category: e.category,
+    thumbnail: e.thumbnail || null,
+    excerpt: "",
+    hasBody: e.isCms || false,
+  };
+}
+
 export async function upsertIndexEntry(post) {
   const idx = await readPostIndex();
   const entry = indexEntry(post);
@@ -60,10 +74,12 @@ export async function upsertIndexEntry(post) {
   else idx.posts.unshift(entry);
   sortIndexPosts(idx.posts);
   await writePostIndex(idx);
+  await writeWebIndex(idx.posts.map(toWebEntry));
 }
 
 export async function removeIndexEntry(logNo) {
   const idx = await readPostIndex();
   idx.posts = idx.posts.filter((p) => p.logNo !== logNo);
   await writePostIndex(idx);
+  await writeWebIndex(idx.posts.map(toWebEntry));
 }

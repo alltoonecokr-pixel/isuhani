@@ -14,6 +14,7 @@ import { POST_PREFIX, META_KEY, INDEX_KEY, DEFAULT_CATEGORIES } from "../constan
 
 const REGION = process.env.AWS_REGION || "ap-northeast-2";
 const BUCKET = process.env.BUCKET;
+const WEB_BUCKET = process.env.WEB_BUCKET;
 
 const s3 = new S3Client({ region: REGION });
 
@@ -137,6 +138,20 @@ export async function writePostIndex(idx) {
       Key: INDEX_KEY,
       Body: JSON.stringify(idx, null, 2),
       ContentType: "application/json; charset=utf-8",
+    }),
+  );
+}
+
+// 프론트엔드가 런타임에 fetch하는 공개 인덱스 — CMS 저장 즉시 반영
+export async function writeWebIndex(posts) {
+  if (!WEB_BUCKET) return;
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: WEB_BUCKET,
+      Key: "live-index.json",
+      Body: JSON.stringify({ updatedAt: new Date().toISOString(), posts }),
+      ContentType: "application/json; charset=utf-8",
+      CacheControl: "no-store, max-age=0",
     }),
   );
 }

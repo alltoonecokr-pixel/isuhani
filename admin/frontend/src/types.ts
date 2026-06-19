@@ -33,7 +33,6 @@ export type PostInput = {
   title: string;
   addDate: string;
   category: string;
-  excerpt: string;
   body: string;
 };
 
