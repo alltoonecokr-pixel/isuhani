@@ -61,6 +61,22 @@ export function EditorView({
           <span style={{ fontSize: 12, color: "var(--ink-400)" }}>
             {post ? `편집 중 · #${post.logNo}` : "새 글 작성"}
           </span>
+          {post?.logNo && (
+            <a
+              href={`https://isuclinic.co.kr/${post.logNo}/`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontSize: 12, color: "var(--ink-400)",
+                textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 3,
+                padding: "3px 8px", borderRadius: 5, border: "1px solid var(--ink-200)",
+                background: "var(--white)",
+              }}
+              title="발행된 글을 사이트에서 확인"
+            >
+              ↗ 사이트에서 보기
+            </a>
+          )}
           {saved && <span className="ev-save-hint saved">저장됨</span>}
           {dirty && !saved && <span className="ev-save-hint dirty">저장 필요</span>}
         </div>

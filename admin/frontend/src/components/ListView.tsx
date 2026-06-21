@@ -222,6 +222,15 @@ export function ListView({ posts, categories, loading, onNew, onEdit, onDelete, 
                 </div>
                 {!selecting && (
                   <div className="lv-actions" onClick={e => e.stopPropagation()}>
+                    <a
+                      className="lv-site-link"
+                      href={`https://isuclinic.co.kr/${p.logNo}/`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="사이트에서 보기"
+                    >
+                      ↗
+                    </a>
                     <button onClick={() => onEdit(p.logNo)}>수정</button>
                     <button className="danger" onClick={() => onDelete(p.logNo)}>삭제</button>
                   </div>
