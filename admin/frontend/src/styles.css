@@ -156,7 +156,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* ─── 목록 뷰 ──────────────────────────────────────────────── */
-.lv-wrap { flex: 1; padding: 24px; max-width: 860px; margin: 0 auto; width: 100%; }
+.lv-wrap { flex: 1; padding: 32px 32px 80px; max-width: 900px; margin: 0 auto; width: 100%; }
 
 .lv-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
 .lv-title { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink-900); }
@@ -225,8 +225,8 @@ input:focus, select:focus, textarea:focus {
   background: var(--white); overflow: hidden; box-shadow: var(--shadow-xs);
 }
 .lv-row {
-  display: flex; align-items: center; gap: 12px;
-  padding: 11px 14px; border-bottom: 1px solid var(--ink-100);
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px; border-bottom: 1px solid var(--ink-100);
   cursor: pointer; transition: background 0.1s;
 }
 .lv-row:last-child { border-bottom: none; }
@@ -310,9 +310,9 @@ input:focus, select:focus, textarea:focus {
 .ev-save-hint.dirty { color: #92400e; background: #fef3c7; }
 
 /* 분할 레이아웃 */
-.ev-body { flex: 1; padding: 20px 20px 80px; }
-.ev-split { display: block; }
-.ev-split.on { display: grid; grid-template-columns: minmax(0,3fr) minmax(0,2fr); gap: 20px; align-items: start; }
+.ev-body { flex: 1; padding: 28px 28px 100px; }
+.ev-split { display: block; max-width: 860px; margin: 0 auto; }
+.ev-split.on { display: grid; grid-template-columns: minmax(0,3fr) minmax(0,2fr); gap: 24px; align-items: start; max-width: none; margin: 0; }
 @media (max-width: 1100px) { .ev-split.on { grid-template-columns: 1fr; } }
 
 /* 폼 영역 */
@@ -320,18 +320,18 @@ input:focus, select:focus, textarea:focus {
   background: var(--white); border: 1px solid var(--ink-200);
   border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow-xs);
 }
-.ev-form-top { padding: 16px; border-bottom: 1px solid var(--ink-100); }
-.ev-form-meta { padding: 12px 16px; background: var(--ink-50); border-bottom: 1px solid var(--ink-100); }
+.ev-form-top { padding: 28px 28px 24px; border-bottom: 1px solid var(--ink-100); }
+.ev-form-meta { padding: 18px 28px; background: var(--ink-50); border-bottom: 1px solid var(--ink-100); }
 .ev-field { margin-bottom: 0; }
 .ev-label {
   display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
-  color: var(--ink-400); text-transform: uppercase; margin-bottom: 5px;
+  color: var(--ink-400); text-transform: uppercase; margin-bottom: 6px;
 }
-.ev-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ev-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .ev-title-input {
-  font-size: 16px; font-weight: 600; border: none; border-radius: 0;
+  font-size: 20px; font-weight: 700; border: none; border-radius: 0;
   background: transparent; padding: 0; width: 100%;
-  color: var(--ink-900); letter-spacing: -0.01em;
+  color: var(--ink-900); letter-spacing: -0.02em; line-height: 1.4;
 }
 .ev-title-input:focus { box-shadow: none; border-color: transparent; }
 .ev-title-input::placeholder { color: var(--ink-300); font-weight: 400; }
@@ -339,11 +339,11 @@ input:focus, select:focus, textarea:focus {
 /* ─── 리치 툴바 ──────────────────────────────────────────────── */
 .rich-toolbar {
   display: flex; gap: 1px; align-items: center; flex-wrap: wrap;
-  padding: 6px 8px; border-bottom: 1px solid var(--ink-200);
+  padding: 8px 12px; border-bottom: 1px solid var(--ink-200);
   background: var(--ink-50);
 }
 .rich-toolbar button {
-  padding: 5px 9px; font-size: 12.5px; box-shadow: none;
+  padding: 6px 10px; font-size: 12.5px; box-shadow: none;
   border-color: transparent; background: transparent;
   color: var(--ink-600, #4b5563); border-radius: var(--r-sm);
 }
@@ -354,8 +354,8 @@ input:focus, select:focus, textarea:focus {
 /* ─── 에디터 본문 ────────────────────────────────────────────── */
 .rich-editor { background: var(--white); }
 .rich-editor .ProseMirror {
-  padding: 18px 20px; min-height: 360px; outline: none;
-  font-size: 15px; line-height: 1.8; color: var(--ink-900);
+  padding: 28px 28px 48px; min-height: 420px; outline: none;
+  font-size: 15.5px; line-height: 1.85; color: var(--ink-900);
 }
 .rich-editor .ProseMirror:focus { outline: none; }
 .rich-editor .ProseMirror p { margin: 0 0 0.85em; }
