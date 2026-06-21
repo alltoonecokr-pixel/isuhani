@@ -40,20 +40,20 @@ export function CategoriesModal({ categories, onSave, onClose }: Props) {
             <div className="row-cat" key={`${c}-${i}`}>
               <span className="name">{c}</span>
               <button
-                className="tiny ghost"
+                className="ghost"
                 disabled={i === 0}
                 onClick={() => move(i, -1)}
               >
                 ↑
               </button>
               <button
-                className="tiny ghost"
+                className="ghost"
                 disabled={i === cats.length - 1}
                 onClick={() => move(i, 1)}
               >
                 ↓
               </button>
-              <button className="tiny danger" onClick={() => remove(i)}>
+              <button className="danger" onClick={() => remove(i)}>
                 삭제
               </button>
             </div>

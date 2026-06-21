@@ -54,7 +54,7 @@ export function GuideModal({ onClose }: Props) {
       }}
     >
       <div className="modal guide">
-        <h3>📖 건강 저널 관리 — 사용 설명서</h3>
+        <h3>건강 저널 관리 — 사용 설명서</h3>
         <p style={{ color: "var(--ink-500)", fontSize: 13.5, margin: "-6px 0 14px" }}>
           이 페이지에서 홈페이지(건강 저널)의 글을 직접 쓰고 고칠 수 있습니다.
           처음이시면 아래 순서대로 따라 하세요.

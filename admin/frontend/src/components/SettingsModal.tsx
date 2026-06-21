@@ -34,7 +34,7 @@ export function SettingsModal({ cfg, force, onSubmit, onClose, onGuide }: Props)
       <div className="modal">
         {force && (
           <div style={{ marginBottom: 6 }}>
-            <div className="lb-logo">잎</div>
+            <div className="lb-icon">醫</div>
             <div className="lb-title">이수한의원</div>
             <div className="lb-sub">건강 저널 콘텐츠 관리</div>
           </div>
@@ -54,7 +54,7 @@ export function SettingsModal({ cfg, force, onSubmit, onClose, onGuide }: Props)
           </p>
         )}
         <div style={{ marginBottom: 12 }}>
-          <span className="field-label">비밀번호</span>
+          <span className="ev-label">비밀번호</span>
           <input
             type="password"
             placeholder="비밀번호를 입력하세요"
@@ -76,7 +76,7 @@ export function SettingsModal({ cfg, force, onSubmit, onClose, onGuide }: Props)
             고급 설정
           </summary>
           <div style={{ marginTop: 12 }}>
-            <span className="field-label">사용자명</span>
+            <span className="ev-label">사용자명</span>
             <input
               type="text"
               value={user}
@@ -85,7 +85,7 @@ export function SettingsModal({ cfg, force, onSubmit, onClose, onGuide }: Props)
             />
           </div>
           <div style={{ marginTop: 10 }}>
-            <span className="field-label">CMS API URL</span>
+            <span className="ev-label">CMS API URL</span>
             <input
               type="url"
               value={url}
@@ -96,19 +96,11 @@ export function SettingsModal({ cfg, force, onSubmit, onClose, onGuide }: Props)
         <div className="modal-actions">
           <button
             type="button"
+            className="ghost"
             onClick={onGuide}
-            style={{
-              marginRight: "auto",
-              background: "none",
-              border: "none",
-              boxShadow: "none",
-              color: "var(--herb)",
-              cursor: "pointer",
-              fontSize: 13.5,
-              fontWeight: 600,
-            }}
+            style={{ marginRight: "auto", color: "var(--herb)", fontWeight: 600 }}
           >
-            📖 사용 설명서
+            사용 안내
           </button>
           {!force && <button onClick={onClose}>취소</button>}
           <button className="herb" onClick={submit}>

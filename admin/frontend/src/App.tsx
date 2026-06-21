@@ -289,26 +289,26 @@ export function App() {
     <div className="wrap">
       <header className="top">
         <div className="brand">
-          <span className="leaf">醫</span>
-          건강 저널 관리 <small>이수한의원</small>
+          <span className="brand-icon">醫</span>
+          건강 저널 관리
+          <small>이수한의원</small>
         </div>
         <div className="top-actions">
-          <span className="muted">
+          <span className="top-status">
             <span className={"dot " + status.kind} />
             {status.text}
           </span>
-          <button className="ghost" onClick={() => setGuideOpen(true)}>
-            📖 사용 설명서
+          <button className="ghost" onClick={() => setGuideOpen(true)} title="사용 설명서">
+            안내
           </button>
           <button
             className="ghost"
+            title="카테고리 관리"
             onClick={async () => {
               try {
                 const cats = await apiRef.current.getCategories();
                 if (cats.categories) setCategories(cats.categories);
-              } catch {
-                /* 무시 — 모달에서 현재 목록으로 편집 */
-              }
+              } catch { /* 무시 */ }
               setCatsOpen(true);
             }}
           >
@@ -316,6 +316,7 @@ export function App() {
           </button>
           <button
             className="ghost"
+            title="API 설정"
             onClick={() => setSettings({ open: true, force: false })}
           >
             설정
@@ -367,7 +368,7 @@ export function App() {
 
       <DeployProgress state={deploy} />
 
-      <div className={"toast " + (toastState.show ? "show " : "") + toastState.kind}>
+      <div className={["toast", toastState.show ? "show" : "", toastState.kind].filter(Boolean).join(" ")}>
         {toastState.msg}
       </div>
     </div>
