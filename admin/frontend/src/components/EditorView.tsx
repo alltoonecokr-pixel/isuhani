@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 import type { FullPost, PostInput } from "../types";
 import { RichEditor } from "../editor/RichEditor";
 import { PreviewPane } from "./PreviewPane";
+import { CustomSelect } from "./CustomSelect";
+import { DatePicker } from "./DatePicker";
 import { cleanForEditor, cleanForSave, isoToAddDate, isoToday } from "../html";
 
 type Props = {
@@ -131,13 +133,18 @@ export function EditorView({
               <div className="ev-grid2">
                 <div>
                   <span className="ev-label">카테고리</span>
-                  <select value={category} onChange={(e) => { setCategory(e.target.value); markDirty(); }}>
-                    {catOptions.map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
+                  <CustomSelect
+                    value={category}
+                    options={catOptions}
+                    onChange={(v) => { setCategory(v); markDirty(); }}
+                  />
                 </div>
                 <div>
                   <span className="ev-label">발행일</span>
-                  <input type="date" value={date} onChange={(e) => { setDate(e.target.value); markDirty(); }} />
+                  <DatePicker
+                    value={date}
+                    onChange={(v) => { setDate(v); markDirty(); }}
+                  />
                 </div>
               </div>
             </div>

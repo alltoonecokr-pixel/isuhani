@@ -452,6 +452,100 @@ input:focus, select:focus, textarea:focus {
   width: 110px; height: 4px; border-radius: 999px; background: #000; opacity: 0.14;
 }
 
+/* ─── 커스텀 셀렉트 ─────────────────────────────────────────── */
+.csel-wrap { position: relative; width: 100%; }
+.csel-trigger {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 10px; background: var(--white); border: 1px solid var(--ink-200);
+  border-radius: var(--r-sm); color: var(--ink-900); font-size: 13.5px;
+  cursor: pointer; box-shadow: var(--shadow-xs); gap: 6px; text-align: left;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.csel-trigger:hover { border-color: var(--ink-300); box-shadow: var(--shadow-sm); }
+.csel-trigger.open { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(22,101,52,0.12); }
+.csel-value { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.csel-arrow { flex: none; color: var(--ink-400); transition: transform 0.15s; }
+.csel-arrow.open { transform: rotate(180deg); }
+.csel-panel {
+  position: absolute; top: calc(100% + 5px); left: 0; right: 0; z-index: 40;
+  background: var(--white); border: 1px solid var(--ink-200); border-radius: var(--r-lg);
+  box-shadow: var(--shadow-md); padding: 4px; max-height: 240px; overflow-y: auto;
+}
+.csel-item {
+  display: flex; align-items: center; gap: 7px; width: 100%;
+  padding: 7px 10px; border-radius: var(--r-sm); font-size: 13.5px;
+  color: var(--ink-700); background: transparent; border: none; box-shadow: none;
+  text-align: left; cursor: pointer;
+}
+.csel-item:hover { background: var(--ink-50); color: var(--ink-900); }
+.csel-item.on { color: var(--accent); font-weight: 600; }
+
+/* ─── 데이트 피커 ────────────────────────────────────────────── */
+.dp-wrap { position: relative; width: 100%; }
+.dp-trigger {
+  width: 100%; display: flex; align-items: center; gap: 7px;
+  padding: 7px 10px; background: var(--white); border: 1px solid var(--ink-200);
+  border-radius: var(--r-sm); color: var(--ink-700); font-size: 13.5px;
+  cursor: pointer; box-shadow: var(--shadow-xs); text-align: left;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.dp-trigger span { flex: 1; }
+.dp-trigger:hover { border-color: var(--ink-300); box-shadow: var(--shadow-sm); }
+.dp-trigger.open { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(22,101,52,0.12); }
+.dp-icon { flex: none; color: var(--ink-400); }
+.dp-panel {
+  position: absolute; top: calc(100% + 5px); left: 0; z-index: 40;
+  background: var(--white); border: 1px solid var(--ink-200); border-radius: var(--r-lg);
+  box-shadow: var(--shadow-md); padding: 12px; width: 264px;
+}
+.dp-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.dp-month-label { font-size: 13.5px; font-weight: 700; color: var(--ink-900); }
+.dp-nav {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 6px;
+  background: transparent; border: none; box-shadow: none; color: var(--ink-500); cursor: pointer;
+}
+.dp-nav:hover { background: var(--ink-100); color: var(--ink-900); border-color: transparent; box-shadow: none; }
+.dp-weekdays {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 4px;
+}
+.dp-dow {
+  text-align: center; font-size: 11px; font-weight: 600; color: var(--ink-400);
+  padding: 4px 0; letter-spacing: 0.02em;
+}
+.dp-dow.sun { color: #ef4444; }
+.dp-dow.sat { color: var(--blue); }
+.dp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; }
+.dp-cell {
+  display: flex; align-items: center; justify-content: center;
+  height: 32px; border-radius: 6px; font-size: 13px; color: var(--ink-700);
+  background: transparent; border: none; box-shadow: none; cursor: pointer;
+}
+.dp-cell:hover:not(.empty) { background: var(--ink-100); color: var(--ink-900); border-color: transparent; box-shadow: none; }
+.dp-cell.empty { cursor: default; }
+.dp-cell.sun { color: #ef4444; }
+.dp-cell.sat { color: var(--blue); }
+.dp-cell.today {
+  font-weight: 700; color: var(--accent);
+  box-shadow: inset 0 0 0 1.5px var(--accent-border);
+}
+.dp-cell.today:hover { background: var(--accent-light); }
+.dp-cell.selected {
+  background: var(--accent) !important; color: #fff !important;
+  font-weight: 700; box-shadow: none !important;
+}
+.dp-footer { margin-top: 10px; border-top: 1px solid var(--ink-100); padding-top: 8px; text-align: center; }
+.dp-today-btn {
+  font-size: 12.5px; color: var(--accent); font-weight: 600;
+  background: transparent; border: none; box-shadow: none; cursor: pointer;
+  padding: 4px 12px; border-radius: 6px;
+}
+.dp-today-btn:hover { background: var(--accent-light); border-color: transparent; box-shadow: none; }
+
 /* ─── 모달 ──────────────────────────────────────────────────── */
 .modal-bg {
   position: fixed; inset: 0; background: rgba(0,0,0,0.3);
