@@ -84,17 +84,25 @@ export function EditorView({
         </div>
         <div className="ev-bar-right">
           <button
-            className={showPreview ? "ghost" : "ghost"}
-            style={{
-              fontSize: 12.5,
-              color: showPreview ? "var(--accent)" : "var(--ink-400)",
-              background: showPreview ? "var(--accent-light)" : "transparent",
-              borderColor: "transparent",
-              boxShadow: "none",
-            }}
             onClick={() => setShowPreview(v => !v)}
+            style={{
+              fontSize: 12.5, gap: 6,
+              color: showPreview ? "var(--accent)" : "var(--ink-500)",
+              background: showPreview ? "var(--accent-light)" : "var(--white)",
+              borderColor: showPreview ? "var(--accent-border)" : "var(--ink-200)",
+            }}
+            title={showPreview ? "미리보기 닫기" : "미리보기 열기"}
           >
-            미리보기
+            {/* 분할 패널 아이콘 */}
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+              <rect x="1" y="1" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="1.4"/>
+              <line x1="8" y1="1" x2="8" y2="14" stroke="currentColor" strokeWidth="1.4"/>
+              {showPreview
+                ? <path d="M10.5 5.5L12 7.5L10.5 9.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                : <path d="M11 5.5L9.5 7.5L11 9.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+              }
+            </svg>
+            {showPreview ? "미리보기 닫기" : "미리보기"}
           </button>
           <div style={{ width: 1, height: 16, background: "var(--ink-200)", margin: "0 8px" }} />
           {post && (

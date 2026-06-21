@@ -96,15 +96,15 @@ export function DatePicker({ value, onChange }: Props) {
         <div className="dp-panel">
           {/* 헤더 */}
           <div className="dp-header">
-            <button type="button" className="dp-nav" onClick={prevMonth}>
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M8.5 3.5L5 7l3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+            <button type="button" className="dp-nav" onClick={prevMonth} title="이전 달">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path d="M11 4.5L6.5 9 11 13.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
             <span className="dp-month-label">{viewY}년 {MONTHS[viewM - 1]}</span>
-            <button type="button" className="dp-nav" onClick={nextMonth}>
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M5.5 3.5L9 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+            <button type="button" className="dp-nav" onClick={nextMonth} title="다음 달">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path d="M7 4.5L11.5 9 7 13.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
           </div>

@@ -502,13 +502,13 @@ input:focus, select:focus, textarea:focus {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 10px;
 }
-.dp-month-label { font-size: 13.5px; font-weight: 700; color: var(--ink-900); }
+.dp-month-label { font-size: 14px; font-weight: 700; color: var(--ink-900); }
 .dp-nav {
   display: flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px; border-radius: 6px;
-  background: transparent; border: none; box-shadow: none; color: var(--ink-500); cursor: pointer;
+  width: 34px; height: 34px; border-radius: 8px;
+  background: var(--ink-50); border: 1px solid var(--ink-200); box-shadow: none; color: var(--ink-600, #4b5563); cursor: pointer;
 }
-.dp-nav:hover { background: var(--ink-100); color: var(--ink-900); border-color: transparent; box-shadow: none; }
+.dp-nav:hover { background: var(--ink-100); color: var(--ink-900); border-color: var(--ink-300); box-shadow: none; }
 .dp-weekdays {
   display: grid; grid-template-columns: repeat(7, 1fr);
   margin-bottom: 4px;
