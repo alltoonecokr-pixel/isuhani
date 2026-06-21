@@ -585,17 +585,69 @@ input:focus, select:focus, textarea:focus {
 .row-cat:first-child { border-top: none; }
 .row-cat .name { flex: 1; font-size: 13.5px; color: var(--ink-700); }
 
-/* 가이드 */
-.g-step { display: flex; gap: 10px; margin: 12px 0; }
-.g-no {
-  flex: none; width: 20px; height: 20px; border-radius: 50%;
-  background: var(--accent); color: #fff;
-  display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;
-  margin-top: 1px;
+/* ─── 가이드 투어 모달 ───────────────────────────────────────── */
+.modal.guide-tour {
+  max-width: 400px; padding: 0; overflow: hidden;
+  display: flex; flex-direction: column;
 }
-.g-tip {
-  background: var(--ink-50); border: 1px solid var(--ink-200);
-  border-radius: var(--r-md); padding: 12px 14px; margin-top: 14px; font-size: 13px; line-height: 1.65;
+.gt-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px 0;
+}
+.gt-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--accent);
+}
+.gt-close {
+  border: none; background: transparent; box-shadow: none;
+  color: var(--ink-400); padding: 4px; cursor: pointer; border-radius: 6px;
+}
+.gt-close:hover { background: var(--ink-100); color: var(--ink-700); }
+
+.gt-illus {
+  display: flex; align-items: center; justify-content: center;
+  padding: 28px 40px 20px;
+}
+.guide-icon { width: 100px; height: 100px; }
+
+.gt-dots {
+  display: flex; gap: 6px; justify-content: center; margin-bottom: 20px;
+}
+.gt-dot {
+  width: 6px; height: 6px; border-radius: 99px;
+  background: var(--ink-200); border: none; padding: 0; cursor: pointer;
+  transition: width 0.2s, background 0.2s;
+}
+.gt-dot.on { width: 18px; background: var(--accent); }
+
+.gt-body {
+  padding: 0 28px 24px; text-align: center;
+}
+.gt-step-no {
+  font-size: 11px; color: var(--ink-400); font-weight: 600; margin-bottom: 8px;
+}
+.gt-title {
+  font-size: 18px; font-weight: 700; color: var(--ink-900);
+  letter-spacing: -0.02em; margin: 0 0 10px;
+}
+.gt-desc {
+  font-size: 13.5px; line-height: 1.75; color: var(--ink-600, #4b5563);
+  margin: 0;
+}
+
+.gt-actions {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px 20px;
+  border-top: 1px solid var(--ink-100);
+}
+.gt-prev {
+  border: none; background: transparent; box-shadow: none;
+  font-size: 13px; color: var(--ink-400); padding: 6px 2px; cursor: pointer;
+}
+.gt-prev:disabled { opacity: 0.3; cursor: default; }
+.gt-prev:not(:disabled):hover { color: var(--ink-700); }
+.gt-next, .gt-done {
+  font-size: 13px; padding: 8px 20px; border-radius: 8px;
 }
 
 /* ─── 에디터 레이블 (인풋 위 label) ─────────────────────────── */
