@@ -211,6 +211,14 @@ input:focus, select:focus, textarea:focus {
 }
 .lv-panel-item:hover { background: var(--ink-50); border-color: transparent; box-shadow: none; color: var(--ink-900); }
 .lv-panel-item.on { color: var(--accent); font-weight: 600; background: var(--accent-light); }
+.lv-panel-divider { height: 1px; background: var(--ink-100); margin: 6px 0; }
+.lv-panel-apply {
+  display: block; width: calc(100% - 16px); margin: 4px 8px 8px;
+  padding: 7px 0; background: var(--accent); color: #fff;
+  border: none; border-radius: var(--r-sm); font-size: 12.5px;
+  font-weight: 600; cursor: pointer; text-align: center;
+}
+.lv-panel-apply:hover { background: var(--accent-dim); }
 
 /* 검색 */
 .lv-search-row { margin-bottom: 8px; }

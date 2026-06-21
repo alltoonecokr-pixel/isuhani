@@ -3,6 +3,7 @@ import type { PostIndexEntry } from "../types";
 
 const PAGE_SIZE = 20;
 type StatusFilter = "all" | "cms" | "imported";
+type SortOrder = "newest" | "oldest";
 
 type Props = {
   posts: PostIndexEntry[];
@@ -29,6 +30,7 @@ export function ListView({ posts, categories, loading, onNew, onEdit, onDelete, 
   const [searchOpen, setSearchOpen] = useState(false);
   const [status, setStatus]     = useState<StatusFilter>("all");
   const [cat, setCat]           = useState("");
+  const [sort, setSort]         = useState<SortOrder>("newest");
   const [page, setPage]         = useState(0);
   const [viewOpen, setViewOpen] = useState(false);
   const [selecting, setSelecting] = useState(false);
@@ -48,21 +50,30 @@ export function ListView({ posts, categories, loading, onNew, onEdit, onDelete, 
 
   const filtered = useMemo(() => {
     const query = q.trim().toLowerCase();
-    return posts.filter(p => {
+    const list = posts.filter(p => {
       if (query && !p.title.toLowerCase().includes(query)) return false;
       if (cat && p.category !== cat) return false;
       if (status === "cms" && !p.isCms) return false;
       if (status === "imported" && p.isCms) return false;
       return true;
     });
-  }, [posts, q, cat, status]);
+    return [...list].sort((a, b) => {
+      const da = a.date || a.addDate || "";
+      const db = b.date || b.addDate || "";
+      return sort === "newest" ? db.localeCompare(da) : da.localeCompare(db);
+    });
+  }, [posts, q, cat, status, sort]);
 
   const pages  = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const curPage = Math.min(page, pages - 1);
   const slice  = filtered.slice(curPage * PAGE_SIZE, curPage * PAGE_SIZE + PAGE_SIZE);
 
   const statusLabel: Record<StatusFilter, string> = { all: "전체", cms: "CMS 작성", imported: "네이버 이전" };
-  const viewLabel = cat || (status !== "all" ? statusLabel[status] : "전체 보기");
+  const sortLabel: Record<SortOrder, string> = { newest: "최신순", oldest: "오래된순" };
+  const viewLabel = [
+    cat || (status !== "all" ? statusLabel[status] : "전체"),
+    sortLabel[sort],
+  ].join(" · ");
 
   const togglePick = (logNo: string) => setPicked(prev => {
     const next = new Set(prev);
@@ -87,7 +98,7 @@ export function ListView({ posts, categories, loading, onNew, onEdit, onDelete, 
     exitSelect();
   };
 
-  const pickView = (next: () => void) => { next(); resetPage(); setViewOpen(false); };
+  const pickView = (next: () => void, keepOpen?: boolean) => { next(); resetPage(); if (!keepOpen) setViewOpen(false); };
 
   return (
     <div className="lv-wrap">
@@ -131,26 +142,41 @@ export function ListView({ posts, categories, loading, onNew, onEdit, onDelete, 
             </button>
             {viewOpen && (
               <div className="lv-panel">
-                <div className="lv-panel-cur">{viewLabel}</div>
+                <div className="lv-panel-sec">정렬</div>
+                {(["newest", "oldest"] as SortOrder[]).map(s => (
+                  <button
+                    key={s}
+                    className={"lv-panel-item" + (sort === s ? " on" : "")}
+                    onClick={() => pickView(() => setSort(s), true)}
+                  >
+                    {sortLabel[s]}
+                  </button>
+                ))}
+                <div className="lv-panel-divider" />
                 <div className="lv-panel-sec">상태</div>
                 {(["all", "cms", "imported"] as StatusFilter[]).map(s => (
                   <button
                     key={s}
                     className={"lv-panel-item" + (status === s && !cat ? " on" : "")}
-                    onClick={() => pickView(() => { setStatus(s); setCat(""); })}
+                    onClick={() => pickView(() => { setStatus(s); setCat(""); }, true)}
                   >
                     {statusLabel[s]}
                   </button>
                 ))}
+                <div className="lv-panel-divider" />
                 <div className="lv-panel-sec">카테고리</div>
-                <button className={"lv-panel-item" + (!cat ? " on" : "")} onClick={() => pickView(() => setCat(""))}>
+                <button className={"lv-panel-item" + (!cat ? " on" : "")} onClick={() => pickView(() => setCat(""), true)}>
                   전체
                 </button>
                 {categories.map(c => (
-                  <button key={c} className={"lv-panel-item" + (cat === c ? " on" : "")} onClick={() => pickView(() => setCat(c))}>
+                  <button key={c} className={"lv-panel-item" + (cat === c ? " on" : "")} onClick={() => pickView(() => setCat(c), true)}>
                     {c}
                   </button>
                 ))}
+                <div className="lv-panel-divider" />
+                <button className="lv-panel-apply" onClick={() => setViewOpen(false)}>
+                  적용
+                </button>
               </div>
             )}
           </div>
