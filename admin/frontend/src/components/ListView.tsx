@@ -33,18 +33,21 @@ export function ListView({ posts, categories, loading, onNew, onEdit, onDelete, 
   const [sort, setSort]         = useState<SortOrder>("newest");
   const [page, setPage]         = useState(0);
   const [viewOpen, setViewOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
   const [selecting, setSelecting] = useState(false);
   const [picked, setPicked]     = useState<Set<string>>(new Set());
   const viewRef = useRef<HTMLDivElement>(null);
+  const sortRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!viewOpen) return;
+    if (!viewOpen && !sortOpen) return;
     const onDoc = (e: MouseEvent) => {
       if (viewRef.current && !viewRef.current.contains(e.target as Node)) setViewOpen(false);
+      if (sortRef.current && !sortRef.current.contains(e.target as Node)) setSortOpen(false);
     };
     document.addEventListener("mousedown", onDoc);
     return () => document.removeEventListener("mousedown", onDoc);
-  }, [viewOpen]);
+  }, [viewOpen, sortOpen]);
 
   const resetPage = () => setPage(0);
 
@@ -70,10 +73,7 @@ export function ListView({ posts, categories, loading, onNew, onEdit, onDelete, 
 
   const statusLabel: Record<StatusFilter, string> = { all: "전체", cms: "CMS 작성", imported: "네이버 이전" };
   const sortLabel: Record<SortOrder, string> = { newest: "최신순", oldest: "오래된순" };
-  const viewLabel = [
-    cat || (status !== "all" ? statusLabel[status] : "전체"),
-    sortLabel[sort],
-  ].join(" · ");
+  const viewLabel = cat || (status !== "all" ? statusLabel[status] : "전체 보기");
 
   const togglePick = (logNo: string) => setPicked(prev => {
     const next = new Set(prev);
@@ -99,6 +99,7 @@ export function ListView({ posts, categories, loading, onNew, onEdit, onDelete, 
   };
 
   const pickView = (next: () => void, keepOpen?: boolean) => { next(); resetPage(); if (!keepOpen) setViewOpen(false); };
+  const pickSort = (next: () => void) => { next(); resetPage(); setSortOpen(false); };
 
   return (
     <div className="lv-wrap">
@@ -136,23 +137,39 @@ export function ListView({ posts, categories, loading, onNew, onEdit, onDelete, 
         </div>
 
         <div className="lv-bar-right">
-          <div className="lv-view" ref={viewRef}>
-            <button className="lv-btn" onClick={() => setViewOpen(v => !v)}>
-              {viewLabel} ▾
+          {/* 정렬 드롭다운 (시간순 독립) */}
+          <div className="lv-view" ref={sortRef}>
+            <button
+              className={"lv-btn" + (sort !== "newest" ? " active" : "")}
+              onClick={() => { setSortOpen(v => !v); setViewOpen(false); }}
+            >
+              {sortLabel[sort]} ▾
             </button>
-            {viewOpen && (
+            {sortOpen && (
               <div className="lv-panel">
-                <div className="lv-panel-sec">정렬</div>
                 {(["newest", "oldest"] as SortOrder[]).map(s => (
                   <button
                     key={s}
                     className={"lv-panel-item" + (sort === s ? " on" : "")}
-                    onClick={() => pickView(() => setSort(s), true)}
+                    onClick={() => pickSort(() => setSort(s))}
                   >
                     {sortLabel[s]}
                   </button>
                 ))}
-                <div className="lv-panel-divider" />
+              </div>
+            )}
+          </div>
+
+          {/* 필터 드롭다운 (카테고리·상태) */}
+          <div className="lv-view" ref={viewRef}>
+            <button
+              className={"lv-btn" + (cat || status !== "all" ? " active" : "")}
+              onClick={() => { setViewOpen(v => !v); setSortOpen(false); }}
+            >
+              {viewLabel} ▾
+            </button>
+            {viewOpen && (
+              <div className="lv-panel">
                 <div className="lv-panel-sec">상태</div>
                 {(["all", "cms", "imported"] as StatusFilter[]).map(s => (
                   <button
