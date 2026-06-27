@@ -130,6 +130,11 @@ JSON
     },
     {
       "Effect": "Allow",
+      "Action": ["s3:GetObject","s3:PutObject"],
+      "Resource": "arn:aws:s3:::$SITE_BUCKET/live-index.json"
+    },
+    {
+      "Effect": "Allow",
       "Action": ["codebuild:StartBuild","codebuild:BatchGetBuilds"],
       "Resource": "arn:aws:codebuild:$REGION:$ACCOUNT:project/$BUILD_PROJECT"
     },
