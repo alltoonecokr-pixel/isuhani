@@ -1,20 +1,13 @@
 "use client";
 
-// 인라인 편집 엔진 — 실제 사이트 페이지 위에서 보이는 텍스트를 직접 고친다.
-// CMS가 ?__edit=1 로 iframe에 띄우면 활성화. 편집 모드에서는 사이트를 자유롭게 이동하며
-// (링크가 __edit=1 을 유지) 어느 페이지의 어떤 텍스트든 고칠 수 있고, 변경은 페이지 경로와
-// 함께 부모(CMS)로 postMessage 된다. 저장은 CMS가 모아서 한다.
+// 인라인 편집 엔진 — ?__edit=1 (CMS iframe) 에서만 활성.
+// <main> 안의 모든 텍스트 leaf 를 자동으로 편집 가능하게 만든다(마커 불필요).
+// 변경은 페이지 슬러그 + 인덱스 + tag 와 함께 부모(CMS)로 postMessage. 저장은 CMS가 한다.
+// 편집 모드에선 사이트 링크가 __edit=1 을 유지해 페이지 사이 자유 이동.
 // 공개 사이트(일반 방문)에서는 no-op.
 
 import { useEffect } from "react";
-
-// URL 경로 → 페이지 슬러그 (저장 키). 예: /treatment/spine/ → treatment-spine, / → home
-function pathToSlug(pathname: string): string {
-  const p = pathname.replace(/\/+$/, "");
-  if (p === "" || p === "/home") return "home";
-  const seg = p.replace(/^\//, "");
-  return seg.replace(/\//g, "-");
-}
+import { editableLeaves, pathToSlug } from "@/lib/cmsFields";
 
 export function InlineEditor() {
   useEffect(() => {
@@ -28,7 +21,7 @@ export function InlineEditor() {
 
     document.body.classList.add("cms-edit-mode");
 
-    // 같은 출처 페이지 링크는 __edit=1 을 유지해 편집 모드가 끊기지 않게 한다.
+    // 같은 출처 링크는 __edit=1 유지(편집 모드 끊김 방지)
     document.querySelectorAll<HTMLAnchorElement>("a[href]").forEach((a) => {
       const href = a.getAttribute("href") || "";
       if (/^(tel:|mailto:|#)/.test(href)) return;
@@ -38,43 +31,38 @@ export function InlineEditor() {
       } catch { /* ignore */ }
     });
 
-    const els = Array.from(document.querySelectorAll<HTMLElement>("[data-cms-field]"));
-    const valueOf = (el: HTMLElement) => (el.innerText ?? el.textContent ?? "");
-
-    const snapshot: Record<string, string> = {};
-    for (const el of els) {
-      const field = el.dataset.cmsField!;
-      snapshot[field] = valueOf(el);
+    const main = document.querySelector("main");
+    const leaves = editableLeaves(main);
+    const snapshot: Record<string, { t: string; v: string }> = {};
+    leaves.forEach((el, i) => {
+      el.dataset.cmsi = String(i);
       el.setAttribute("contenteditable", "true");
       el.setAttribute("spellcheck", "false");
-    }
+      snapshot[i] = { t: el.tagName, v: el.innerText };
+    });
     post({ type: "snapshot", payload: snapshot });
 
     const onInput = (e: Event) => {
-      const el = (e.target as HTMLElement)?.closest?.("[data-cms-field]") as HTMLElement | null;
+      const el = (e.target as HTMLElement)?.closest?.("[data-cmsi]") as HTMLElement | null;
       if (!el) return;
-      post({ type: "change", field: el.dataset.cmsField, value: valueOf(el) });
+      post({ type: "change", field: el.dataset.cmsi, tag: el.tagName, value: el.innerText });
     };
     const onPaste = (e: ClipboardEvent) => {
-      if (!(e.target as HTMLElement)?.closest?.("[data-cms-field]")) return;
+      if (!(e.target as HTMLElement)?.closest?.("[data-cmsi]")) return;
       e.preventDefault();
       document.execCommand("insertText", false, e.clipboardData?.getData("text/plain") ?? "");
     };
-    // 편집 가능한 요소 클릭 시엔 편집, 그 외 링크 클릭은 (편집 중 실수 방지) tel/외부만 차단
+    // 편집 영역은 그대로 편집. tel/mailto 는 편집 중 차단(실수로 전화 걸림 방지)
     const onClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (target?.closest?.("[data-cms-field]")) return; // 편집 영역은 그대로 편집
+      if (target?.closest?.("[data-cmsi]")) return;
       const a = target?.closest?.("a");
-      if (!a) return;
-      const href = a.getAttribute("href") || "";
-      if (/^(tel:|mailto:)/.test(href)) { e.preventDefault(); } // 전화/메일은 편집 중 차단
-      // 같은 출처 페이지 이동은 허용(위에서 __edit 유지). 외부는 새 탭 두는 편이 안전하지만 v1은 허용.
+      if (a && /^(tel:|mailto:)/.test(a.getAttribute("href") || "")) e.preventDefault();
     };
 
     document.addEventListener("input", onInput, true);
     document.addEventListener("paste", onPaste, true);
     document.addEventListener("click", onClick, true);
-
     post({ type: "ready" });
 
     return () => {
@@ -82,7 +70,7 @@ export function InlineEditor() {
       document.removeEventListener("paste", onPaste, true);
       document.removeEventListener("click", onClick, true);
       document.body.classList.remove("cms-edit-mode");
-      for (const el of els) el.removeAttribute("contenteditable");
+      leaves.forEach((el) => el.removeAttribute("contenteditable"));
     };
   }, []);
 

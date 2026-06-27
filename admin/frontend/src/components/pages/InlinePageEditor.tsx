@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 // 편집 모드에서 사이트를 자유롭게 이동(링크가 __edit 유지)하며 어느 페이지든 텍스트를 고치고,
 // 변경은 페이지별로 누적된다. "저장·발행"은 변경된 모든 페이지를 한 번에 저장 → 빌드 발행.
 
-export type ChangesByPage = Record<string, Record<string, string>>;
+export type FieldOverride = { t: string; v: string };
+export type ChangesByPage = Record<string, Record<string, FieldOverride>>;
 
 type Props = {
   startSlug: string; // 진입 시작 페이지 (예: "spine" → /treatment/spine)
@@ -31,9 +32,9 @@ export function InlinePageEditor({ startSlug, busy, onBack, onSaveAll }: Props) 
       if (d.type === "snapshot" || d.type === "ready") {
         if (d.page) setCurrentPage(d.page);
         setReady(true);
-      } else if (d.type === "change" && d.page && d.field) {
+      } else if (d.type === "change" && d.page && d.field != null) {
         const page = (changesRef.current[d.page] ??= {});
-        page[d.field] = d.value;
+        page[String(d.field)] = { t: String(d.tag || ""), v: String(d.value ?? "") };
         bumpChanges((n) => n + 1);
       }
     };

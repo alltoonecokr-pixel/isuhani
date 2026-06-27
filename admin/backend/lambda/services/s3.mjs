@@ -202,3 +202,17 @@ export async function deleteLivePost(logNo) {
     new DeleteObjectCommand({ Bucket: WEB_BUCKET, Key: `live-posts/${logNo}.json` }),
   ).catch(() => {});
 }
+
+// 페이지 인라인 편집: 텍스트 오버라이드 맵을 웹 버킷에 공개 기록 (즉시 적용용)
+export async function writeLivePage(slug, overrides) {
+  if (!WEB_BUCKET) return;
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: WEB_BUCKET,
+      Key: `live-pages/${slug}.json`,
+      Body: JSON.stringify(overrides),
+      ContentType: "application/json; charset=utf-8",
+      CacheControl: "no-store, max-age=0",
+    }),
+  );
+}

@@ -747,18 +747,18 @@ a {
 
 
 /* ── 인라인 편집 모드 (CMS ?__edit=1 에서만 활성) ── */
-.cms-edit-mode [data-cms-field] {
+.cms-edit-mode [data-cmsi] {
   outline: 1px dashed rgba(45, 110, 90, 0.45);
   outline-offset: 3px;
   border-radius: 3px;
   cursor: text;
   transition: outline-color 0.15s, background 0.15s;
 }
-.cms-edit-mode [data-cms-field]:hover {
+.cms-edit-mode [data-cmsi]:hover {
   outline-color: #2d6e5a;
   background: rgba(45, 110, 90, 0.05);
 }
-.cms-edit-mode [data-cms-field]:focus {
+.cms-edit-mode [data-cmsi]:focus {
   outline: 2px solid #2d6e5a;
   outline-offset: 3px;
   background: rgba(45, 110, 90, 0.07);

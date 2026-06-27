@@ -12,7 +12,10 @@ export function PagesView({ treatments, onEditTreatment }: Props) {
     <div className="pg-list">
       <div className="pg-list-intro">
         <h2>페이지 편집</h2>
-        <p>건강 저널(글) 외의 사이트 페이지를 섹션별로 직접 수정합니다. 저장하면 즉시 사이트에 반영됩니다.</p>
+        <p>실제 사이트 화면에서 텍스트를 직접 클릭해 수정합니다. 편집 중 메뉴로 페이지를 자유롭게 이동하며 고치고, 저장하면 즉시 반영됩니다.</p>
+        <button className="primary pg-start" onClick={() => onEditTreatment("home")}>
+          사이트 편집 시작 (병원 소개부터) →
+        </button>
       </div>
 
       <div className="pg-group">
@@ -34,16 +37,16 @@ export function PagesView({ treatments, onEditTreatment }: Props) {
       <div className="pg-group">
         <div className="pg-group-h">기타 페이지</div>
         <div className="pg-cards">
-          <div className="pg-card disabled">
-            <div className="pg-card-name">병원 소개</div>
-            <div className="pg-card-tagline">원장 소개 · 진료 시간 · 오시는 길</div>
-            <div className="pg-card-meta">다음 단계 준비 중</div>
-          </div>
-          <div className="pg-card disabled">
+          <button className="pg-card" onClick={() => onEditTreatment("home")}>
+            <div className="pg-card-name">병원 소개 (메인)</div>
+            <div className="pg-card-tagline">홈 히어로 · 통계 · 원장 · 진료 안내</div>
+            <div className="pg-card-meta"><span className="pg-card-go">수정 ›</span></div>
+          </button>
+          <button className="pg-card" onClick={() => onEditTreatment("visit-guide")}>
             <div className="pg-card-name">첫 방문 안내</div>
             <div className="pg-card-tagline">진료 절차 · 준비물</div>
-            <div className="pg-card-meta">다음 단계 준비 중</div>
-          </div>
+            <div className="pg-card-meta"><span className="pg-card-go">수정 ›</span></div>
+          </button>
         </div>
       </div>
     </div>
