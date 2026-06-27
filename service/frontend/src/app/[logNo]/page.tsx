@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { getAllPosts, getCategories, getPostByLogNo, makeExcerpt, sanitizeBody, extractFAQs, extractSummaryPoints } from "@/lib/blog";
 import { BlogCategoryBar } from "@/components/blog/BlogCategoryBar";
-import { ArticleToolbar } from "@/components/blog/ArticleToolbar";
+import { ArticleBodyLive } from "@/components/blog/ArticleBodyLive";
 import { SITE_URL } from "@/lib/site";
 
 const DEFAULT_OG = `${SITE_URL}/og.png`;
@@ -230,11 +230,15 @@ export default function PostPage({ params }: { params: { logNo: string } }) {
               const points = (post.summary && post.summary.length >= 2)
                 ? post.summary
                 : extractSummaryPoints(html);
+              // 정적 본문 즉시 표시 + 수정 발행 시 live-posts로 자동 갱신
               return (
-                <>
-                  <ArticleToolbar url={postUrl} title={post.title} summaryPoints={points} />
-                  <div dangerouslySetInnerHTML={{ __html: html }} />
-                </>
+                <ArticleBodyLive
+                  logNo={post.logNo}
+                  initialHtml={html}
+                  initialPoints={points}
+                  title={post.title}
+                  postUrl={postUrl}
+                />
               );
             })()}
           </div>
