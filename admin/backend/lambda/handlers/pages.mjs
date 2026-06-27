@@ -2,7 +2,7 @@
 // 자동 인라인 편집: <main> 텍스트 leaf 의 인덱스별 오버라이드 { "인덱스": {t:tag, v:텍스트} }.
 // PUT은 변경분만 받아 기존에 병합 → 데이터 버킷(durable) + 웹 버킷 live-pages(즉시 적용) 둘 다 기록.
 
-import { getPageContent, putPageContent, writeLivePage } from "../services/s3.mjs";
+import { getPageContent, putPageContent, writeLivePage, deletePageContent } from "../services/s3.mjs";
 import { EDITABLE_PAGES } from "../constants.mjs";
 
 function isEditablePage(slug) {
@@ -37,4 +37,11 @@ export async function handlePutPage(slug, body) {
   await putPageContent(slug, merged); // 데이터 버킷 (durable)
   await writeLivePage(slug, merged);  // 웹 버킷 (즉시 서빙)
   return { slug, fields: Object.keys(merged).length };
+}
+
+// 원래대로 초기화 — 저장된 오버라이드 삭제 → 코드 기본값으로 복원
+export async function handleDeletePage(slug) {
+  if (!isEditablePage(slug)) return undefined; // 404
+  await deletePageContent(slug);
+  return { slug, reset: true };
 }

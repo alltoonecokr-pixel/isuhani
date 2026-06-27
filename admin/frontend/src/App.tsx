@@ -287,18 +287,31 @@ export function App() {
 
   // ── 페이지 편집 (인라인) ─────────────────────────────────────────
   // 변경된 모든 페이지를 각각 PUT(변경분 병합). 텍스트는 클라이언트가 즉시 적용 → 빌드 불필요.
-  const savePages = async (changes: ChangesByPage) => {
+  const savePages = async (changes: ChangesByPage): Promise<boolean> => {
     const entries = Object.entries(changes).filter(([, c]) => Object.keys(c).length);
-    if (!entries.length) return;
+    if (!entries.length) return false;
     setBusy(true);
     try {
       for (const [slug, fields] of entries) {
         await apiRef.current.putPage(slug, fields);
       }
-      setEditingSlug(null);
       toast("저장됨 · 사이트에 즉시 반영됩니다");
+      return true;
     } catch (e) {
       toast(e instanceof Error ? e.message : "저장 실패", "error");
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const resetPage = async (slug: string) => {
+    setBusy(true);
+    try {
+      await apiRef.current.resetPage(slug);
+      toast("원래 디자인으로 되돌렸습니다");
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "초기화 실패", "error");
     } finally {
       setBusy(false);
     }
@@ -368,6 +381,7 @@ export function App() {
           busy={busy}
           onBack={() => setSection("journal")}
           onSaveAll={savePages}
+          onReset={resetPage}
         />
       ) : view === "list" ? (
         <ListView

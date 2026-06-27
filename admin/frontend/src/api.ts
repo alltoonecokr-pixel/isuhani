@@ -176,6 +176,10 @@ export class CmsApi {
     });
   }
 
+  resetPage(slug: string): Promise<{ slug: string; reset: boolean }> {
+    return this.req(`/api/pages/${slug}`, { method: "DELETE" });
+  }
+
   deploy(): Promise<{ buildId: string }> {
     return this.req("/api/deploy", { method: "POST" });
   }

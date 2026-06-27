@@ -203,6 +203,18 @@ export async function deleteLivePost(logNo) {
   ).catch(() => {});
 }
 
+// 페이지 오버라이드 삭제 (원래대로 초기화) — 데이터/웹 버킷 둘 다
+export async function deletePageContent(slug) {
+  await s3.send(
+    new DeleteObjectCommand({ Bucket: BUCKET, Key: `${PAGE_PREFIX}${slug}.json` }),
+  ).catch(() => {});
+  if (WEB_BUCKET) {
+    await s3.send(
+      new DeleteObjectCommand({ Bucket: WEB_BUCKET, Key: `live-pages/${slug}.json` }),
+    ).catch(() => {});
+  }
+}
+
 // 페이지 인라인 편집: 텍스트 오버라이드 맵을 웹 버킷에 공개 기록 (즉시 적용용)
 export async function writeLivePage(slug, overrides) {
   if (!WEB_BUCKET) return;

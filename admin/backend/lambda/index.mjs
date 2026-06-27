@@ -10,7 +10,7 @@
 //   CMS_PASSWORD    Basic Auth 비밀번호
 
 import { handleList, handleCreate, handleUpdate, handleDelete } from "./handlers/posts.mjs";
-import { handleGetPage, handlePutPage } from "./handlers/pages.mjs";
+import { handleGetPage, handlePutPage, handleDeletePage } from "./handlers/pages.mjs";
 import { handleDeploy, handleBuildStatus } from "./handlers/deploy.mjs";
 import { handleUpload } from "./handlers/media.mjs";
 import { getPost, getCategories, putCategories } from "./services/s3.mjs";
@@ -109,6 +109,11 @@ export const handler = async (event) => {
         const result = await handlePutPage(slug, body);
         if (result === undefined) return respond(404, { error: "not found" });
         if (result?.error) return respond(400, result);
+        return respond(200, result);
+      }
+      if (method === "DELETE") {
+        const result = await handleDeletePage(slug);
+        if (result === undefined) return respond(404, { error: "not found" });
         return respond(200, result);
       }
     }
