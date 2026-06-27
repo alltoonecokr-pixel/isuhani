@@ -27,6 +27,9 @@ phases:
       - COUNT=$(ls service/frontend/src/data/blog/posts/*.json 2>/dev/null | wc -l)
       - echo "  포스트 ${COUNT}개"
       - test "$COUNT" -gt 100 || (echo "포스트가 너무 적음 — 마이그레이션 누락 의심" && exit 1)
+      - echo "▸ 페이지 콘텐츠 sync (진료영역 등 고정 섹션 페이지 — 있으면 코드 기본값 위에 덮어씀)"
+      - mkdir -p service/frontend/src/data/pages
+      - aws s3 sync "s3://$CMS_BUCKET/pages/" service/frontend/src/data/pages/ --exclude "*" --include "*.json" || true
       - echo "▸ npm install (service/frontend)"
       - cd service/frontend && npm install --no-audit --no-fund && cd ../..
 
@@ -41,7 +44,7 @@ phases:
       - echo "▸ S3 업로드 (long-cache, immutable assets)"
       - aws s3 sync service/frontend/out/_next/static "s3://$SITE_BUCKET/_next/static" --delete --cache-control "public, max-age=31536000, immutable"
       - echo "▸ S3 업로드 (HTML — short cache). /admin·live-index.json·live-posts/는 CMS Lambda/별도 배포가 단독 관리 → --delete 보호"
-      - aws s3 sync service/frontend/out "s3://$SITE_BUCKET" --delete --cache-control "public, max-age=60, must-revalidate" --exclude "_next/static/*" --exclude "admin/*" --exclude "live-index.json" --exclude "live-posts/*"
+      - aws s3 sync service/frontend/out "s3://$SITE_BUCKET" --delete --cache-control "public, max-age=60, must-revalidate" --exclude "_next/static/*" --exclude "admin/*" --exclude "live-index.json" --exclude "live-posts/*" --exclude "live-pages/*"
       - echo "▸ CloudFront invalidate"
       - aws cloudfront create-invalidation --distribution-id "$CF_DISTRIBUTION_ID" --paths "/*"
       - echo "✓ 배포 완료"

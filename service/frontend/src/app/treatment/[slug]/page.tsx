@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Phone } from "lucide-react";
 import { getAllPosts, makeExcerpt } from "@/lib/blog";
-import { TREATMENTS, TREATMENT_LIST } from "@/data/treatments";
+import { TREATMENT_LIST } from "@/data/treatments";
+import { getTreatment, getTreatmentList } from "@/data/treatmentOverride";
 import { SITE_URL } from "@/lib/site";
 import { TreatmentIllustration } from "@/components/treatment/TreatmentIllustration";
 import { TreatmentAnimations } from "@/components/treatment/TreatmentAnimations";
@@ -76,7 +77,7 @@ export function generateStaticParams() {
 }
 
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const t = TREATMENTS[params.slug];
+  const t = getTreatment(params.slug);
   if (!t) return { title: "이수한의원" };
   const url = `${SITE_URL}/treatment/${params.slug}`;
   return {
@@ -89,7 +90,7 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
 }
 
 export default function TreatmentPage({ params }: { params: { slug: string } }) {
-  const t = TREATMENTS[params.slug];
+  const t = getTreatment(params.slug);
   if (!t) notFound();
 
   const theme = THEMES[params.slug] ?? DEFAULT_THEME;
@@ -124,7 +125,7 @@ export default function TreatmentPage({ params }: { params: { slug: string } }) 
     .filter((p) => t.categoryMatch.includes(p.category))
     .slice(0, 6);
 
-  const otherTreatments = TREATMENT_LIST.filter((x) => x.slug !== params.slug);
+  const otherTreatments = getTreatmentList().filter((x) => x.slug !== params.slug);
 
   // GEO: 관련 글을 hasPart로 연결해 AI 크롤러가 콘텐츠 클러스터를 인식하도록
   const jsonLdEnriched = {

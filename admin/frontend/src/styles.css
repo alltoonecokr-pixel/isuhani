@@ -771,3 +771,5 @@ button.ghost.sm { font-size: 12px; padding: 5px 10px; }
 .pgp-faq { border-bottom: 1px solid var(--ink-200); padding-bottom: 10px; }
 .pgp-faq-q { font-size: 14px; font-weight: 700; color: var(--ink-900); }
 .pgp-faq-a { font-size: 13px; line-height: 1.65; color: var(--ink-600, var(--ink-700)); margin-top: 5px; white-space: pre-wrap; }
+
+.pg-loading { max-width: 980px; margin: 0 auto; padding: 80px 24px; text-align: center; color: var(--ink-400); font-size: 14px; }

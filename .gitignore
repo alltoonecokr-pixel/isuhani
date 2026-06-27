@@ -5,6 +5,8 @@ node_modules/
 # build / output
 service/frontend/.next/
 service/frontend/out/
+# CMS 편집 페이지 콘텐츠 (빌드 시 S3에서 sync — 커밋 안 함)
+service/frontend/src/data/pages/
 .work/
 admin/backend/.work/
 

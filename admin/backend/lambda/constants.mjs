@@ -1,6 +1,7 @@
 // 전역 상수 — S3 키 프리픽스, 카테고리 매핑, 기본 카테고리 목록
 
 export const POST_PREFIX = "posts/";
+export const PAGE_PREFIX = "pages/";
 export const IMAGE_PREFIX = "images/";
 export const META_KEY = "meta/categories.json";
 export const INDEX_KEY = "index.json";

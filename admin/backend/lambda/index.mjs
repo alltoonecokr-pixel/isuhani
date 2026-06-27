@@ -10,6 +10,7 @@
 //   CMS_PASSWORD    Basic Auth 비밀번호
 
 import { handleList, handleCreate, handleUpdate, handleDelete } from "./handlers/posts.mjs";
+import { handleGetPage, handlePutPage } from "./handlers/pages.mjs";
 import { handleDeploy, handleBuildStatus } from "./handlers/deploy.mjs";
 import { handleUpload } from "./handlers/media.mjs";
 import { getPost, getCategories, putCategories } from "./services/s3.mjs";
@@ -92,6 +93,23 @@ export const handler = async (event) => {
         const deleted = await handleDelete(logNo);
         if (!deleted) return respond(404, { error: "not found" });
         return respond(200, { ok: true });
+      }
+    }
+
+    // 페이지 콘텐츠 (진료영역 등 고정 섹션 페이지)
+    const pageSingle = path.match(/^\/api\/pages\/([a-z][a-z0-9-]{1,40})$/);
+    if (pageSingle) {
+      const pageId = pageSingle[1];
+      if (method === "GET") {
+        const r = await handleGetPage(pageId);
+        if (!r) return respond(404, { error: "unknown page" });
+        return respond(200, r);
+      }
+      if (method === "PUT") {
+        const r = await handlePutPage(pageId, body);
+        if (!r) return respond(404, { error: "unknown page" });
+        if (r.error) return respond(400, r);
+        return respond(200, r);
       }
     }
 

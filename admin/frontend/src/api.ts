@@ -164,6 +164,18 @@ export class CmsApi {
     });
   }
 
+  // 페이지 콘텐츠 (진료영역 등 고정 섹션 페이지)
+  getPage<T = unknown>(pageId: string): Promise<{ pageId: string; content: T | null }> {
+    return this.req(`/api/pages/${pageId}`);
+  }
+
+  putPage<T = unknown>(pageId: string, content: T): Promise<{ pageId: string; content: T }> {
+    return this.req(`/api/pages/${pageId}`, {
+      method: "PUT",
+      body: JSON.stringify({ content }),
+    });
+  }
+
   deploy(): Promise<{ buildId: string }> {
     return this.req("/api/deploy", { method: "POST" });
   }
