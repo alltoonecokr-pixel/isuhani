@@ -11,7 +11,7 @@ import type { Config, FullPost, PostIndexEntry, PostInput, StatusKind } from "./
 import { ListView } from "./components/ListView";
 import { EditorView } from "./components/EditorView";
 import { PagesView } from "./components/pages/PagesView";
-import { TreatmentEditor } from "./components/pages/TreatmentEditor";
+import { InlinePageEditor } from "./components/pages/InlinePageEditor";
 import { TREATMENT_SEED, type TreatmentContent } from "./pages/treatmentContent";
 import { SettingsModal } from "./components/SettingsModal";
 import { CategoriesModal } from "./components/CategoriesModal";
@@ -382,9 +382,10 @@ export function App() {
       {section === "pages" ? (
         editingSlug ? (
           editingContent ? (
-            <TreatmentEditor
+            <InlinePageEditor
               key={editingSlug}
-              initial={editingContent}
+              slug={editingSlug}
+              base={editingContent}
               busy={busy}
               onBack={() => { setEditingSlug(null); setEditingContent(null); }}
               onSave={saveTreatment}

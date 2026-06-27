@@ -211,15 +211,15 @@ export default function TreatmentPage({ params }: { params: { slug: string } }) 
               Treatment · {heroNum}
             </div>
 
-            <h1 className="tx-enter tx-e2 font-serif text-[36px] sm:text-[46px] md:text-[58px] font-black tracking-[-0.03em] text-ink-900 leading-[1.06]">
+            <h1 data-cms-field="name" className="tx-enter tx-e2 font-serif text-[36px] sm:text-[46px] md:text-[58px] font-black tracking-[-0.03em] text-ink-900 leading-[1.06]">
               {t.name}
             </h1>
 
-            <div className="tx-enter tx-e3 mt-3 text-[16px] md:text-[18px] font-semibold" style={{ color: theme.accent }}>
+            <div data-cms-field="tagline" className="tx-enter tx-e3 mt-3 text-[16px] md:text-[18px] font-semibold" style={{ color: theme.accent }}>
               {t.tagline}
             </div>
 
-            <p className="tx-enter tx-e4 mt-5 text-[15px] md:text-[16px] text-ink-600 leading-[1.88] max-w-[500px]">
+            <p data-cms-field="description" className="tx-enter tx-e4 mt-5 text-[15px] md:text-[16px] text-ink-600 leading-[1.88] max-w-[500px]">
               {t.description}
             </p>
 
@@ -300,10 +300,10 @@ export default function TreatmentPage({ params }: { params: { slug: string } }) 
                   {String(i + 1).padStart(2, "0")}
                 </div>
 
-                <h3 className="relative font-serif text-[20px] md:text-[22px] font-black tracking-[-0.02em] text-ink-900 leading-tight">
+                <h3 data-cms-field={`methods.${i}.title`} className="relative font-serif text-[20px] md:text-[22px] font-black tracking-[-0.02em] text-ink-900 leading-tight">
                   {m.title}
                 </h3>
-                <p className="relative mt-3 text-[14px] text-ink-600 leading-[1.82]">{m.desc}</p>
+                <p data-cms-field={`methods.${i}.desc`} className="relative mt-3 text-[14px] text-ink-600 leading-[1.82]">{m.desc}</p>
 
                 {/* 하단 슬라이딩 액센트 바 */}
                 <div

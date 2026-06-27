@@ -6,6 +6,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ChatDock } from "@/components/chat/ChatDock";
 import { LofiToggle } from "@/components/LofiToggle";
+import { InlineEditor } from "@/components/cms/InlineEditor";
 import { getAllPosts } from "@/lib/blog";
 import { SITE_URL } from "@/lib/site";
 
@@ -282,6 +283,7 @@ export default function RootLayout({
         <Footer />
         <ChatDock />
         <LofiToggle />
+        <InlineEditor />
       </body>
     </html>
   );
