@@ -10,6 +10,9 @@ import {
 import type { Config, FullPost, PostIndexEntry, PostInput, StatusKind } from "./types";
 import { ListView } from "./components/ListView";
 import { EditorView } from "./components/EditorView";
+import { PagesView } from "./components/pages/PagesView";
+import { TreatmentEditor } from "./components/pages/TreatmentEditor";
+import { TREATMENT_SEED, type TreatmentContent } from "./pages/treatmentContent";
 import { SettingsModal } from "./components/SettingsModal";
 import { CategoriesModal } from "./components/CategoriesModal";
 import { GuideModal } from "./components/GuideModal";
@@ -57,6 +60,11 @@ export function App() {
   const [view, setView] = useState<View>("list");
   const [editingPost, setEditingPost] = useState<FullPost | null>(null);
   const [editorKey, setEditorKey] = useState(0);
+
+  // 상단 모드: 글 관리 vs 페이지 편집 (목업 — 진료영역 로컬 시드)
+  const [section, setSection] = useState<"journal" | "pages">("journal");
+  const [treatments, setTreatments] = useState<TreatmentContent[]>(TREATMENT_SEED);
+  const [editingSlug, setEditingSlug] = useState<string | null>(null);
 
   const [settings, setSettings] = useState<{ open: boolean; force: boolean }>({ open: false, force: false });
   const [catsOpen, setCatsOpen] = useState(false);
@@ -299,8 +307,22 @@ export function App() {
       <header className="top">
         <div className="brand">
           <span className="brand-icon">醫</span>
-          건강 저널 관리
-          <small>이수한의원</small>
+          이수한의원 관리
+          <small>CMS</small>
+        </div>
+        <div className="top-tabs">
+          <button
+            className={"top-tab" + (section === "journal" ? " active" : "")}
+            onClick={() => setSection("journal")}
+          >
+            건강 저널
+          </button>
+          <button
+            className={"top-tab" + (section === "pages" ? " active" : "")}
+            onClick={() => { setSection("pages"); setEditingSlug(null); }}
+          >
+            페이지 편집
+          </button>
         </div>
         <div className="top-actions">
           <span className="top-status">
@@ -324,7 +346,23 @@ export function App() {
         </div>
       </header>
 
-      {view === "list" ? (
+      {section === "pages" ? (
+        editingSlug ? (
+          <TreatmentEditor
+            key={editingSlug}
+            initial={treatments.find((t) => t.slug === editingSlug)!}
+            busy={busy}
+            onBack={() => setEditingSlug(null)}
+            onSave={(next) => {
+              setTreatments((prev) => prev.map((t) => (t.slug === next.slug ? next : t)));
+              toast("저장됨 (목업 — 백엔드 연결 시 즉시 발행)", "ok");
+              setEditingSlug(null);
+            }}
+          />
+        ) : (
+          <PagesView treatments={treatments} onEditTreatment={setEditingSlug} />
+        )
+      ) : view === "list" ? (
         <ListView
           posts={posts}
           categories={categories}
