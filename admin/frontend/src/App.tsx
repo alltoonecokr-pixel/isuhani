@@ -11,8 +11,8 @@ import type { Config, FullPost, PostIndexEntry, PostInput, StatusKind } from "./
 import { ListView } from "./components/ListView";
 import { EditorView } from "./components/EditorView";
 import { PagesView } from "./components/pages/PagesView";
-import { InlinePageEditor } from "./components/pages/InlinePageEditor";
-import { TREATMENT_SEED, type TreatmentContent } from "./pages/treatmentContent";
+import { InlinePageEditor, type ChangesByPage } from "./components/pages/InlinePageEditor";
+import { TREATMENT_SEED } from "./pages/treatmentContent";
 import { SettingsModal } from "./components/SettingsModal";
 import { CategoriesModal } from "./components/CategoriesModal";
 import { GuideModal } from "./components/GuideModal";
@@ -64,8 +64,6 @@ export function App() {
   // 상단 모드: 글 관리 vs 페이지 편집. 진료영역 콘텐츠는 API에서 로드, 없으면 시드.
   const [section, setSection] = useState<"journal" | "pages">("journal");
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
-  const [editingContent, setEditingContent] = useState<TreatmentContent | null>(null);
-  const [pagesLoading, setPagesLoading] = useState(false);
 
   const [settings, setSettings] = useState<{ open: boolean; force: boolean }>({ open: false, force: false });
   const [catsOpen, setCatsOpen] = useState(false);
@@ -289,31 +287,18 @@ export function App() {
     }
   };
 
-  // ── 페이지 편집 (진료영역) ───────────────────────────────────────
-  const openTreatment = async (slug: string) => {
-    const seed = TREATMENT_SEED.find((t) => t.slug === slug)!;
-    setEditingSlug(slug);
-    setEditingContent(null);
-    setPagesLoading(true);
-    try {
-      const { content } = await apiRef.current.getPage<TreatmentContent>(`treatment-${slug}`);
-      // 저장된 적 있으면 그 값, 없으면 시드. 시드 기본값으로 빠진 필드 보강.
-      setEditingContent(content ? { ...seed, ...content, slug } : seed);
-    } catch (e) {
-      toast(e instanceof Error ? e.message : "불러오기 실패", "error");
-      setEditingContent(seed);
-    } finally {
-      setPagesLoading(false);
-    }
-  };
-
-  const saveTreatment = async (next: TreatmentContent) => {
+  // ── 페이지 편집 (인라인) ─────────────────────────────────────────
+  // 변경된 모든 페이지(슬러그→{필드:텍스트})를 각각 PUT(변경분만 병합) 후 한 번만 빌드 발행.
+  const savePages = async (changes: ChangesByPage) => {
+    const entries = Object.entries(changes).filter(([, c]) => Object.keys(c).length);
+    if (!entries.length) return;
     setBusy(true);
     try {
-      await apiRef.current.putPage(`treatment-${next.slug}`, next);
+      for (const [slug, fields] of entries) {
+        await apiRef.current.putPage(slug, fields);
+      }
       setEditingSlug(null);
-      setEditingContent(null);
-      void runDeploy(); // 글과 동일하게 빌드로 사이트 반영
+      void runDeploy();
     } catch (e) {
       toast(e instanceof Error ? e.message : "저장 실패", "error");
     } finally {
@@ -381,20 +366,15 @@ export function App() {
 
       {section === "pages" ? (
         editingSlug ? (
-          editingContent ? (
-            <InlinePageEditor
-              key={editingSlug}
-              slug={editingSlug}
-              base={editingContent}
-              busy={busy}
-              onBack={() => { setEditingSlug(null); setEditingContent(null); }}
-              onSave={saveTreatment}
-            />
-          ) : (
-            <div className="pg-list"><p className="pg-empty">{pagesLoading ? "불러오는 중…" : ""}</p></div>
-          )
+          <InlinePageEditor
+            key={editingSlug}
+            startSlug={editingSlug}
+            busy={busy}
+            onBack={() => setEditingSlug(null)}
+            onSaveAll={savePages}
+          />
         ) : (
-          <PagesView treatments={TREATMENT_SEED} onEditTreatment={openTreatment} />
+          <PagesView treatments={TREATMENT_SEED} onEditTreatment={setEditingSlug} />
         )
       ) : view === "list" ? (
         <ListView

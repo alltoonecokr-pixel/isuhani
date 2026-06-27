@@ -1,88 +1,79 @@
 import { useEffect, useRef, useState } from "react";
-import type { TreatmentContent } from "../../pages/treatmentContent";
 
-// 실제 사이트 페이지를 iframe으로 띄워 그 위에서 인라인 편집.
-// 사이트의 InlineEditor(?__edit=1)가 변경을 postMessage로 보내고, 여기서 모아 저장한다.
-// 저장 안 보이는 필드(faq 등)는 base 에서 그대로 보존.
+// 실제 사이트를 iframe으로 띄워 그 위에서 인라인 편집.
+// 편집 모드에서 사이트를 자유롭게 이동(링크가 __edit 유지)하며 어느 페이지든 텍스트를 고치고,
+// 변경은 페이지별로 누적된다. "저장·발행"은 변경된 모든 페이지를 한 번에 저장 → 빌드 발행.
+
+export type ChangesByPage = Record<string, Record<string, string>>;
 
 type Props = {
-  slug: string;          // "spine" …
-  base: TreatmentContent; // 현재 콘텐츠(시드+저장본) — 비편집 필드 보존용
+  startSlug: string; // 진입 시작 페이지 (예: "spine" → /treatment/spine)
   busy?: boolean;
   onBack: () => void;
-  onSave: (content: TreatmentContent) => void;
+  onSaveAll: (changes: ChangesByPage) => void;
 };
 
-function buildContent(base: TreatmentContent, map: Record<string, string>): TreatmentContent {
-  const methods = base.methods.map((m) => ({ ...m }));
-  for (const [k, v] of Object.entries(map)) {
-    const mm = k.match(/^methods\.(\d+)\.(title|desc)$/);
-    if (mm) {
-      const i = Number(mm[1]);
-      if (!methods[i]) methods[i] = { title: "", desc: "" };
-      methods[i][mm[2] as "title" | "desc"] = v;
-    }
-  }
-  return {
-    slug: base.slug,
-    name: (map.name ?? base.name).trim(),
-    tagline: (map.tagline ?? base.tagline).trim(),
-    description: (map.description ?? base.description).trim(),
-    methods: methods.map((m) => ({ title: m.title.trim(), desc: m.desc.trim() })),
-    faq: base.faq, // 페이지에 안 보이는 필드 — 보존
-  };
-}
+const startPath = (slug: string) =>
+  slug === "home" ? "/home/" : slug === "visit-guide" ? "/visit-guide/" : `/treatment/${slug}/`;
 
-export function InlinePageEditor({ slug, base, busy, onBack, onSave }: Props) {
+export function InlinePageEditor({ startSlug, busy, onBack, onSaveAll }: Props) {
   const [ready, setReady] = useState(false);
-  const [changed, setChanged] = useState(false);
-  const mapRef = useRef<Record<string, string>>({});
+  const [currentPage, setCurrentPage] = useState<string>("");
+  const [, bumpChanges] = useState(0); // 변경 누적 시 리렌더 트리거 (값은 changesRef에서 계산)
+  const changesRef = useRef<ChangesByPage>({});
   const [device, setDevice] = useState<"desktop" | "mobile">("desktop");
-
-  const src = `/treatment/${slug}/?__edit=1`;
 
   useEffect(() => {
     const onMessage = (ev: MessageEvent) => {
       if (ev.origin !== window.location.origin) return;
       const d = ev.data;
       if (d?.source !== "cms-inline") return;
-      if (d.type === "snapshot") { mapRef.current = { ...d.payload }; setReady(true); }
-      else if (d.type === "ready") { setReady(true); }
-      else if (d.type === "change") {
-        mapRef.current = { ...mapRef.current, [d.field]: d.value };
-        setChanged(true);
+      if (d.type === "snapshot" || d.type === "ready") {
+        if (d.page) setCurrentPage(d.page);
+        setReady(true);
+      } else if (d.type === "change" && d.page && d.field) {
+        const page = (changesRef.current[d.page] ??= {});
+        page[d.field] = d.value;
+        bumpChanges((n) => n + 1);
       }
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
   }, []);
 
-  const save = () => onSave(buildContent(base, mapRef.current));
+  const totalChanged = Object.values(changesRef.current).reduce(
+    (n, p) => n + Object.keys(p).length,
+    0,
+  );
+  const pageCount = Object.values(changesRef.current).filter((p) => Object.keys(p).length).length;
+  const dirty = totalChanged > 0;
 
   return (
     <div className="pg-editor">
       <div className="pg-editor-bar">
         <button className="ghost" onClick={onBack}>← 페이지 목록</button>
         <div className="pg-editor-title">
-          진료영역 · {base.name}
-          <span className="pg-slug">실제 페이지에서 텍스트를 클릭해 수정</span>
+          사이트 편집
+          <span className="pg-slug">
+            {currentPage ? `현재: ${currentPage}` : "불러오는 중…"}
+            {dirty ? ` · 변경 ${totalChanged}곳 (${pageCount}페이지)` : " · 텍스트를 클릭해 수정 · 링크로 이동 가능"}
+          </span>
         </div>
         <div className="pg-device-toggle">
           <button className={device === "desktop" ? "active" : ""} onClick={() => setDevice("desktop")}>데스크탑</button>
           <button className={device === "mobile" ? "active" : ""} onClick={() => setDevice("mobile")}>모바일</button>
         </div>
-        <button className="primary" disabled={!ready || !changed || busy} onClick={save}>
-          {busy ? "저장 중…" : changed ? "저장 · 발행" : ready ? "변경 없음" : "불러오는 중…"}
+        <button
+          className="primary"
+          disabled={!ready || !dirty || busy}
+          onClick={() => onSaveAll(changesRef.current)}
+        >
+          {busy ? "저장 중…" : dirty ? `저장 · 발행 (${pageCount})` : ready ? "변경 없음" : "불러오는 중…"}
         </button>
       </div>
 
       <div className={"pg-iframe-wrap " + device}>
-        <iframe
-          key={slug}
-          className="pg-iframe"
-          src={src}
-          title="페이지 편집"
-        />
+        <iframe className="pg-iframe" src={`${startPath(startSlug)}?__edit=1`} title="사이트 편집" />
       </div>
     </div>
   );

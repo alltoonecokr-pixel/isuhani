@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { Phone } from "lucide-react";
 import { getAllPosts, makeExcerpt } from "@/lib/blog";
 import { TREATMENT_LIST } from "@/data/treatments";
-import { getTreatment } from "@/lib/pages";
+import { getTreatment, pageOverrides } from "@/lib/pages";
 import { SITE_URL } from "@/lib/site";
 import { TreatmentIllustration } from "@/components/treatment/TreatmentIllustration";
 import { TreatmentAnimations } from "@/components/treatment/TreatmentAnimations";
@@ -92,6 +92,7 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
 export default function TreatmentPage({ params }: { params: { slug: string } }) {
   const t = getTreatment(params.slug);
   if (!t) notFound();
+  const ov = pageOverrides(`treatment-${params.slug}`);
 
   const theme = THEMES[params.slug] ?? DEFAULT_THEME;
   const index = TREATMENT_LIST.findIndex((x) => x.slug === params.slug);
@@ -275,8 +276,8 @@ export default function TreatmentPage({ params }: { params: { slug: string } }) 
         <div className="max-w-5xl mx-auto px-5 md:px-8">
           <div className="reveal flex items-baseline gap-4 mb-11">
             <span className="font-serif text-[11px] tracking-[0.3em] text-ink-400 tabular-nums">01</span>
-            <h2 className="font-serif text-[26px] md:text-[34px] font-black tracking-[-0.025em] text-ink-900">
-              주요 진료 방법
+            <h2 data-cms-field="methods.heading" className="font-serif text-[26px] md:text-[34px] font-black tracking-[-0.025em] text-ink-900">
+              {ov["methods.heading"] ?? "주요 진료 방법"}
             </h2>
           </div>
 
@@ -325,8 +326,8 @@ export default function TreatmentPage({ params }: { params: { slug: string } }) 
             <div className="reveal flex items-baseline justify-between mb-9">
               <div className="flex items-baseline gap-4">
                 <span className="font-serif text-[11px] tracking-[0.3em] text-ink-400 tabular-nums">02</span>
-                <h2 className="font-serif text-[26px] md:text-[34px] font-black tracking-[-0.025em] text-ink-900">
-                  관련 칼럼
+                <h2 data-cms-field="related.heading" className="font-serif text-[26px] md:text-[34px] font-black tracking-[-0.025em] text-ink-900">
+                  {ov["related.heading"] ?? "관련 칼럼"}
                 </h2>
               </div>
               <Link

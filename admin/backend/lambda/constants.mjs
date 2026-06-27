@@ -7,9 +7,11 @@ export const META_KEY = "meta/categories.json";
 export const INDEX_KEY = "index.json";
 
 // 편집 가능한 사이트 페이지 (건강저널 글이 아닌 정적 페이지). 슬러그 화이트리스트.
+// 텍스트에 data-cms-field 마커가 심긴 페이지만 실제 편집됨 — 여기는 안전 경계.
 export const EDITABLE_PAGES = [
   "treatment-spine", "treatment-women", "treatment-children",
   "treatment-diet", "treatment-health", "treatment-skin",
+  "home", "visit-guide",
 ];
 
 // 레거시(네이버 크롤) categoryNo → 표시 이름 매핑
