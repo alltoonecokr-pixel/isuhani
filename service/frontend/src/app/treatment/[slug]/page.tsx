@@ -337,7 +337,7 @@ export default function TreatmentPage({ params }: { params: { slug: string } }) 
               </Link>
             </div>
 
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
+            <div data-cms-skip className="grid sm:grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
               {relatedPosts.map((p, i) => (
                 <Link
                   key={p.logNo}
