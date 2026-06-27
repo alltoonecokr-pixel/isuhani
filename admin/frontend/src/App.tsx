@@ -10,9 +10,7 @@ import {
 import type { Config, FullPost, PostIndexEntry, PostInput, StatusKind } from "./types";
 import { ListView } from "./components/ListView";
 import { EditorView } from "./components/EditorView";
-import { PagesView } from "./components/pages/PagesView";
 import { InlinePageEditor, type ChangesByPage } from "./components/pages/InlinePageEditor";
-import { TREATMENT_SEED } from "./pages/treatmentContent";
 import { SettingsModal } from "./components/SettingsModal";
 import { CategoriesModal } from "./components/CategoriesModal";
 import { GuideModal } from "./components/GuideModal";
@@ -337,7 +335,7 @@ export function App() {
           </button>
           <button
             className={"top-tab" + (section === "pages" ? " active" : "")}
-            onClick={() => { setSection("pages"); setEditingSlug(null); }}
+            onClick={() => { setSection("pages"); setEditingSlug("home"); }}
           >
             페이지 편집
           </button>
@@ -365,17 +363,12 @@ export function App() {
       </header>
 
       {section === "pages" ? (
-        editingSlug ? (
-          <InlinePageEditor
-            key={editingSlug}
-            startSlug={editingSlug}
-            busy={busy}
-            onBack={() => setEditingSlug(null)}
-            onSaveAll={savePages}
-          />
-        ) : (
-          <PagesView treatments={TREATMENT_SEED} onEditTreatment={setEditingSlug} />
-        )
+        <InlinePageEditor
+          startSlug={editingSlug ?? "home"}
+          busy={busy}
+          onBack={() => setSection("journal")}
+          onSaveAll={savePages}
+        />
       ) : view === "list" ? (
         <ListView
           posts={posts}

@@ -52,12 +52,12 @@ export function InlinePageEditor({ startSlug, busy, onBack, onSaveAll }: Props) 
   return (
     <div className="pg-editor">
       <div className="pg-editor-bar">
-        <button className="ghost" onClick={onBack}>← 페이지 목록</button>
+        <button className="ghost" onClick={onBack}>← 나가기</button>
         <div className="pg-editor-title">
           사이트 편집
           <span className="pg-slug">
             {currentPage ? `현재: ${currentPage}` : "불러오는 중…"}
-            {dirty ? ` · 변경 ${totalChanged}곳 (${pageCount}페이지)` : " · 텍스트를 클릭해 수정 · 링크로 이동 가능"}
+            {dirty ? ` · 변경 ${totalChanged}곳 (${pageCount}페이지)` : " · 텍스트를 클릭해 수정 · 메뉴로 이동"}
           </span>
         </div>
         <div className="pg-device-toggle">
