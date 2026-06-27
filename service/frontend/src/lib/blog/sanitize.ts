@@ -35,6 +35,49 @@ export function decodeEntities(s: string): string {
  * - CMS 지정 width(%) · data-align 보존, 나머지 인라인 치수·스타일 제거
  * - script / style / 트래킹 제거, 빈 블록 제거, 광고 영역 제거
  */
+/**
+ * 네이버 oglink(뉴스/외부 링크 카드) 컴포넌트를 찾아 주석 플레이스홀더로 치환.
+ * 닫는 태그가 `</script></div>`인 원본 export와 script가 제거된 CMS 저장본(중첩 div만)
+ * 양쪽을 모두 처리하기 위해 정규식 앵커 대신 div 깊이를 세어 컴포넌트 끝을 찾는다.
+ */
+function oglinkToPlaceholders(html: string): string {
+  const startRe = /<div[^>]*class="[^"]*se-component[^"]*se-oglink[^"]*"[^>]*>/gi;
+  let result = "";
+  let last = 0;
+  let m: RegExpExecArray | null;
+  while ((m = startRe.exec(html)) !== null) {
+    const start = m.index;
+    // div 깊이를 세어 매칭되는 컴포넌트 종료 위치 탐색
+    const tagRe = /<\/?div\b[^>]*>/gi;
+    tagRe.lastIndex = start;
+    let depth = 0;
+    let end = -1;
+    let t: RegExpExecArray | null;
+    while ((t = tagRe.exec(html)) !== null) {
+      depth += t[0][1] === "/" ? -1 : 1;
+      if (depth === 0) { end = t.index + t[0].length; break; }
+    }
+    if (end === -1) break; // 깨진 구조 — 이후는 건드리지 않음
+    const block = html.slice(start, end);
+    const href = (block.match(/\bhref="([^"]+)"/) || [])[1];
+    if (href) {
+      const titleRaw = (block.match(/se-oglink-title"[^>]*>([\s\S]*?)<\/(?:strong|p|div|span)>/i) || [])[1] || "";
+      const title = titleRaw.replace(/<[^>]+>/g, "").trim();
+      const domain = ((block.match(/se-oglink-url"[^>]*>([^<]+)</) || [])[1] || "").trim();
+      // 카드 썸네일: 컴포넌트 안 첫 img src (엔티티는 본문 HTML 렌더 시 브라우저가 디코딩)
+      const thumb = (block.match(/<img[^>]+src="([^"]+)"/i) || [])[1] || "";
+      const label = title || domain || href;
+      result += html.slice(last, start) +
+        `<!--OGLINK:${encodeURIComponent(href)}:${encodeURIComponent(label)}:${encodeURIComponent(domain)}:${encodeURIComponent(thumb)}-->`;
+    } else {
+      result += html.slice(last, end); // href 없으면 원본 유지
+    }
+    last = end;
+    startRe.lastIndex = end;
+  }
+  return result + html.slice(last);
+}
+
 export function sanitizeBody(body: string): string {
   let out = body;
 
@@ -109,23 +152,8 @@ export function sanitizeBody(body: string): string {
   );
 
   // 2단계: oglink 컴포넌트 → 주석 플레이스홀더 (ATTR_RE가 class를 지우기 전에 데이터 추출)
-  out = out.replace(
-    /<div[^>]+class="[^"]*se-component[^"]*se-oglink[^"]*"[\s\S]*?<\/script>\s*<\/div>/gi,
-    (m) => {
-      const hrefRaw = (m.match(/\bhref="([^"]+)"/) || [])[1];
-      if (!hrefRaw) return "";
-      const titleRaw = (m.match(/class="se-oglink-title"[^>]*>([\s\S]*?)<\/(?:strong|p|div)>/i) || [])[1] || "";
-      const title = titleRaw.replace(/<[^>]+>/g, "").trim();
-      const domainRaw = (m.match(/class="se-oglink-url"[^>]*>([^<]+)</) || [])[1] || "";
-      const domain = domainRaw.trim();
-      // 카드 썸네일: oglink 안의 첫 img src (위 img 처리로 class는 이미 제거됨)
-      // 엔티티(&#x3D; 등)는 그대로 보존 — 본문 HTML로 렌더되면 브라우저가 디코딩한다
-      const thumb = (m.match(/<img[^>]+src="([^"]+)"/i) || [])[1] || "";
-      const label = title || domain || hrefRaw;
-      // 데이터를 URI 인코딩해 주석에 저장 (ATTR_RE에서 안전)
-      return `<!--OGLINK:${encodeURIComponent(hrefRaw)}:${encodeURIComponent(label)}:${encodeURIComponent(domain)}:${encodeURIComponent(thumb)}-->`;
-    },
-  );
+  // div 깊이 기반 매칭 — script 유무(원본 export vs CMS 저장본) 모두 처리
+  out = oglinkToPlaceholders(out);
 
   // script / style 제거
   out = out.replace(/<script[\s\S]*?<\/script>/gi, "");
@@ -204,8 +232,10 @@ export function sanitizeBody(body: string): string {
 
   // 마지막 단계: oglink 플레이스홀더 → 최종 link-card HTML (ATTR_RE 이후라 class 보존됨)
   // 썸네일이 있으면 이미지 포함 리치 카드, 없으면 기존 텍스트 카드
+  // 그룹은 [^:>]* — 인코딩 필드엔 `:`/`>`가 없으므로 안전하고, `-->`의 `>`를 못 넘어
+  // 뒤쪽 다른 HTML 주석(<!-- SE-TEXT --> 등)까지 흡수하는 일이 없다.
   out = out.replace(
-    /<!--OGLINK:([^:]*):([^:]*):([^:]*):([^:]*)-->/g,
+    /<!--OGLINK:([^:>]*):([^:>]*):([^:>]*):([^:>]*)-->/g,
     (_m, hrefEnc, labelEnc, domainEnc, thumbEnc) => {
       const hrefRaw = decodeURIComponent(hrefEnc);
       const label = decodeURIComponent(labelEnc);
