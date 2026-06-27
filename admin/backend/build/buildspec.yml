@@ -40,8 +40,8 @@ phases:
     commands:
       - echo "▸ S3 업로드 (long-cache, immutable assets)"
       - aws s3 sync service/frontend/out/_next/static "s3://$SITE_BUCKET/_next/static" --delete --cache-control "public, max-age=31536000, immutable"
-      - echo "▸ S3 업로드 (HTML — short cache). /admin은 deploy-admin-frontend가 단독 관리, live-index.json은 CMS Lambda가 단독 관리 → --delete 보호"
-      - aws s3 sync service/frontend/out "s3://$SITE_BUCKET" --delete --cache-control "public, max-age=60, must-revalidate" --exclude "_next/static/*" --exclude "admin/*" --exclude "live-index.json"
+      - echo "▸ S3 업로드 (HTML — short cache). /admin·live-index.json·live-posts/는 CMS Lambda/별도 배포가 단독 관리 → --delete 보호"
+      - aws s3 sync service/frontend/out "s3://$SITE_BUCKET" --delete --cache-control "public, max-age=60, must-revalidate" --exclude "_next/static/*" --exclude "admin/*" --exclude "live-index.json" --exclude "live-posts/*"
       - echo "▸ CloudFront invalidate"
       - aws cloudfront create-invalidation --distribution-id "$CF_DISTRIBUTION_ID" --paths "/*"
       - echo "✓ 배포 완료"

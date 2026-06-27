@@ -1,6 +1,6 @@
 // 글 CRUD 핸들러 — GET/POST/PUT/DELETE /api/posts
 
-import { getPost, putPost, deletePost, postExists } from "../services/s3.mjs";
+import { getPost, putPost, deletePost, postExists, writeLivePost, deleteLivePost } from "../services/s3.mjs";
 import { upsertIndexEntry, removeIndexEntry, indexEntry, categoryOf } from "../services/indexer.mjs";
 import { toItem, putIndex, deleteIndex, queryAll } from "../services/dynamo.mjs";
 import { renderBlocks, sanitizeBody } from "../utils/html.mjs";
@@ -62,11 +62,27 @@ function buildPostFromInput(input, logNo, existing = null) {
   };
 }
 
-// DynamoDB 메타 인덱스 + S3 index.json 동시 갱신
+// 즉시 발행용 공개 본문 엔트리 (프론트 LiveArticle 가 읽는 형태)
+function liveEntry(post) {
+  return {
+    logNo: post.logNo,
+    title: post.title,
+    category: categoryOf(post),
+    dateLabel: post.addDate || "",
+    date: parseAddDate(post.addDate),
+    body: post.body ?? null,
+    ogImage: post?.meta?.ogImage ?? null,
+    externalUrl: `https://blog.naver.com/isuhani/${post.logNo}`,
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+// DynamoDB 메타 인덱스 + S3 index.json + 즉시 발행 본문 동시 갱신
 async function syncIndexes(post) {
   await Promise.all([
     upsertIndexEntry(post),
     putIndex(toItem(indexEntry(post), { excerpt: post?.meta?.ogDesc || null })),
+    writeLivePost(liveEntry(post)),
   ]);
 }
 
@@ -106,6 +122,6 @@ export async function handleUpdate(logNo, input) {
 export async function handleDelete(logNo) {
   if (!(await postExists(logNo))) return false;
   await deletePost(logNo);
-  await Promise.all([removeIndexEntry(logNo), deleteIndex(logNo)]);
+  await Promise.all([removeIndexEntry(logNo), deleteIndex(logNo), deleteLivePost(logNo)]);
   return true;
 }

@@ -26,6 +26,18 @@ function logNoFromPath(): string | null {
 export default function LivePostPage() {
   const [state, setState] = useState<State>({ kind: "loading" });
 
+  // 이 폴백 경로는 색인 대상이 아님 — SEO는 빌드된 정적 상세 페이지가 담당
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    let meta = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.name = "robots";
+      document.head.appendChild(meta);
+    }
+    meta.content = "noindex";
+  }, []);
+
   useEffect(() => {
     const logNo = logNoFromPath();
     if (!logNo) {

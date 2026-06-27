@@ -155,3 +155,25 @@ export async function writeWebIndex(posts) {
     }),
   );
 }
+
+// 즉시 발행: 갓 저장된 글 1건을 웹 버킷에 공개 기록 (정적 빌드 전이라도 사이트가 바로 읽음)
+// 프론트의 LiveArticle/ArticleBodyLive 가 이 JSON을 fetch → sanitizeBody 적용해 렌더.
+export async function writeLivePost(entry) {
+  if (!WEB_BUCKET || !entry?.logNo) return;
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: WEB_BUCKET,
+      Key: `live-posts/${entry.logNo}.json`,
+      Body: JSON.stringify(entry),
+      ContentType: "application/json; charset=utf-8",
+      CacheControl: "no-store, max-age=0",
+    }),
+  );
+}
+
+export async function deleteLivePost(logNo) {
+  if (!WEB_BUCKET) return;
+  await s3.send(
+    new DeleteObjectCommand({ Bucket: WEB_BUCKET, Key: `live-posts/${logNo}.json` }),
+  ).catch(() => {});
+}

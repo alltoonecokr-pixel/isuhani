@@ -130,8 +130,11 @@ JSON
     },
     {
       "Effect": "Allow",
-      "Action": ["s3:GetObject","s3:PutObject"],
-      "Resource": "arn:aws:s3:::$SITE_BUCKET/live-index.json"
+      "Action": ["s3:GetObject","s3:PutObject","s3:DeleteObject"],
+      "Resource": [
+        "arn:aws:s3:::$SITE_BUCKET/live-index.json",
+        "arn:aws:s3:::$SITE_BUCKET/live-posts/*"
+      ]
     },
     {
       "Effect": "Allow",
