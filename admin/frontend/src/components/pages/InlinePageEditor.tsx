@@ -69,7 +69,7 @@ export function InlinePageEditor({ startSlug, busy, onBack, onSaveAll }: Props) 
           disabled={!ready || !dirty || busy}
           onClick={() => onSaveAll(changesRef.current)}
         >
-          {busy ? "저장 중…" : dirty ? `저장 · 발행 (${pageCount})` : ready ? "변경 없음" : "불러오는 중…"}
+          {busy ? "저장 중…" : dirty ? `저장 (${pageCount}페이지)` : ready ? "변경 없음" : "불러오는 중…"}
         </button>
       </div>
 

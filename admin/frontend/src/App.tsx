@@ -288,7 +288,7 @@ export function App() {
   };
 
   // ── 페이지 편집 (인라인) ─────────────────────────────────────────
-  // 변경된 모든 페이지(슬러그→{필드:텍스트})를 각각 PUT(변경분만 병합) 후 한 번만 빌드 발행.
+  // 변경된 모든 페이지를 각각 PUT(변경분 병합). 텍스트는 클라이언트가 즉시 적용 → 빌드 불필요.
   const savePages = async (changes: ChangesByPage) => {
     const entries = Object.entries(changes).filter(([, c]) => Object.keys(c).length);
     if (!entries.length) return;
@@ -298,7 +298,7 @@ export function App() {
         await apiRef.current.putPage(slug, fields);
       }
       setEditingSlug(null);
-      void runDeploy();
+      toast("저장됨 · 사이트에 즉시 반영됩니다");
     } catch (e) {
       toast(e instanceof Error ? e.message : "저장 실패", "error");
     } finally {
