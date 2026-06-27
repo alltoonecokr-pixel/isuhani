@@ -2,7 +2,7 @@
 // "포스트가 어느 카테고리인가", "썸네일이 뭔가"를 여기서만 결정한다.
 
 import { CATEGORY_MAP, PARENT_CATEGORY_MAP } from "../constants.mjs";
-import { cleanImageUrl } from "../utils/images.mjs";
+import { cleanImageUrl, decodeEntities } from "../utils/images.mjs";
 import { parseAddDate } from "../utils/date.mjs";
 import { readPostIndex, writePostIndex, writeWebIndex } from "./s3.mjs";
 
@@ -18,19 +18,21 @@ export function categoryOf(post) {
 }
 
 export function thumbnailOf(post) {
-  if (post?.images && post.images.length > 0) return post.images[0];
+  // 썸네일 URL은 index.json/live-index.json에 저장돼 React src로 직접 쓰이므로
+  // (HTML 파싱을 안 거침) 네이버 엔티티 인코딩(&#x3D; 등)을 반드시 풀어준다.
+  if (post?.images && post.images.length > 0) return decodeEntities(post.images[0]);
   const body = post?.body;
   if (body) {
     const lazy = body.match(/<img[^>]+data-lazy-src="([^"]+)"/);
-    if (lazy) return cleanImageUrl(lazy[1]);
+    if (lazy) return cleanImageUrl(decodeEntities(lazy[1]));
     const src = body.match(
       /<img[^>]+src="(https:\/\/(?:postfiles|blogfiles|mblogthumb|blogthumb)[^"]+)"/,
     );
-    if (src) return cleanImageUrl(src[1]);
+    if (src) return cleanImageUrl(decodeEntities(src[1]));
     const any = body.match(/<img[^>]+src="([^"]+)"/);
-    if (any) return any[1];
+    if (any) return decodeEntities(any[1]);
   }
-  if (post?.meta?.ogImage) return cleanImageUrl(post.meta.ogImage);
+  if (post?.meta?.ogImage) return cleanImageUrl(decodeEntities(post.meta.ogImage));
   return null;
 }
 

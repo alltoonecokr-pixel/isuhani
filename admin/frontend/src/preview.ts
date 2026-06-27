@@ -43,6 +43,27 @@ export function sanitizeBody(body: string): string {
   });
   out = out.replace(/<img[^>]+src=""[^>]*>/gi, "");
 
+  // oglink(뉴스/외부 링크) 카드 → 이미지+제목+도메인 리치 카드
+  // 사이트 sanitizeBody와 동일한 결과물(.link-card-rich). script 제거 전에 처리해야 함.
+  out = out.replace(
+    /<div[^>]+class="[^"]*se-component[^"]*se-oglink[^"]*"[\s\S]*?<\/script>\s*<\/div>/gi,
+    (m) => {
+      const hrefRaw = (m.match(/\bhref="([^"]+)"/) || [])[1];
+      if (!hrefRaw) return "";
+      const titleRaw = (m.match(/class="se-oglink-title"[^>]*>([\s\S]*?)<\/(?:strong|p|div)>/i) || [])[1] || "";
+      const title = titleRaw.replace(/<[^>]+>/g, "").trim();
+      const domain = ((m.match(/class="se-oglink-url"[^>]*>([^<]+)</) || [])[1] || "").trim();
+      const thumb = (m.match(/<img[^>]+src="([^"]+)"/i) || [])[1] || "";
+      const label = title || domain || hrefRaw;
+      const domainHtml = domain ? `<span class="link-card-domain">${domain}</span>` : "";
+      if (thumb) {
+        const altSafe = label.replace(/"/g, "&quot;");
+        return `<div class="link-card link-card-rich"><a href="${hrefRaw}" target="_blank" rel="noopener noreferrer"><img class="link-card-thumb" src="${thumb}" alt="${altSafe}" referrerpolicy="no-referrer" loading="lazy" /><span class="link-card-text"><span class="link-card-label">${label}</span>${domainHtml}</span></a></div>`;
+      }
+      return `<div class="link-card"><a href="${hrefRaw}" target="_blank" rel="noopener noreferrer"><span class="link-card-label">${label}</span>${domainHtml}</a></div>`;
+    },
+  );
+
   // script/style 제거
   out = out.replace(/<script[\s\S]*?<\/script>/gi, "");
   out = out.replace(/<style[\s\S]*?<\/style>/gi, "");

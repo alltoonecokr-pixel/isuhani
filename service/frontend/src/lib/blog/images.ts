@@ -1,5 +1,7 @@
 // 이미지 URL 정제 · 썸네일 추출
 
+import { decodeEntities } from "./sanitize";
+
 /**
  * 네이버 이미지 ?type 파라미터를 큰 해상도로 정규화.
  * w275 / w80_blur 같은 작거나 흐린 type도 size(기본 w966)로 교체.
@@ -27,12 +29,12 @@ export function extractThumbnail(
 ): string | null {
   if (body) {
     const lazy = body.match(/<img[^>]+data-lazy-src="([^"]+)"/);
-    if (lazy) return cleanImageUrl(lazy[1]);
+    if (lazy) return cleanImageUrl(decodeEntities(lazy[1]));
     const src = body.match(
       /<img[^>]+src="(https:\/\/(?:postfiles|blogfiles|mblogthumb|blogthumb)[^"]+)"/,
     );
-    if (src) return cleanImageUrl(src[1]);
+    if (src) return cleanImageUrl(decodeEntities(src[1]));
   }
-  if (ogImage) return cleanImageUrl(ogImage);
+  if (ogImage) return cleanImageUrl(decodeEntities(ogImage));
   return null;
 }

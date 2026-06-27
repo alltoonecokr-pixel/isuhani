@@ -118,9 +118,12 @@ export function sanitizeBody(body: string): string {
       const title = titleRaw.replace(/<[^>]+>/g, "").trim();
       const domainRaw = (m.match(/class="se-oglink-url"[^>]*>([^<]+)</) || [])[1] || "";
       const domain = domainRaw.trim();
+      // 카드 썸네일: oglink 안의 첫 img src (위 img 처리로 class는 이미 제거됨)
+      // 엔티티(&#x3D; 등)는 그대로 보존 — 본문 HTML로 렌더되면 브라우저가 디코딩한다
+      const thumb = (m.match(/<img[^>]+src="([^"]+)"/i) || [])[1] || "";
       const label = title || domain || hrefRaw;
       // 데이터를 URI 인코딩해 주석에 저장 (ATTR_RE에서 안전)
-      return `<!--OGLINK:${encodeURIComponent(hrefRaw)}:${encodeURIComponent(label)}:${encodeURIComponent(domain)}-->`;
+      return `<!--OGLINK:${encodeURIComponent(hrefRaw)}:${encodeURIComponent(label)}:${encodeURIComponent(domain)}:${encodeURIComponent(thumb)}-->`;
     },
   );
 
@@ -200,14 +203,21 @@ export function sanitizeBody(body: string): string {
   );
 
   // 마지막 단계: oglink 플레이스홀더 → 최종 link-card HTML (ATTR_RE 이후라 class 보존됨)
+  // 썸네일이 있으면 이미지 포함 리치 카드, 없으면 기존 텍스트 카드
   out = out.replace(
-    /<!--OGLINK:([^:>]*):([^:>]*):([^->]*)-->/g,
-    (_m, hrefEnc, labelEnc, domainEnc) => {
+    /<!--OGLINK:([^:]*):([^:]*):([^:]*):([^:]*)-->/g,
+    (_m, hrefEnc, labelEnc, domainEnc, thumbEnc) => {
       const hrefRaw = decodeURIComponent(hrefEnc);
       const label = decodeURIComponent(labelEnc);
       const domain = decodeURIComponent(domainEnc);
+      const thumb = decodeURIComponent(thumbEnc);
       if (!hrefRaw) return "";
-      return `<div class="link-card"><a href="${hrefRaw}" target="_blank" rel="noopener noreferrer"><span class="link-card-label">${label}</span>${domain ? `<span class="link-card-domain">${domain}</span>` : ""}</a></div>`;
+      const domainHtml = domain ? `<span class="link-card-domain">${domain}</span>` : "";
+      if (thumb) {
+        const altSafe = label.replace(/"/g, "&quot;");
+        return `<div class="link-card link-card-rich"><a href="${hrefRaw}" target="_blank" rel="noopener noreferrer"><img class="link-card-thumb" src="${thumb}" alt="${altSafe}" referrerpolicy="no-referrer" loading="lazy" /><span class="link-card-text"><span class="link-card-label">${label}</span>${domainHtml}</span></a></div>`;
+      }
+      return `<div class="link-card"><a href="${hrefRaw}" target="_blank" rel="noopener noreferrer"><span class="link-card-label">${label}</span>${domainHtml}</a></div>`;
     },
   );
 

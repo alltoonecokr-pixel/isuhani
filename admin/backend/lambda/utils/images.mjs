@@ -1,5 +1,27 @@
 // 이미지 URL 정제 · 추출 유틸리티
 
+const HTML_ENTITIES = {
+  "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&#39;": "'", "&nbsp;": " ",
+};
+
+// HTML 엔티티 디코딩. 네이버 export는 URL을 &#x3D; / &amp; 로 인코딩해 저장하는 경우가 있어,
+// React src 등 HTML 파싱을 거치지 않는 곳에서 쓰려면 미리 풀어야 한다. (변화 없을 때까지 반복)
+export function decodeEntities(s) {
+  if (!s) return s;
+  const once = (x) =>
+    x
+      .replace(/&#(\d+);/g, (_m, n) => String.fromCharCode(parseInt(n, 10)))
+      .replace(/&#x([0-9a-f]+);/gi, (_m, h) => String.fromCharCode(parseInt(h, 16)))
+      .replace(/&[a-z]+;/gi, (m) => HTML_ENTITIES[m] ?? m);
+  let prev = s;
+  for (let i = 0; i < 5; i++) {
+    const next = once(prev);
+    if (next === prev) break;
+    prev = next;
+  }
+  return prev;
+}
+
 // 네이버 이미지 ?type 파라미터를 원하는 사이즈로 정규화
 export function cleanImageUrl(url, size = "w966") {
   if (!url) return "";
