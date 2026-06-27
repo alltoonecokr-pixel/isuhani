@@ -12,7 +12,14 @@
     "ogDesc": "&amp;#x27;충분히 골고루 먹기&amp;#x27;가 역시 중요하다 엄마라면 누구나 자기 아이가 건강하게 자라길 원할 것입...",
     "ogImage": "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/f5a5342744bd0d9d.png",
     "date": "2025. 1. 14. 13:41",
-    "category": null
+    "category": null,
+    "summary": [
+      "성장기 아이의 식단은 탄수화물, 단백질, 지방, 칼슘, 철분을 골고루 섭취하는 것이 기본 원칙이다.",
+      "탄수화물은 뇌의 유일한 에너지원인 포도당을 공급하며, 부족하면 두뇌 활동과 성장 속도가 저하된다.",
+      "2세 이상 아이는 하루 총 칼로리의 30%를 지방으로 섭취해야 뇌와 각 기관의 정상 발달을 기대할 수 있다.",
+      "칼슘은 우유 2잔(약 500mg)으로 가장 쉽게 섭취할 수 있으며, 사골국은 인 함량이 높아 오히려 칼슘 흡수를 방해한다.",
+      "모유 수유 아기는 생후 6개월 이후 철분 보충이 필요하며, 이유식이 부실하면 철 결핍성 빈혈이 생길 수 있다."
+    ]
   },
   "images": [
     "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/b98c342315858206.png",

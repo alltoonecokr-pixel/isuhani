@@ -12,7 +12,14 @@
     "ogDesc": "음식을 섭취하고 삼키는 것은 뇌신경들과 척수 신경, 근육들이 연관되어 수의적, 불수의적으로 일어나는 복...",
     "ogImage": "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/94771cc77d36a168.png",
     "date": "2025. 3. 5. 21:49",
-    "category": null
+    "category": null,
+    "summary": [
+      "삼킴 운동은 뇌신경·척수신경·근육이 연관된 복잡한 과정으로 구강기·인두기·식도기 세 단계로 나뉜다.",
+      "하루 평균 연하 횟수는 약 600회이며 식사 중 200회, 깨어 있는 동안 350회, 수면 중 50회가 발생한다.",
+      "후두개는 음식이 기도로 넘어가지 않도록 막아주는 연골 구조로 삼킴 시 기도 보호의 핵심 역할을 한다.",
+      "설소대 단축증이나 혀유착증은 혀의 움직임을 제한해 노년기에 연하장애로 이어질 수 있다.",
+      "노화로 설골이 하방으로 이동하고 근육이 약화되면 삼킴에 필요한 이동 거리가 늘어나 삼킴장애 위험이 높아진다."
+    ]
   },
   "images": [
     "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/861eb8f85391b585.png",

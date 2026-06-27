@@ -13,6 +13,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/ask`, priority: 0.8, changeFrequency: "monthly" },
     { url: `${SITE_URL}/clinic`, priority: 0.8, changeFrequency: "monthly" },
     { url: `${SITE_URL}/visit-guide`, priority: 0.7, changeFrequency: "monthly" },
+    { url: `${SITE_URL}/gongjindan`, lastModified: TODAY, priority: 0.85, changeFrequency: "monthly" as const },
+    { url: `${SITE_URL}/chuna`, lastModified: TODAY, priority: 0.85, changeFrequency: "monthly" as const },
+    { url: `${SITE_URL}/sanhu`, lastModified: TODAY, priority: 0.85, changeFrequency: "monthly" as const },
+    { url: `${SITE_URL}/children-growth`, lastModified: TODAY, priority: 0.85, changeFrequency: "monthly" as const },
   ];
 
   // 진료 영역 6개

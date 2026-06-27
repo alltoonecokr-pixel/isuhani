@@ -12,7 +12,14 @@
     "ogDesc": "어깨가 아픈 중년의 환자분들 중에 &lsquo;사진 찍어보니 어깨에 석회가 있다고 해요&rsquo; 라고 호소하시는 분들이 ...",
     "ogImage": "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/378e0a43dcda7a8b.jpg",
     "date": "2024. 7. 3. 15:51",
-    "category": null
+    "category": null,
+    "summary": [
+      "회전근개 석회성 힘줄염은 성인의 약 2.5~7.5%에서 발병하며 40~50대 여성에게 주로 나타난다.",
+      "석회의 80%는 극상근 힘줄에 생기며 신체 활동량과는 무관하게 발생한다.",
+      "증상은 야간에 심해지는 극심한 어깨 통증과 움직임 제한이 특징이며, 20%는 무증상이다.",
+      "석회는 자연적으로 재흡수되어 사라질 수 있으나, 흡수 시 오히려 급성 통증이 심해지기도 한다.",
+      "치료는 소염진통제, 물리치료, 스테로이드 주사, 충격파, 수술 등 보존적 방법부터 단계적으로 적용한다."
+    ]
   },
   "images": [
     "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/0aa93f777abfad4d.jpg",

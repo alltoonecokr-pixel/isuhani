@@ -12,7 +12,13 @@
     "ogDesc": "안녕하세요. 남성역 다이어트 한의원 이수한의원 입니다. 이제 완연한 봄이네요. 옷차림이 가벼워서 너무 ...",
     "ogImage": "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/82eefca5bb01f324.png",
     "date": "2025. 3. 24. 12:03",
-    "category": null
+    "category": null,
+    "summary": [
+      "다이어트 성공의 핵심은 무엇을 먹고 무엇을 피해야 하는지 아는 것이다.",
+      "한의원에서는 체질과 개인 특성에 따라 맞춤형 다이어트 식단을 제시한다.",
+      "다이어트 중 먹으면 안 되는 금기식품과 적극적으로 먹어야 할 권장음식이 구분된다.",
+      "간식을 완전히 끊기 어려울 때는 다이어트에 적합한 대체 간식을 선택하면 된다."
+    ]
   },
   "images": [
     "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/e88b8c7830fb075c.png",

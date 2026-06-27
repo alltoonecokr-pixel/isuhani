@@ -12,7 +12,14 @@
     "ogDesc": "안녕하세요! 이수한의원 문학진 원장입니다. 감비환을 처방받으신 분들을 위해 감비환 복용법을 설명해드리...",
     "ogImage": "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/cea7c9ef7cfc6779.png",
     "date": "2025. 3. 21. 18:50",
-    "category": null
+    "category": null,
+    "summary": [
+      "감비환은 식욕 억제, 지방 분해, 내장 지방 연소, 대사 기능 향상에 효과가 있는 한약이다.",
+      "감비환은 하루 2~3회 식사 1시간 전에 복용하며, 저녁 약은 잠들기 6시간 전인 오후 5시에 복용한다.",
+      "복용 중 지방 연소로 수분 소모가 늘어나므로 하루 1.5~2L 물을 조금씩 자주 마셔야 한다.",
+      "카페인 음료는 가슴 두근거림과 불면을 유발할 수 있어 복용 기간 중 삼가야 한다.",
+      "체질에 따라 손떨림, 두통, 불면, 변비 등의 초기 부반응이 3~5일 내 완화될 수 있다."
+    ]
   },
   "images": [
     "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/ada4664b7510bf6e.png",

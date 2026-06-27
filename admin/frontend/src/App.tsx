@@ -20,29 +20,35 @@ import {
 } from "./components/DeployProgress";
 
 const PHASE_PCT: Record<string, number> = {
-  SUBMITTED: 12,
-  QUEUED: 20,
-  PROVISIONING: 30,
-  DOWNLOAD_SOURCE: 40,
-  INSTALL: 55,
-  PRE_BUILD: 65,
-  BUILD: 80,
-  POST_BUILD: 92,
-  COMPLETED: 100,
+  SUBMITTED: 12, QUEUED: 20, PROVISIONING: 30, DOWNLOAD_SOURCE: 40,
+  INSTALL: 55, PRE_BUILD: 65, BUILD: 80, POST_BUILD: 92, COMPLETED: 100,
 };
 const FAIL = new Set(["FAILED", "STOPPED", "FAULT", "TIMED_OUT"]);
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 type View = "list" | "editor";
 
+// ── 해시 라우팅 유틸 ──────────────────────────────────────────────
+// history.pushState 는 popstate 를 발생시키지 않음 → 루프 없음
+// 브라우저 뒤로/앞으로 → popstate 발생 → React state 복원
+function getHashInfo(): { view: View; logNo: string | null } {
+  const h = window.location.hash.replace(/^#\/?/, "");
+  if (h.startsWith("edit/")) return { view: "editor", logNo: h.slice(5) };
+  if (h === "new") return { view: "editor", logNo: null };
+  return { view: "list", logNo: null };
+}
+function pushHash(path: string) {
+  history.pushState({ hash: path }, "", path ? `#${path}` : location.pathname + location.search);
+}
+function replaceHash(path: string) {
+  history.replaceState({ hash: path }, "", path ? `#${path}` : location.pathname + location.search);
+}
+
 export function App() {
   const [cfg, setCfg] = useState<Config>(() => loadConfig());
   const apiRef = useRef<CmsApi>(new CmsApi(cfg));
 
-  const [status, setStatus] = useState<{ kind: StatusKind; text: string }>({
-    kind: "",
-    text: "연결 중…",
-  });
+  const [status, setStatus] = useState<{ kind: StatusKind; text: string }>({ kind: "", text: "연결 중…" });
   const [categories, setCategories] = useState<string[]>([]);
   const [posts, setPosts] = useState<PostIndexEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,33 +56,23 @@ export function App() {
 
   const [view, setView] = useState<View>("list");
   const [editingPost, setEditingPost] = useState<FullPost | null>(null);
-  const [editorKey, setEditorKey] = useState(0); // 새 글/수정 전환 시 폼 리셋
+  const [editorKey, setEditorKey] = useState(0);
 
-  const [settings, setSettings] = useState<{ open: boolean; force: boolean }>({
-    open: false,
-    force: false,
-  });
+  const [settings, setSettings] = useState<{ open: boolean; force: boolean }>({ open: false, force: false });
   const [catsOpen, setCatsOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
   const [deploy, setDeploy] = useState<DeployState>(initialDeploy);
 
-  // ── toast ──────────────────────────────────────────────────────────────────
-  const [toastState, setToastState] = useState<{ msg: string; kind: string; show: boolean }>({
-    msg: "",
-    kind: "",
-    show: false,
-  });
+  // ── toast ───────────────────────────────────────────────────────
+  const [toastState, setToastState] = useState<{ msg: string; kind: string; show: boolean }>({ msg: "", kind: "", show: false });
   const toastTimer = useRef<number | undefined>(undefined);
   const toast = useCallback((msg: string, kind: "ok" | "error" = "ok") => {
     setToastState({ msg, kind: kind === "error" ? "error" : "", show: true });
     window.clearTimeout(toastTimer.current);
-    toastTimer.current = window.setTimeout(
-      () => setToastState((s) => ({ ...s, show: false })),
-      2400,
-    );
+    toastTimer.current = window.setTimeout(() => setToastState((s) => ({ ...s, show: false })), 2400);
   }, []);
 
-  // ── api 401 → 로그인 재노출 ──────────────────────────────────────────────────
+  // ── api 401 ─────────────────────────────────────────────────────
   useEffect(() => {
     apiRef.current.onUnauthorized = () => {
       setCfg((c) => ({ ...c, pass: "" }));
@@ -85,7 +81,7 @@ export function App() {
     };
   }, []);
 
-  // ── boot ─────────────────────────────────────────────────────────────────────
+  // ── boot ────────────────────────────────────────────────────────
   const loadPosts = useCallback(async () => {
     setStatus({ kind: "busy", text: "불러오는 중…" });
     const data = await apiRef.current.listPosts();
@@ -95,11 +91,7 @@ export function App() {
 
   const boot = useCallback(async () => {
     const api = apiRef.current;
-    if (!api.cfg.pass) {
-      setSettings({ open: true, force: true });
-      setLoading(false);
-      return;
-    }
+    if (!api.cfg.pass) { setSettings({ open: true, force: true }); setLoading(false); return; }
     setStatus({ kind: "", text: "확인 중…" });
     setLoading(true);
     try {
@@ -116,13 +108,9 @@ export function App() {
     }
   }, [loadPosts, toast]);
 
-  useEffect(() => {
-    void boot();
-    // 최초 1회
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useEffect(() => { void boot(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
 
-  // ── 설정 저장(로그인) ────────────────────────────────────────────────────────
+  // ── 설정 ────────────────────────────────────────────────────────
   const submitSettings = (next: Config) => {
     saveConfig(next);
     apiRef.current.cfg = next;
@@ -131,34 +119,76 @@ export function App() {
     void boot();
   };
 
-  // ── 에디터 진입 ──────────────────────────────────────────────────────────────
-  const openNew = async () => {
+  // ── 목록으로 ─────────────────────────────────────────────────────
+  const goToList = useCallback(() => {
+    setView("list");
+    setEditingPost(null);
+    pushHash("");
+  }, []);
+
+  // ── 에디터 진입 ──────────────────────────────────────────────────
+  const openNew = useCallback(async () => {
     if (categories.length === 0) {
       try {
         const cats = await apiRef.current.getCategories();
         setCategories(cats.categories?.length ? cats.categories : DEFAULT_CATEGORIES);
       } catch {
-        toast("카테고리를 불러오지 못했습니다. [설정]을 확인하세요", "error");
-        return;
+        toast("카테고리를 불러오지 못했습니다", "error"); return;
       }
     }
     setEditingPost(null);
     setEditorKey((k) => k + 1);
     setView("editor");
-  };
+    pushHash("new");
+  }, [categories, toast]);
 
-  const openEdit = async (logNo: string) => {
+  const openEdit = useCallback(async (logNo: string) => {
     try {
       const post = await apiRef.current.getPost(logNo);
       setEditingPost(post);
       setEditorKey((k) => k + 1);
       setView("editor");
+      pushHash(`edit/${logNo}`);
     } catch (e) {
       toast(e instanceof Error ? e.message : "불러오기 실패", "error");
     }
-  };
+  }, [toast]);
 
-  // ── 저장 / 발행 ──────────────────────────────────────────────────────────────
+  // ── 브라우저 뒤로/앞으로 (popstate) ─────────────────────────────
+  useEffect(() => {
+    replaceHash(""); // 최초 진입 시 히스토리 엔트리 확보
+
+    const onPop = async () => {
+      const { view: v, logNo } = getHashInfo();
+      if (v === "list") {
+        setView("list");
+        setEditingPost(null);
+      } else if (v === "editor" && logNo) {
+        try {
+          const post = await apiRef.current.getPost(logNo);
+          setEditingPost(post);
+          setEditorKey((k) => k + 1);
+          setView("editor");
+        } catch {
+          // 포스트 로드 실패 → 목록으로
+          setView("list");
+          setEditingPost(null);
+          replaceHash("");
+        }
+      } else {
+        // #new → 새 글 에디터 (카테고리는 이미 로드됐을 것)
+        setEditingPost(null);
+        setEditorKey((k) => k + 1);
+        setView("editor");
+      }
+    };
+
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ── 저장 / 발행 ──────────────────────────────────────────────────
   const handleSave = async (input: PostInput, publish: boolean) => {
     setBusy(true);
     try {
@@ -168,15 +198,22 @@ export function App() {
       } else {
         saved = await apiRef.current.createPost(input);
       }
-      if (saved?.logNo) setEditingPost((p) => p ?? saved);
+      if (saved?.logNo) {
+        setEditingPost((p) => p ?? saved);
+        // 새 글이었으면 해시를 edit/xxx 로 교체 (뒤로가기 시 list로 가도록)
+        if (!editingPost?.logNo) {
+          replaceHash(`edit/${saved.logNo}`);
+        }
+      }
       if (publish) {
         toast("발행 시작 — 사이트 반영까지 약 2~3분");
         void runDeploy();
+        await loadPosts();
+        goToList();
       } else {
-        toast("저장되었습니다 (사이트엔 아직 반영 안 됨)");
+        toast("임시 저장되었습니다");
+        await loadPosts();
       }
-      await loadPosts();
-      if (publish) setView("list");
     } catch (e) {
       toast(e instanceof Error ? e.message : "저장 실패", "error");
     } finally {
@@ -192,7 +229,7 @@ export function App() {
       await apiRef.current.deletePost(logNo);
       toast("삭제되었습니다");
       await loadPosts();
-      setView("list");
+      goToList();
     } catch (e) {
       toast(e instanceof Error ? e.message : "삭제 실패", "error");
     }
@@ -209,28 +246,17 @@ export function App() {
     }
   };
 
-  // 일괄 삭제 — 확인은 ListView에서, 여기선 순차 삭제 후 한 번만 새로고침.
   const bulkDelete = async (logNos: string[]) => {
     let ok = 0;
     for (const logNo of logNos) {
-      try {
-        await apiRef.current.deletePost(logNo);
-        ok++;
-      } catch {
-        /* 개별 실패는 건너뛰고 계속 */
-      }
+      try { await apiRef.current.deletePost(logNo); ok++; } catch { /* skip */ }
     }
     await loadPosts();
     const failed = logNos.length - ok;
-    toast(
-      failed === 0
-        ? `${ok}개 삭제 완료`
-        : `${ok}개 삭제 · ${failed}개 실패`,
-      failed === 0 ? "ok" : "error",
-    );
+    toast(failed === 0 ? `${ok}개 삭제 완료` : `${ok}개 삭제 · ${failed}개 실패`, failed === 0 ? "ok" : "error");
   };
 
-  // ── 배포 진행 폴링 ────────────────────────────────────────────────────────────
+  // ── 배포 ─────────────────────────────────────────────────────────
   const runDeploy = async () => {
     setDeploy({ open: true, title: "발행 중…", step: "빌드 시작", pct: 10 });
     try {
@@ -240,38 +266,21 @@ export function App() {
         await sleep(5000);
         const s = await apiRef.current.buildStatus(res.buildId);
         const pct = PHASE_PCT[s.currentPhase || ""] || 50;
-        setDeploy({
-          open: true,
-          title: "발행 중…",
-          step: `${s.currentPhase || s.status} (${s.status})`,
-          pct,
-        });
+        setDeploy({ open: true, title: "발행 중…", step: `${s.currentPhase || s.status} (${s.status})`, pct });
         if (s.status === "SUCCEEDED") {
-          setDeploy({
-            open: true,
-            title: "발행 완료",
-            step: "사이트가 갱신되었습니다",
-            pct: 100,
-          });
+          setDeploy({ open: true, title: "발행 완료", step: "사이트가 갱신되었습니다", pct: 100 });
           setTimeout(() => setDeploy((d) => ({ ...d, open: false })), 4000);
           return;
         }
-        if (FAIL.has(s.status)) {
-          setDeploy((d) => ({ ...d, title: "발행 실패", step: s.status }));
-          return;
-        }
+        if (FAIL.has(s.status)) { setDeploy((d) => ({ ...d, title: "발행 실패", step: s.status })); return; }
       }
       setDeploy((d) => ({ ...d, step: "타임아웃 — CodeBuild 콘솔에서 확인" }));
     } catch (e) {
-      setDeploy((d) => ({
-        ...d,
-        title: "발행 실패",
-        step: e instanceof Error ? e.message : "오류",
-      }));
+      setDeploy((d) => ({ ...d, title: "발행 실패", step: e instanceof Error ? e.message : "오류" }));
     }
   };
 
-  // ── 카테고리 저장 ─────────────────────────────────────────────────────────────
+  // ── 카테고리 ─────────────────────────────────────────────────────
   const saveCats = async (cats: string[]) => {
     try {
       const res = await apiRef.current.putCategories(cats);
@@ -298,12 +307,9 @@ export function App() {
             <span className={"dot " + status.kind} />
             {status.text}
           </span>
-          <button className="ghost" onClick={() => setGuideOpen(true)} title="사용 설명서">
-            안내
-          </button>
+          <button className="ghost" onClick={() => setGuideOpen(true)}>안내</button>
           <button
             className="ghost"
-            title="카테고리 관리"
             onClick={async () => {
               try {
                 const cats = await apiRef.current.getCategories();
@@ -314,13 +320,7 @@ export function App() {
           >
             카테고리
           </button>
-          <button
-            className="ghost"
-            title="API 설정"
-            onClick={() => setSettings({ open: true, force: false })}
-          >
-            설정
-          </button>
+          <button className="ghost" onClick={() => setSettings({ open: true, force: false })}>설정</button>
         </div>
       </header>
 
@@ -342,7 +342,7 @@ export function App() {
           busy={busy}
           onSave={handleSave}
           onDelete={handleDelete}
-          onBack={() => setView("list")}
+          onBack={goToList}
           onUploadImage={onUploadImage}
           toast={toast}
         />
@@ -350,20 +350,13 @@ export function App() {
 
       {settings.open && (
         <SettingsModal
-          cfg={cfg}
-          force={settings.force}
+          cfg={cfg} force={settings.force}
           onSubmit={submitSettings}
           onClose={() => setSettings({ open: false, force: false })}
           onGuide={() => setGuideOpen(true)}
         />
       )}
-      {catsOpen && (
-        <CategoriesModal
-          categories={categories}
-          onSave={saveCats}
-          onClose={() => setCatsOpen(false)}
-        />
-      )}
+      {catsOpen && <CategoriesModal categories={categories} onSave={saveCats} onClose={() => setCatsOpen(false)} />}
       {guideOpen && <GuideModal onClose={() => setGuideOpen(false)} />}
 
       <DeployProgress state={deploy} />

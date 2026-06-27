@@ -22,8 +22,8 @@ export function LofiToggle() {
     } catch {
       /* noop */
     }
-    // 사용자가 직접 끈 적('0')이 없으면 기본 ON
-    setOn(stored !== "0");
+    // 사용자가 직접 켠 적('1')이 있을 때만 ON (기본 OFF)
+    setOn(stored === "1");
     setHydrated(true);
   }, []);
 
@@ -94,8 +94,10 @@ export function LofiToggle() {
         aria-label={on ? "배경음악 끄기" : "잔잔한 배경음악 켜기"}
         title={on ? "배경음악 끄기" : "잔잔한 배경음악 켜기"}
         className={[
-          "fixed bottom-5 left-5 z-30 inline-flex items-center gap-2",
-          "rounded-full pl-3 pr-4 py-2.5 text-[13px] font-semibold tracking-[-0.01em]",
+          "fixed bottom-5 left-5 z-30 inline-flex items-center",
+          /* 모바일: 아이콘 전용 원형 / 데스크톱: 텍스트 포함 pill */
+          "md:gap-2 md:pl-3 md:pr-4 md:py-2.5 md:text-[13px] md:font-semibold md:tracking-[-0.01em]",
+          "p-2.5 rounded-full",
           "shadow-[0_10px_28px_-12px_rgba(26,20,16,0.35)] transition-colors",
           on
             ? "bg-herb-700 text-white hover:bg-herb-800"
@@ -103,15 +105,15 @@ export function LofiToggle() {
         ].join(" ")}
       >
         {on ? (
-          <Pause size={15} aria-hidden />
+          <Pause size={14} aria-hidden />
         ) : (
-          <Music size={15} aria-hidden />
+          <Music size={14} aria-hidden />
         )}
-        <span>{on ? "음악 끄기" : "잔잔한 음악"}</span>
+        <span className="hidden md:inline">{on ? "음악 끄기" : "잔잔한 음악"}</span>
         {on && (
           <span
             aria-hidden
-            className="ml-0.5 inline-flex items-center gap-[3px]"
+            className="hidden md:inline-flex ml-0.5 items-center gap-[3px]"
           >
             <span className="w-[3px] h-[3px] rounded-full bg-white/90 animate-pulse" />
             <span className="w-[3px] h-[3px] rounded-full bg-white/90 animate-pulse [animation-delay:0.2s]" />

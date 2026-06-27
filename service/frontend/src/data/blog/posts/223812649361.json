@@ -12,7 +12,14 @@
     "ogDesc": "추위가 가시고 봄날씨가 되니 야외 활동이 늘어요! 야외활동 하다보면 발목을 다칠 위험이 있으니, 늘 주의...",
     "ogImage": "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/0cc5fdfaf6a453a9.png",
     "date": "2025. 3. 28. 9:50",
-    "category": null
+    "category": null,
+    "summary": [
+      "발목과 발등에는 수많은 인대와 힘줄이 있어 손상 부위를 정확히 파악하는 것이 중요하다.",
+      "X-ray 검사로 발목 골절 여부를 확인할 수 있다.",
+      "초음파 진단기기로 인대·힘줄 손상 및 관절 주변 조직의 부종을 확인할 수 있다.",
+      "한의원에서는 발목 염좌를 침, 약침, 한약, 부항 등으로 치료한다.",
+      "야외 활동 시 발목 부상 위험이 높으므로 각별한 주의가 필요하다."
+    ]
   },
   "images": [
     "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/c93206fd6117d57a.jpg",

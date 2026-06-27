@@ -31,14 +31,12 @@ export function VisitFlow({
 }) {
   return (
     <div className={className}>
-      <header className="reveal-on-scroll text-center">
-        <div className="text-[12px] font-bold tracking-[0.12em] text-herb-700">
-          {eyebrow}
-        </div>
-        <h2 className="mt-3 font-serif text-[26px] md:text-[36px] font-bold tracking-[-0.025em] text-ink-900 leading-[1.2]">
+      <header className="reveal-on-scroll">
+        <div className="chip-kr mb-5">{eyebrow}</div>
+        <h2 className="font-serif text-[30px] md:text-[44px] leading-[1.15] tracking-[-0.022em] text-ink-900">
           {title}
         </h2>
-        <p className="mt-4 text-[15px] md:text-[16px] text-ink-500">{subtitle}</p>
+        <p className="mt-4 text-[14.5px] text-ink-400 max-w-md">{subtitle}</p>
       </header>
 
       <div className="reveal-on-scroll relative mt-14">

@@ -12,7 +12,14 @@
     "ogDesc": "&amp;quot;노화&amp;quot;가 무언지는 누구나 알고 있다. 아니. 노화, 즉 늙어간다는 것이 어떠한 것인지를 알고 있...",
     "ogImage": "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/eef5e9f5d4fa8394.png",
     "date": "2026. 3. 20. 9:47",
-    "category": null
+    "category": null,
+    "summary": [
+      "노화는 시간이 지남에 따라 분자 및 세포 손상이 축적되어 생리적 기능이 감소하고 질병 위험이 높아지는 비가역적 과정이다.",
+      "노화 속도는 유전보다 생활습관과 환경의 영향을 더 크게 받으며, 올바른 생활습관은 수명을 최대 10년 연장할 수 있다.",
+      "근감소증은 30세 이후 운동 없이 방치하면 70세까지 근육량이 약 20%, 50~75세 사이에만 약 25%가 감소하는 질환이다.",
+      "80세 이상에서는 남성의 50% 이상, 여성의 30% 이상이 근감소증에 해당할 만큼 고령층에서 매우 흔하다.",
+      "근육 손실을 예방하려면 충분한 단백질 섭취와 근육 단백질 합성을 촉진하는 규칙적인 운동이 필수적이다."
+    ]
   },
   "images": [
     "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/fcc696ac9d3bdfff.png",

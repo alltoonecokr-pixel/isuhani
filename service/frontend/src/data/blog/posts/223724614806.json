@@ -12,7 +12,14 @@
     "ogDesc": "고단백, 저지방 식단으로 정해진 시간에 조금씩 나눠 먹어야 소아 비만은 생활 환경, 식생활의 영향 서구화...",
     "ogImage": "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/c7d6e2b1156fb6df.png",
     "date": "2025. 1. 13. 17:58",
-    "category": null
+    "category": null,
+    "summary": [
+      "소아 비만의 50% 이상은 성인 비만으로 이어지며, 어릴수록 지방세포 수가 늘어 고도 비만으로 진행되기 쉽다.",
+      "소아 비만의 주요 원인은 운동 부족, 패스트푸드 섭취 증가, 야식 등 서구화된 생활 환경이다.",
+      "성장기 적정 섭취 열량은 '1000 + 만 나이 × 100(kcal)'이며, 탄수화물·단백질·지방을 5:2:3 비율로 섭취해야 한다.",
+      "비만 예방을 위해 고단백 저지방 식단을 유지하고, 야채를 충분히 섭취해 포만감을 높이는 것이 효과적이다.",
+      "식사는 일정한 시간에 천천히 조금씩 나눠 먹고, TV·컴퓨터 시청 중 식사는 과식을 유발하므로 피해야 한다."
+    ]
   },
   "images": [
     "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/966ffa7f4a1a513f.png",

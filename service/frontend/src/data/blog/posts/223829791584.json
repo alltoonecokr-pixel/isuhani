@@ -12,7 +12,14 @@
     "ogDesc": "안녕하세요. 7호선 남성역 1번출구 앞 이수한의원입니다. 엉치가 아프고 다리가 땡기고 저리는 증상을 경험...",
     "ogImage": "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/329e2df854aa5356.png",
     "date": "2025. 4. 11. 15:35",
-    "category": null
+    "category": null,
+    "summary": [
+      "엉치 통증과 다리 저림의 원인은 허리에서 신경이 눌리면서 엉치·다리 방향으로 통증이 방사되는 것이다.",
+      "허리 신경 압박 치료 시 근원인 허리뿐 아니라 엉치와 다리도 함께 치료해야 효과적이다.",
+      "한의원에서는 약침, 침치료, 추나요법을 병행하여 디스크 및 척추골반 틀어짐을 교정한다.",
+      "집에서 테니스공, 마사지볼, 폼롤러를 이용해 엉치 골반을 셀프 마사지하면 회복 속도가 빨라진다.",
+      "뻐근하거나 통증이 퍼지는 부위에는 30초~1분간 압박을 유지하는 것이 셀프 마사지 핵심 요령이다."
+    ]
   },
   "images": [
     "https://www.mayoclinic.org/-/media/kcms/gbs/patient-consumer/images/2013/08/26/10/53/ds00516_im02917_mcdc_sciaticathu_jpg.jpg",

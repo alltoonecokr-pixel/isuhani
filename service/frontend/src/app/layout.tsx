@@ -25,6 +25,12 @@ const notoSerifKr = Noto_Serif_KR({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  verification: {
+    google: "78921185acfec329",
+    // TODO: 네이버 서치어드바이저 등록 후 코드 추가
+    // searchadvisor.naver.com → 사이트 등록 → HTML 태그 방식 선택 → 코드 붙여넣기
+    // other: { "naver-site-verification": "NAVER_CODE_HERE" },
+  },
   title: {
     default: "이수한의원 — 매일의 건강 이야기, Since 1986",
     template: "%s | 이수한의원",
@@ -136,6 +142,33 @@ const jsonLd = {
     name: "서울특별시 동작구",
   },
   priceRange: "$$",
+  availableService: [
+    {
+      "@type": "MedicalTherapy",
+      name: "공진단 처방",
+      alternateName: "供辰丹",
+      url: `${SITE_URL}/gongjindan`,
+      description: "체질 진단 후 사향·녹용 원방 공진단 처방. 원기 회복, 면역 강화, 수험생 집중력 향상.",
+    },
+    {
+      "@type": "MedicalTherapy",
+      name: "경옥고",
+      url: `${SITE_URL}/gongjindan`,
+      description: "정(精) 보충·노화 예방·폐 건강 강화를 위한 장기 복용 보약.",
+    },
+    {
+      "@type": "MedicalTherapy",
+      name: "추나요법",
+      url: `${SITE_URL}/treatment/spine`,
+      description: "건강보험 적용 한방 수기치료. 근골격계 변위 교정. 허리·목디스크, 체형교정.",
+    },
+    {
+      "@type": "MedicalTherapy",
+      name: "산후조리 한약",
+      url: `${SITE_URL}/treatment/women`,
+      description: "출산 후 체질 맞춤 산후 회복 한약 처방. 나효석 원장(한방부인과 전문의) 직접 진료.",
+    },
+  ],
 };
 
 export default function RootLayout({

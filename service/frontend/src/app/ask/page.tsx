@@ -3,7 +3,6 @@ import Link from "next/link";
 import {
   Phone,
   ArrowRight,
-  ArrowUp,
   Activity,
   Leaf,
   Baby,
@@ -13,6 +12,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { SsuMascot } from "@/components/chat/SsuMascot";
+import { AskChatEmbed } from "@/components/chat/AskChatEmbed";
 import { VisitFlow } from "@/components/sections/VisitFlow";
 import { SITE_URL } from "@/lib/site";
 
@@ -85,122 +85,36 @@ const ASK_GROUPS: {
   },
 ];
 
-/* ── 샘플 대화 쇼케이스 (chatLogic 톤 그대로) ── */
-const SAMPLES: {
-  tag: string;
-  desc: string;
-  turns: { who: "me" | "ssu"; text: string }[];
-}[] = [
-  {
-    tag: "막연한 증상",
-    desc: "어디부터 물어야 할지 몰라도 괜찮아요.",
-    turns: [
-      { who: "me", text: "요즘 허리가 자주 아픈데, 한의원 가야 할까요?" },
-      {
-        who: "ssu",
-        text:
-          "허리 통증은 자세·디스크·근육 긴장 등 원인이 다양해서, 한방에서는 추나요법·침 치료로 접근하는 경우가 많아요. 정확한 원인은 내원 진찰이 필요하지만, 어떤 상황에서 더 아프신지 알려주시면 관련 정보를 먼저 정리해드릴게요.",
-      },
-      { who: "me", text: "앉아 있다가 일어설 때 특히 심해요" },
-      {
-        who: "ssu",
-        text:
-          "그런 양상은 자세·디스크와 관련된 경우가 많아 추나요법 상담을 권하는 편이에요. 진료 시간 안내해드리고, 첫 방문 흐름도 같이 알려드릴까요?",
-      },
-    ],
-  },
-  {
-    tag: "보약 관심",
-    desc: "구매 결정 전이라도 편하게.",
-    turns: [
-      { who: "me", text: "수능 앞둔 아이 체력 보강해주고 싶어요" },
-      {
-        who: "ssu",
-        text:
-          "수험생 보약은 체질·수면·소화 상태에 맞춰 처방드려요. 공진단·한방 보약 등 선택지가 있는데, 아이 나이와 주로 힘들어하는 부분(집중력·피로·식욕 등)을 알려주시면 어떤 상담이 맞을지 안내해드릴게요.",
-      },
-      { who: "me", text: "고3이고 늘 피곤해해요" },
-      {
-        who: "ssu",
-        text:
-          "피로 위주라면 진료 후 체질에 맞춘 보약을 권하는 경우가 많아요. 정확한 처방은 진찰이 필요하고, 공진단 FAQ 칼럼도 함께 보여드릴게요.",
-      },
-    ],
-  },
-  {
-    tag: "예약 · 방문",
-    desc: "방문 전에 궁금한 건 다.",
-    turns: [
-      { who: "me", text: "오늘 진료하나요? 주차도 되나요?" },
-      {
-        who: "ssu",
-        text:
-          "평일은 09:30–20:00(야간진료), 토·일은 09:30–15:00 진료하고 공휴일은 휴진이에요. 전용 주차장은 없어 인근 공영주차장을 이용하시면 되고, 자세한 길 안내는 전화로 도와드려요.",
-      },
-      { who: "me", text: "그럼 예약은 어떻게 해요?" },
-      {
-        who: "ssu",
-        text:
-          "전화 예약(02-584-1075)이 가장 빠르고, 워크인도 가능해요. 다만 대기 시간이 있을 수 있어 전화 예약을 권해드려요.",
-      },
-    ],
-  },
-];
 
 export default function AskPage() {
   return (
     <div className="bg-white">
-      {/* ── HERO ── */}
-      <section className="relative overflow-hidden bg-paper-50">
-        {/* 부드러운 herb 글로우 — 토스식 절제된 배경 */}
+      {/* ── HERO + 채팅 ── */}
+      <section className="relative overflow-hidden bg-paper-50 border-b border-ink-100">
         <div
-          className="pointer-events-none absolute -top-40 left-1/2 h-[42rem] w-[42rem] -translate-x-1/2 rounded-full opacity-60 blur-3xl"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(111,176,122,0.18) 0%, rgba(111,176,122,0) 65%)",
-          }}
+          className="pointer-events-none absolute -top-40 left-1/2 h-[42rem] w-[42rem] -translate-x-1/2 rounded-full opacity-50 blur-3xl"
+          style={{ background: "radial-gradient(circle, rgba(111,176,122,0.18) 0%, rgba(111,176,122,0) 65%)" }}
         />
-        <div className="relative max-w-container mx-auto px-5 md:px-8 pt-24 md:pt-32 pb-16 md:pb-24 text-center">
-          <div className="hero-rise-1 inline-flex items-center gap-2 rounded-full bg-white/80 backdrop-blur px-4 py-2 text-[12px] font-bold tracking-[0.08em] text-herb-700 shadow-[0_2px_10px_-2px_rgba(26,20,16,0.08)]">
-            <SsuMascot size={20} />
-            ISUHANI · AI 상담
+        <div className="relative max-w-container mx-auto px-5 md:px-8 pt-14 md:pt-20 pb-14 md:pb-20">
+          {/* 타이틀 */}
+          <div className="text-center mb-8 md:mb-10">
+            <div className="hero-rise-1 inline-flex items-center gap-2 rounded-full bg-white/80 backdrop-blur px-4 py-2 text-[12px] font-bold tracking-[0.08em] text-herb-700 shadow-[0_2px_10px_-2px_rgba(26,20,16,0.08)]">
+              <SsuMascot size={18} />
+              ISUHANI · AI 상담
+            </div>
+            <h1 className="hero-rise-2 mt-5 font-serif text-[28px] md:text-[48px] font-bold tracking-[-0.03em] text-ink-900 leading-[1.18]">
+              그 증상, 한방으로 될까?
+              <br />
+              <span className="text-herb-700">쑤</span>에게 먼저 물어보세요.
+            </h1>
+            <p className="hero-rise-3 mt-4 mx-auto max-w-[30rem] text-[14px] md:text-[16px] text-ink-500 leading-[1.75]">
+              증상·치료·비용·예약 — 진단이 아닌 따뜻한 길잡이예요.
+            </p>
           </div>
 
-          <h1 className="hero-rise-2 mt-7 font-serif text-[34px] md:text-[56px] font-bold tracking-[-0.03em] text-ink-900 leading-[1.18]">
-            그 증상, 한방으로 될까?
-            <br />
-            <span className="text-herb-700">쑤</span>에게 먼저 물어보세요.
-          </h1>
-          <p className="hero-rise-3 mt-6 mx-auto max-w-[34rem] text-[15px] md:text-[17px] text-ink-600 leading-[1.75]">
-            증상·치료·비용·예약까지, 한의원에 관한 거라면 무엇이든.
-            <br className="hidden md:block" />
-            진단이 아니라, 내원 전에 길을 잡아주는 따뜻한 길잡이예요.
-          </p>
-
-          {/* 목업 입력바 — 토스식 부드러운 그림자 */}
-          <div className="hero-rise-4 mt-10 mx-auto max-w-[34rem]">
-            <div className="flex items-center gap-2 rounded-full bg-white p-2 pl-6 shadow-[0_12px_36px_-12px_rgba(26,20,16,0.22)] ring-1 ring-ink-100">
-              <span className="flex-1 text-left text-[15px] text-ink-400">
-                쑤에게 무엇이든 물어보세요
-              </span>
-              <button
-                type="button"
-                aria-label="쑤에게 보내기"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-herb-700 text-white transition-colors hover:bg-herb-900"
-              >
-                <ArrowUp size={20} strokeWidth={2.5} />
-              </button>
-            </div>
-            <div className="mt-4 flex flex-wrap justify-center gap-2">
-              {["진료 시간", "공진단", "추나요법", "주차", "실비 청구"].map((c) => (
-                <span
-                  key={c}
-                  className="rounded-full bg-white px-4 py-2 text-[13px] font-medium text-ink-600 ring-1 ring-ink-100 transition-colors hover:text-herb-700 hover:ring-herb-200"
-                >
-                  {c}
-                </span>
-              ))}
-            </div>
+          {/* 실제 채팅 UI */}
+          <div className="hero-rise-4 mx-auto max-w-[42rem]">
+            <AskChatEmbed />
           </div>
         </div>
       </section>
@@ -342,53 +256,6 @@ export default function AskPage() {
         </div>
       </section>
 
-      {/* ── 샘플 대화 쇼케이스 ── */}
-      <section className="max-w-container mx-auto px-5 md:px-8 py-20 md:py-28">
-        <header className="reveal-on-scroll text-center">
-          <div className="text-[12px] font-bold tracking-[0.12em] text-herb-700">
-            CONVERSATION
-          </div>
-          <h2 className="mt-3 font-serif text-[26px] md:text-[36px] font-bold tracking-[-0.025em] text-ink-900 leading-[1.2]">
-            쑤는 이렇게 답해요
-          </h2>
-        </header>
-
-        <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {SAMPLES.map((s) => (
-            <div
-              key={s.tag}
-              className="reveal-on-scroll flex flex-col rounded-3xl bg-paper-50 p-6 ring-1 ring-ink-100"
-            >
-              <div className="mb-5">
-                <span className="inline-flex rounded-full bg-herb-700 px-3 py-1 text-[12px] font-bold text-white">
-                  {s.tag}
-                </span>
-                <p className="mt-2.5 text-[13px] text-ink-500">{s.desc}</p>
-              </div>
-              <div className="flex flex-1 flex-col gap-3">
-                {s.turns.map((t, i) =>
-                  t.who === "me" ? (
-                    <div key={i} className="flex justify-end">
-                      <p className="max-w-[85%] rounded-2xl rounded-br-md bg-herb-700 px-4 py-2.5 text-[13.5px] leading-[1.6] text-white">
-                        {t.text}
-                      </p>
-                    </div>
-                  ) : (
-                    <div key={i} className="flex items-end gap-2">
-                      <span className="mb-1 shrink-0 rounded-full bg-white p-1 shadow-[0_2px_6px_-2px_rgba(26,20,16,0.12)]">
-                        <SsuMascot size={24} />
-                      </span>
-                      <p className="max-w-[85%] rounded-2xl rounded-bl-md bg-white px-4 py-2.5 text-[13.5px] leading-[1.65] text-ink-700 shadow-[0_2px_8px_-3px_rgba(26,20,16,0.08)]">
-                        {t.text}
-                      </p>
-                    </div>
-                  ),
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
 
       {/* ── 첫 방문 흐름 단계 시각화 ── */}
       <section className="border-t border-ink-100">
@@ -438,13 +305,13 @@ export default function AskPage() {
               가입 없이, 편하게. 더 깊은 상담은 전화 한 통으로 이어집니다.
             </p>
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <button
-                type="button"
+              <Link
+                href="/ask"
                 className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-4 text-[15px] font-bold text-ink-900 transition-transform hover:-translate-y-0.5"
               >
                 쑤에게 말 걸기
                 <ArrowRight size={18} strokeWidth={2.5} />
-              </button>
+              </Link>
               <Link
                 href="tel:0285841075"
                 className="inline-flex items-center gap-2 rounded-full bg-white/10 px-7 py-4 text-[15px] font-bold text-white ring-1 ring-white/20 backdrop-blur transition-colors hover:bg-white/20"

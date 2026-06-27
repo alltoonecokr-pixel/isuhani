@@ -122,38 +122,55 @@ export function ChatDock() {
 
   return (
     <>
-      {/* 닫힘 — 마스코트가 카드 위로 튀어나오는 디자인 */}
+      {/* 닫힘 — 모바일: 작은 마스코트 FAB / 데스크톱: 카드 */}
       {!open && (
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          aria-label="쑤와 대화하기"
-          className="group fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 outline-none"
-        >
-          <div className="relative">
-            {/* 마스코트 — 카드 위로 -top */}
-            <div className="absolute -top-7 left-4 z-10 transition-transform duration-500 group-hover:-translate-y-1 group-hover:rotate-[-6deg]">
-              <div className="rounded-full bg-paper p-1 shadow-[0_8px_20px_-6px_rgba(26,20,16,0.3)]">
-                <SsuMascot size={56} />
+        <>
+          {/* 모바일 FAB — 마스코트 원형 버튼 */}
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            aria-label="쑤와 대화하기"
+            className="md:hidden group fixed bottom-20 right-4 z-40 outline-none"
+          >
+            <div className="relative transition-transform duration-300 group-hover:-translate-y-1">
+              <div className="w-[52px] h-[52px] rounded-full bg-paper shadow-[0_10px_28px_-8px_rgba(26,20,16,0.35)] flex items-center justify-center border border-ink-100">
+                <SsuMascot size={38} />
               </div>
-              {/* 작은 알림 점 */}
               <span
-                className="absolute top-1 right-1 w-3 h-3 rounded-full bg-herb-700 ring-2 ring-paper animate-pulse"
+                className="absolute top-0.5 right-0.5 w-2.5 h-2.5 rounded-full bg-herb-700 ring-2 ring-paper animate-pulse"
                 aria-hidden
               />
             </div>
+          </button>
 
-            {/* 본 카드 */}
-            <div className="pl-[88px] pr-6 py-4 bg-ink-900 text-white rounded-full shadow-[0_18px_40px_-12px_rgba(26,20,16,0.45)] hover:shadow-[0_24px_56px_-12px_rgba(26,20,16,0.55)] hover:bg-herb-700 transition-all duration-300">
-              <div className="text-[10px] tracking-[0.3em] uppercase text-white/70 font-bold leading-none mb-1">
-                Isuhani · Ask Ssu
+          {/* 데스크톱 카드 — 마스코트가 카드 위로 튀어나오는 디자인 */}
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            aria-label="쑤와 대화하기"
+            className="hidden md:block group fixed bottom-6 right-6 z-40 outline-none"
+          >
+            <div className="relative">
+              <div className="absolute -top-7 left-4 z-10 transition-transform duration-500 group-hover:-translate-y-1 group-hover:rotate-[-6deg]">
+                <div className="rounded-full bg-paper p-1 shadow-[0_8px_20px_-6px_rgba(26,20,16,0.3)]">
+                  <SsuMascot size={56} />
+                </div>
+                <span
+                  className="absolute top-1 right-1 w-3 h-3 rounded-full bg-herb-700 ring-2 ring-paper animate-pulse"
+                  aria-hidden
+                />
               </div>
-              <div className="font-serif text-[15px] font-black tracking-[-0.02em] leading-none">
-                쑤에게 물어보세요 →
+              <div className="pl-[88px] pr-6 py-4 bg-ink-900 text-white rounded-full shadow-[0_18px_40px_-12px_rgba(26,20,16,0.45)] hover:shadow-[0_24px_56px_-12px_rgba(26,20,16,0.55)] hover:bg-herb-700 transition-all duration-300">
+                <div className="text-[10px] tracking-[0.3em] uppercase text-white/70 font-bold leading-none mb-1">
+                  Isuhani · Ask Ssu
+                </div>
+                <div className="font-serif text-[15px] font-black tracking-[-0.02em] leading-none">
+                  쑤에게 물어보세요 →
+                </div>
               </div>
             </div>
-          </div>
-        </button>
+          </button>
+        </>
       )}
 
       {/* 열림 — 둥근 패널 + 부드러운 그림자 */}
@@ -297,10 +314,9 @@ export function ChatDock() {
               <Phone size={11} />
               직접 통화 02-584-1075
             </a>
-            {/* border 항상 존재 → focus 시 색만 변경, layout shift 없음 */}
             <form
               onSubmit={onSubmit}
-              className="flex items-center gap-2 bg-ink-50 rounded-2xl px-4 border border-ink-100 focus-within:border-herb-600 transition-colors"
+              className="flex items-center gap-2 bg-ink-50 rounded-2xl px-4"
             >
               <input
                 ref={inputRef}

@@ -12,7 +12,14 @@
     "ogDesc": "안녕하세요! 이수한의원입니다. 평소 허리 통증이나 골반 통증으로 불편을 느끼고 계시나요? 삐끗한 것도 ...",
     "ogImage": "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/0b746a04eadb6094.png",
     "date": "2025. 5. 17. 21:36",
-    "category": null
+    "category": null,
+    "summary": [
+      "허리·골반 통증의 주요 원인은 다리 꼬기, 짝다리, 비스듬히 앉기 등 잘못된 자세와 생활 습관이다.",
+      "장시간 앉아있거나 한쪽으로만 무거운 짐을 드는 습관도 허리와 골반 통증을 유발한다.",
+      "올바른 앉기 자세는 턱을 당기고 엉덩이를 의자 깊숙이 넣어 무릎이 바닥과 수평이 되게 하는 것이다.",
+      "장기간 잘못된 자세로 생긴 통증은 척추 근육과 인대의 퇴행이 동반되어 스스로 해결하기 어렵다.",
+      "추나요법과 침·약침·한약 병행 치료로 퇴행된 근육과 인대 기능을 회복시킬 수 있다."
+    ]
   },
   "images": [
     "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/a59ce47427db046e.png",

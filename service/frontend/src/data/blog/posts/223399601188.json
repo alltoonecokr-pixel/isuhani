@@ -12,7 +12,14 @@
     "ogDesc": "이 부위 아픈 분들이 많습니다. 뻐근하다 무겁다 아침에 일어났는데 목이 안돌아가고 너무 아프다 제각기 ...",
     "ogImage": "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/d7f3a447a1a00eef.png",
     "date": "2024. 3. 29. 19:22",
-    "category": null
+    "category": null,
+    "summary": [
+      "어깨 윗라인 통증의 원인은 단순 근육 뭉침, 신경 눌림, 목 디스크 등 다양하다.",
+      "경막(dura)은 신경을 보호하는 막으로, 디스크가 이를 건드리면 경막통증이 발생한다.",
+      "경추 5-6번 사이에서 경막이 눌리면 어깨 라인 위쪽으로 통증이 나타난다.",
+      "견갑거근과 승모근은 목에서 연결되는 근육으로, 이 근육의 뭉침이 어깨 통증을 유발한다.",
+      "어깨 통증은 원인이 목에 있는 경우가 많으므로 통증 부위만 치료하면 안 된다."
+    ]
   },
   "images": [
     "https://max-website20-images.s3.ap-south-1.amazonaws.com/shoulder_pain_what_could_be_reason_1_8273180275.jpg",

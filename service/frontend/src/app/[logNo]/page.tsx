@@ -111,6 +111,16 @@ export default function PostPage({ params }: { params: { logNo: string } }) {
       }
     : { "@type": "Organization", name: "이수한의원", url: SITE_URL };
 
+  // 제목에서 핵심 의료 키워드 추출 (GEO 엔티티 연결)
+  const MEDICAL_KEYWORDS = [
+    "공진단","경옥고","추나요법","추나","디스크","허리디스크","목디스크","척추","골반","체형교정",
+    "산후조리","산후풍","갱년기","난임","자궁","생리통","생리불순","임신",
+    "성장","성조숙증","소아","어린이","키","비염",
+    "다이어트","비만","감비환","체중",
+    "침치료","약침","한약","보약","공진단","면역","피로","수험생",
+  ];
+  const titleKeywords = MEDICAL_KEYWORDS.filter((kw) => post.title.includes(kw));
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -122,10 +132,15 @@ export default function PostPage({ params }: { params: { logNo: string } }) {
     mainEntityOfPage: postUrl,
     author: authorEntity,
     publisher: { "@type": "MedicalClinic", "@id": SITE_URL, name: "이수한의원", url: SITE_URL },
+    keywords: ["이수한의원", post.category, ...titleKeywords].join(", "),
     about: [
       { "@type": "Thing", name: post.category },
       ...(treatmentLink ? [{ "@type": "MedicalTherapy", name: treatmentLink.name, url: `${SITE_URL}${treatmentLink.href}` }] : []),
+      ...titleKeywords.map((kw) => ({ "@type": "MedicalTherapy", name: kw })),
     ],
+    isPartOf: treatmentLink
+      ? { "@type": "WebPage", url: `${SITE_URL}${treatmentLink.href}`, name: `${treatmentLink.name} — 이수한의원` }
+      : { "@type": "WebSite", url: SITE_URL, name: "이수한의원" },
     isAccessibleForFree: true,
     inLanguage: "ko",
   };

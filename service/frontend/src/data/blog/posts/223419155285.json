@@ -12,7 +12,13 @@
     "ogDesc": "타인의 건강보험을 이용해 병의원에서 진료를 받는 건강보험 명의도용 건수가 많다고 하네요. (이수한의원...",
     "ogImage": "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/836ab52594b12e0c.png",
     "date": "2024. 4. 18. 9:33",
-    "category": null
+    "category": null,
+    "summary": [
+      "타인의 건강보험을 도용해 병의원 진료를 받는 명의도용 사례가 다수 발생하고 있다.",
+      "2024년 5월부터 정부 제도 정비로 모든 병의원에서 진료 시 신분증 확인이 의무화되었다.",
+      "이수한의원은 명의도용 적발 사례가 있어 이미 자체적으로 본인 확인 절차를 시행해 왔다.",
+      "진료를 받으려면 신분증을 지참해야 하며, 미지참 시 건강보험 적용이 제한될 수 있다."
+    ]
   },
   "images": [
     "https://isuhani-clinic-data.s3.ap-northeast-2.amazonaws.com/images/legacy/348298bdf6318075.png",

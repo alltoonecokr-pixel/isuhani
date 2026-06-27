@@ -25,35 +25,49 @@ type RecentPost = {
 
 type IconType = React.ComponentType<{ size?: number; className?: string }>;
 type MenuItem = { label: string; desc?: string; href: string; Icon: IconType };
+type TreatmentMenuItem = MenuItem & { slug: string };
 
 // 진료 영역 드롭다운 — treatments 데이터 + herb 아이콘 매핑
 const TREATMENT_ICONS: Record<string, IconType> = {
-  spine: SpineIcon,
-  women: MotherChildIcon,
+  spine:    SpineIcon,
+  women:    MotherChildIcon,
   children: SproutIcon,
-  diet: BalanceIcon,
-  health: MortarIcon,
-  skin: DropLeafIcon,
+  diet:     BalanceIcon,
+  health:   MortarIcon,
+  skin:     DropLeafIcon,
 };
-const TREATMENT_ITEMS: MenuItem[] = Object.values(TREATMENTS).map((t) => ({
+
+const TREATMENT_ACCENT: Record<string, { bg: string; fg: string }> = {
+  spine:    { bg: "#f0dece", fg: "#7a4c2e" },
+  women:    { bg: "#f0d5e4", fg: "#9e4568" },
+  children: { bg: "#cce8d8", fg: "#3a7a56" },
+  diet:     { bg: "#ccdaee", fg: "#3a5e80" },
+  health:   { bg: "#c0e2cc", fg: "#2d6b40" },
+  skin:     { bg: "#ddc8ea", fg: "#6e3898" },
+};
+
+type TreatmentItem = MenuItem & { slug: string };
+const TREATMENT_ITEMS: TreatmentItem[] = Object.values(TREATMENTS).map((t) => ({
   label: t.name,
-  desc: t.tagline,
-  href: `/treatment/${t.slug}`,
-  Icon: TREATMENT_ICONS[t.slug] ?? LeafIcon,
+  desc:  t.tagline,
+  href:  `/treatment/${t.slug}`,
+  slug:  t.slug,
+  Icon:  TREATMENT_ICONS[t.slug] ?? LeafIcon,
 }));
 
 export function Header({ recentPosts = [] }: { recentPosts?: RecentPost[] }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const isHome = pathname === "/home" || pathname === "/home/";
   const isJournal =
-    pathname === "/" || pathname === "/journal" || /^\/\d+$/.test(pathname);
+    pathname === "/" || pathname.startsWith("/journal") || /^\/\d+/.test(pathname);
 
   return (
     <header className="sticky top-0 left-0 right-0 z-30 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/70 border-b border-ink-100">
       <div className="max-w-container mx-auto px-4 md:px-8 h-14 md:h-16 flex items-center justify-between gap-4">
         {/* 좌: 브랜드 */}
         <Link
-          href="/"
+          href="/home"
           className="shrink-0 inline-flex items-center gap-2.5 group"
           aria-label="이수한의원 홈"
         >
@@ -73,8 +87,8 @@ export function Header({ recentPosts = [] }: { recentPosts?: RecentPost[] }) {
 
         {/* 중: 데스크톱 네비 */}
         <nav className="hidden md:flex items-center gap-1 mx-auto">
-          <NavLink label="병원 소개" href="/home" active={pathname === "/home"} />
-          <NavDropdown label="진료 영역" items={TREATMENT_ITEMS} active={pathname.startsWith("/treatment")} />
+          <NavLink label="병원 소개" href="/home" active={isHome} />
+          <NavDropdown label="진료 영역" items={TREATMENT_ITEMS} active={pathname.startsWith("/treatment")} pathname={pathname} />
           <NavLink label="건강 저널" href="/journal" active={isJournal} />
           <NavLink label="첫 방문" href="/visit-guide" active={pathname.startsWith("/visit-guide")} />
           <NavLink label="쑤 상담" href="/ask" active={pathname.startsWith("/ask")} badge />
@@ -111,8 +125,8 @@ export function Header({ recentPosts = [] }: { recentPosts?: RecentPost[] }) {
       {open && (
         <div className="md:hidden border-t border-ink-100 bg-white max-h-[80vh] overflow-y-auto">
           <nav className="max-w-container mx-auto px-4 py-2 flex flex-col">
-            <MobileLink label="병원 소개" href="/home" onClick={() => setOpen(false)} active={pathname === "/home"} />
-            <MobileGroup label="진료 영역" items={TREATMENT_ITEMS} onNavigate={() => setOpen(false)} />
+            <MobileLink label="병원 소개" href="/home" onClick={() => setOpen(false)} active={isHome} />
+            <MobileGroup label="진료 영역" items={TREATMENT_ITEMS} onNavigate={() => setOpen(false)} pathname={pathname} />
             <MobileLink label="건강 저널" href="/journal" onClick={() => setOpen(false)} active={isJournal} />
             <MobileLink label="첫 방문" href="/visit-guide" onClick={() => setOpen(false)} active={pathname.startsWith("/visit-guide")} />
             <MobileLink label="쑤 상담" href="/ask" onClick={() => setOpen(false)} active={pathname.startsWith("/ask")} badge />
@@ -146,18 +160,17 @@ function NavLink({
     <Link
       href={href}
       className={[
-        "relative inline-flex items-center h-16 px-3 text-[13.5px] font-semibold tracking-[-0.01em] transition-colors",
-        active ? "text-ink-900" : "text-ink-600 hover:text-ink-900",
+        "group relative inline-flex items-center h-16 px-3 text-[13.5px] font-semibold tracking-[-0.01em] transition-colors outline-none",
+        active ? "text-ink-900" : "text-ink-400 hover:text-ink-900",
       ].join(" ")}
     >
       {label}
       {badge && <NewPing />}
-      {/* 텍스트와 독립된 absolute 언더라인 — 텍스트 위치 절대 불변 */}
       <span
         aria-hidden
         className={[
-          "absolute bottom-0 left-0 right-0 h-[2px] rounded-full transition-opacity duration-200",
-          active ? "bg-herb-700 opacity-100" : "opacity-0",
+          "absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-herb-700 transition-opacity duration-200",
+          active ? "opacity-100" : "opacity-0 group-hover:opacity-20",
         ].join(" ")}
       />
     </Link>
@@ -169,18 +182,20 @@ function NavDropdown({
   label,
   items,
   active,
+  pathname,
 }: {
   label: string;
-  items: MenuItem[];
+  items: TreatmentMenuItem[];
   active: boolean;
+  pathname: string;
 }) {
   return (
     <div className="relative group">
       <button
         type="button"
         className={[
-          "relative inline-flex items-center gap-1 h-16 px-3 text-[13.5px] font-semibold tracking-[-0.01em] transition-colors",
-          active ? "text-ink-900" : "text-ink-600 group-hover:text-ink-900",
+          "relative inline-flex items-center gap-1 h-16 px-3 text-[13.5px] font-semibold tracking-[-0.01em] transition-colors outline-none",
+          active ? "text-ink-900" : "text-ink-400 group-hover:text-ink-900",
         ].join(" ")}
       >
         {label}
@@ -188,33 +203,47 @@ function NavDropdown({
         <span
           aria-hidden
           className={[
-            "absolute bottom-0 left-0 right-0 h-[2px] rounded-full transition-opacity duration-200",
-            active ? "bg-herb-700 opacity-100" : "opacity-0",
+            "absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-herb-700 transition-opacity duration-200",
+            active ? "opacity-100" : "opacity-0 group-hover:opacity-20",
           ].join(" ")}
         />
       </button>
       <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 invisible opacity-0 translate-y-1 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 z-50">
         <div className="absolute top-[3px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-white rotate-45 border-l border-t border-ink-100" />
         <div className="relative min-w-[21rem] rounded-2xl bg-white p-2 shadow-[0_22px_55px_-22px_rgba(26,20,16,0.28)] ring-1 ring-ink-100">
-          {items.map((it) => (
-            <Link
-              key={it.href}
-              href={it.href}
-              className="group/item flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-herb-50 transition-colors"
-            >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-herb-50 text-herb-700 transition-colors group-hover/item:bg-herb-700 group-hover/item:text-white">
-                <it.Icon size={18} />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-[13.5px] font-semibold text-ink-900 transition-colors group-hover/item:text-herb-700">
-                  {it.label}
+          {items.map((it) => {
+            const ac = TREATMENT_ACCENT[it.slug] ?? { bg: "#c0e2cc", fg: "#2d6b40" };
+            const isCurrent = pathname.startsWith(it.href);
+            return (
+              <Link
+                key={it.href}
+                href={it.href}
+                className={[
+                  "group/item flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors",
+                  isCurrent ? "bg-ink-50" : "hover:bg-ink-50",
+                ].join(" ")}
+              >
+                <span
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors"
+                  style={{ background: ac.bg, color: ac.fg }}
+                >
+                  <it.Icon size={18} />
                 </span>
-                {it.desc && (
-                  <span className="block truncate text-[11.5px] text-ink-400">{it.desc}</span>
+                <span className="min-w-0">
+                  <span className={["block text-[13.5px] font-semibold transition-colors", isCurrent ? "font-bold" : "text-ink-900"].join(" ")}
+                    style={isCurrent ? { color: ac.fg } : undefined}>
+                    {it.label}
+                  </span>
+                  {it.desc && (
+                    <span className="block truncate text-[11.5px] text-ink-400">{it.desc}</span>
+                  )}
+                </span>
+                {isCurrent && (
+                  <span className="ml-auto w-1.5 h-1.5 rounded-full shrink-0" style={{ background: ac.fg }} />
                 )}
-              </span>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </div>
@@ -267,28 +296,45 @@ function MobileGroup({
   label,
   items,
   onNavigate,
+  pathname,
 }: {
   label: string;
-  items: MenuItem[];
+  items: TreatmentMenuItem[];
   onNavigate: () => void;
+  pathname: string;
 }) {
   return (
-    <div className="border-b border-ink-100 py-3">
-      <div className="text-[12px] font-bold tracking-[0.04em] text-ink-400 mb-1">{label}</div>
+    <div className="border-b border-ink-100 py-2">
+      <div className="text-[11px] font-bold tracking-[0.08em] text-ink-400 mb-1 px-1">{label}</div>
       <div className="flex flex-col">
-        {items.map((it) => (
-          <Link
-            key={it.href}
-            href={it.href}
-            onClick={onNavigate}
-            className="flex items-center gap-3 py-2.5 text-[14px] text-ink-700 hover:text-herb-700 transition-colors"
-          >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-herb-50 text-herb-700">
-              <it.Icon size={16} />
-            </span>
-            {it.label}
-          </Link>
-        ))}
+        {items.map((it) => {
+          const ac = TREATMENT_ACCENT[it.slug] ?? { bg: "#c0e2cc", fg: "#2d6b40" };
+          const isCurrent = pathname.startsWith(it.href);
+          return (
+            <Link
+              key={it.href}
+              href={it.href}
+              onClick={onNavigate}
+              className={[
+                "flex items-center gap-3 py-2.5 rounded-xl px-2 transition-colors",
+                isCurrent ? "bg-ink-50" : "",
+              ].join(" ")}
+            >
+              <span
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                style={{ background: ac.bg, color: ac.fg }}
+              >
+                <it.Icon size={16} />
+              </span>
+              <span
+                className={["text-[14px] transition-colors", isCurrent ? "font-bold" : "text-ink-700"].join(" ")}
+                style={isCurrent ? { color: ac.fg } : undefined}
+              >
+                {it.label}
+              </span>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
