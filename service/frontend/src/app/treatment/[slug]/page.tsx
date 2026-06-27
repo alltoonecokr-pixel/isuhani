@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { Phone } from "lucide-react";
 import { getAllPosts, makeExcerpt } from "@/lib/blog";
 import { TREATMENT_LIST } from "@/data/treatments";
-import { getTreatment, getTreatmentList } from "@/data/treatmentOverride";
+import { getTreatment } from "@/lib/pages";
 import { SITE_URL } from "@/lib/site";
 import { TreatmentIllustration } from "@/components/treatment/TreatmentIllustration";
 import { TreatmentAnimations } from "@/components/treatment/TreatmentAnimations";
@@ -125,7 +125,7 @@ export default function TreatmentPage({ params }: { params: { slug: string } }) 
     .filter((p) => t.categoryMatch.includes(p.category))
     .slice(0, 6);
 
-  const otherTreatments = getTreatmentList().filter((x) => x.slug !== params.slug);
+  const otherTreatments = TREATMENT_LIST.filter((x) => x.slug !== params.slug);
 
   // GEO: 관련 글을 hasPart로 연결해 AI 크롤러가 콘텐츠 클러스터를 인식하도록
   const jsonLdEnriched = {

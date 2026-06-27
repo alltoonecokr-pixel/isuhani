@@ -164,15 +164,15 @@ export class CmsApi {
     });
   }
 
-  // 페이지 콘텐츠 (진료영역 등 고정 섹션 페이지)
-  getPage<T = unknown>(pageId: string): Promise<{ pageId: string; content: T | null }> {
-    return this.req(`/api/pages/${pageId}`);
+  // 편집 가능 페이지 (진료영역 등) — content=null 이면 아직 저장 전(시드 사용)
+  getPage<T>(slug: string): Promise<{ content: T | null }> {
+    return this.req(`/api/pages/${slug}`);
   }
 
-  putPage<T = unknown>(pageId: string, content: T): Promise<{ pageId: string; content: T }> {
-    return this.req(`/api/pages/${pageId}`, {
+  putPage<T>(slug: string, content: T): Promise<T> {
+    return this.req(`/api/pages/${slug}`, {
       method: "PUT",
-      body: JSON.stringify({ content }),
+      body: JSON.stringify(content),
     });
   }
 

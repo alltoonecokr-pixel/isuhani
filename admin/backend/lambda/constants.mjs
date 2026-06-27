@@ -6,6 +6,12 @@ export const IMAGE_PREFIX = "images/";
 export const META_KEY = "meta/categories.json";
 export const INDEX_KEY = "index.json";
 
+// 편집 가능한 사이트 페이지 (건강저널 글이 아닌 정적 페이지). 슬러그 화이트리스트.
+export const EDITABLE_PAGES = [
+  "treatment-spine", "treatment-women", "treatment-children",
+  "treatment-diet", "treatment-health", "treatment-skin",
+];
+
 // 레거시(네이버 크롤) categoryNo → 표시 이름 매핑
 export const CATEGORY_MAP = {
   "1": "한의원 story", "32": "건강관리", "43": "한의원 story",

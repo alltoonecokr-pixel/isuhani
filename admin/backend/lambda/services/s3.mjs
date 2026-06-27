@@ -74,6 +74,31 @@ export async function deletePost(logNo) {
   );
 }
 
+// ── 편집 가능 페이지 콘텐츠 (pages/{slug}.json, 데이터 버킷) ───────────────────
+
+export async function getPageContent(slug) {
+  try {
+    const out = await s3.send(
+      new GetObjectCommand({ Bucket: BUCKET, Key: `${PAGE_PREFIX}${slug}.json` }),
+    );
+    return JSON.parse(await streamToString(out.Body));
+  } catch (e) {
+    if (e.name === "NoSuchKey" || e.$metadata?.httpStatusCode === 404) return null;
+    throw e;
+  }
+}
+
+export async function putPageContent(slug, content) {
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: BUCKET,
+      Key: `${PAGE_PREFIX}${slug}.json`,
+      Body: JSON.stringify(content, null, 2),
+      ContentType: "application/json; charset=utf-8",
+    }),
+  );
+}
+
 export async function postExists(logNo) {
   try {
     await s3.send(
@@ -176,43 +201,4 @@ export async function deleteLivePost(logNo) {
   await s3.send(
     new DeleteObjectCommand({ Bucket: WEB_BUCKET, Key: `live-posts/${logNo}.json` }),
   ).catch(() => {});
-}
-
-// ── 페이지 콘텐츠 (진료영역 등 고정 섹션 페이지) ──────────────────────────────
-// 원본: data 버킷 pages/{pageId}.json. 사이트 빌드가 sync해 정적 렌더에 사용.
-// 즉시 반영: 웹 버킷 live-pages/{pageId}.json 공개 기록 → 페이지 클라이언트 섬이 fetch.
-
-export async function getPageContent(pageId) {
-  try {
-    const out = await s3.send(
-      new GetObjectCommand({ Bucket: BUCKET, Key: `${PAGE_PREFIX}${pageId}.json` }),
-    );
-    return JSON.parse(await streamToString(out.Body));
-  } catch {
-    return null; // 미저장 — 호출측이 기본 시드 사용
-  }
-}
-
-export async function putPageContent(pageId, content) {
-  await s3.send(
-    new PutObjectCommand({
-      Bucket: BUCKET,
-      Key: `${PAGE_PREFIX}${pageId}.json`,
-      Body: JSON.stringify(content),
-      ContentType: "application/json; charset=utf-8",
-    }),
-  );
-}
-
-export async function writeLivePage(pageId, content) {
-  if (!WEB_BUCKET) return;
-  await s3.send(
-    new PutObjectCommand({
-      Bucket: WEB_BUCKET,
-      Key: `live-pages/${pageId}.json`,
-      Body: JSON.stringify(content),
-      ContentType: "application/json; charset=utf-8",
-      CacheControl: "no-store, max-age=0",
-    }),
-  );
 }

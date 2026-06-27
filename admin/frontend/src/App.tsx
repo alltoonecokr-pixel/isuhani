@@ -61,38 +61,11 @@ export function App() {
   const [editingPost, setEditingPost] = useState<FullPost | null>(null);
   const [editorKey, setEditorKey] = useState(0);
 
-  // 상단 모드: 글 관리 vs 페이지 편집 (진료영역). 코드 시드 위에 API 저장본 덮어씀.
+  // 상단 모드: 글 관리 vs 페이지 편집. 진료영역 콘텐츠는 API에서 로드, 없으면 시드.
   const [section, setSection] = useState<"journal" | "pages">("journal");
-  const [treatments, setTreatments] = useState<TreatmentContent[]>(TREATMENT_SEED);
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
-  const [pageBusy, setPageBusy] = useState(false);
-
-  const openTreatment = useCallback((slug: string) => {
-    setEditingSlug(slug);
-    setPageBusy(true);
-    apiRef.current
-      .getPage<TreatmentContent>(`treatment-${slug}`)
-      .then((r) => {
-        if (r.content) setTreatments((prev) => prev.map((t) => (t.slug === slug ? { ...t, ...r.content } : t)));
-      })
-      .catch(() => { /* 미저장/오류 → 코드 시드 사용 */ })
-      .finally(() => setPageBusy(false));
-  }, []);
-
-  const saveTreatment = useCallback(async (next: TreatmentContent) => {
-    setTreatments((prev) => prev.map((t) => (t.slug === next.slug ? next : t)));
-    setBusy(true);
-    try {
-      await apiRef.current.putPage(`treatment-${next.slug}`, next);
-      await apiRef.current.deploy();
-      toast("저장 완료 — 발행 빌드 시작 (1~3분 후 사이트 반영)", "ok");
-      setEditingSlug(null);
-    } catch (e) {
-      toast("저장 실패: " + ((e as Error)?.message || ""), "error");
-    } finally {
-      setBusy(false);
-    }
-  }, []);
+  const [editingContent, setEditingContent] = useState<TreatmentContent | null>(null);
+  const [pagesLoading, setPagesLoading] = useState(false);
 
   const [settings, setSettings] = useState<{ open: boolean; force: boolean }>({ open: false, force: false });
   const [catsOpen, setCatsOpen] = useState(false);
@@ -316,6 +289,38 @@ export function App() {
     }
   };
 
+  // ── 페이지 편집 (진료영역) ───────────────────────────────────────
+  const openTreatment = async (slug: string) => {
+    const seed = TREATMENT_SEED.find((t) => t.slug === slug)!;
+    setEditingSlug(slug);
+    setEditingContent(null);
+    setPagesLoading(true);
+    try {
+      const { content } = await apiRef.current.getPage<TreatmentContent>(`treatment-${slug}`);
+      // 저장된 적 있으면 그 값, 없으면 시드. 시드 기본값으로 빠진 필드 보강.
+      setEditingContent(content ? { ...seed, ...content, slug } : seed);
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "불러오기 실패", "error");
+      setEditingContent(seed);
+    } finally {
+      setPagesLoading(false);
+    }
+  };
+
+  const saveTreatment = async (next: TreatmentContent) => {
+    setBusy(true);
+    try {
+      await apiRef.current.putPage(`treatment-${next.slug}`, next);
+      setEditingSlug(null);
+      setEditingContent(null);
+      void runDeploy(); // 글과 동일하게 빌드로 사이트 반영
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "저장 실패", "error");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   // ── 카테고리 ─────────────────────────────────────────────────────
   const saveCats = async (cats: string[]) => {
     try {
@@ -376,19 +381,19 @@ export function App() {
 
       {section === "pages" ? (
         editingSlug ? (
-          pageBusy && !busy ? (
-            <div className="pg-loading">진료영역 콘텐츠 불러오는 중…</div>
-          ) : (
+          editingContent ? (
             <TreatmentEditor
               key={editingSlug}
-              initial={treatments.find((t) => t.slug === editingSlug)!}
+              initial={editingContent}
               busy={busy}
-              onBack={() => setEditingSlug(null)}
+              onBack={() => { setEditingSlug(null); setEditingContent(null); }}
               onSave={saveTreatment}
             />
+          ) : (
+            <div className="pg-list"><p className="pg-empty">{pagesLoading ? "불러오는 중…" : ""}</p></div>
           )
         ) : (
-          <PagesView treatments={treatments} onEditTreatment={openTreatment} />
+          <PagesView treatments={TREATMENT_SEED} onEditTreatment={openTreatment} />
         )
       ) : view === "list" ? (
         <ListView

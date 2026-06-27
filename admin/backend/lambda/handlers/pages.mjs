@@ -1,29 +1,45 @@
-// 페이지 콘텐츠 핸들러 — 고정 섹션 페이지(진료영역 등)의 GET/PUT.
-// 본문(글)과 분리: 레이아웃은 코드, 칸 내용만 JSON으로 관리.
+// 편집 가능 페이지 핸들러 — GET/PUT /api/pages/{slug}
+// 진료영역 등 정적 페이지 콘텐츠를 pages/{slug}.json (데이터 버킷)에 저장.
+// 발행은 글과 동일하게 CodeBuild(빌드 시 pages/ 동기화 → 사이트 렌더)로 반영.
 
-import { getPageContent, putPageContent, writeLivePage } from "../services/s3.mjs";
+import { getPageContent, putPageContent } from "../services/s3.mjs";
+import { EDITABLE_PAGES } from "../constants.mjs";
 
-// pageId 화이트리스트 — 임의 키 쓰기 방지 (예: treatment-spine)
-const TREATMENT_SLUGS = ["spine", "women", "children", "diet", "health", "skin"];
-const VALID_PAGE_IDS = new Set(TREATMENT_SLUGS.map((s) => `treatment-${s}`));
+const str = (v) => (typeof v === "string" ? v : "");
 
-export function isValidPageId(pageId) {
-  return VALID_PAGE_IDS.has(pageId);
+// 진료영역 콘텐츠 정규화 — 고정 스키마만 허용 (레이아웃 보호)
+function normalizeTreatment(slug, input) {
+  return {
+    slug,
+    name: str(input?.name).trim(),
+    tagline: str(input?.tagline).trim(),
+    description: str(input?.description).trim(),
+    methods: Array.isArray(input?.methods)
+      ? input.methods
+          .map((m) => ({ title: str(m?.title).trim(), desc: str(m?.desc).trim() }))
+          .filter((m) => m.title || m.desc)
+      : [],
+    faq: Array.isArray(input?.faq)
+      ? input.faq
+          .map((f) => ({ q: str(f?.q).trim(), a: str(f?.a).trim() }))
+          .filter((f) => f.q || f.a)
+      : [],
+    updatedAt: new Date().toISOString(),
+  };
 }
 
-export async function handleGetPage(pageId) {
-  if (!isValidPageId(pageId)) return null;
-  const content = await getPageContent(pageId);
-  // 미저장이면 null 반환 → 어드민이 자체 시드(treatments.ts) 사용
-  return { pageId, content };
+export async function handleGetPage(slug) {
+  if (!EDITABLE_PAGES.includes(slug)) return undefined; // 404
+  return (await getPageContent(slug)) ?? null; // null = 아직 저장 안 됨(시드 사용)
 }
 
-export async function handlePutPage(pageId, body) {
-  if (!isValidPageId(pageId)) return null;
-  const content = body?.content;
-  if (!content || typeof content !== "object") return { error: "content object required" };
-  const saved = { ...content, updatedAt: new Date().toISOString() };
-  // 원본(data) + 즉시반영(web) 동시 기록
-  await Promise.all([putPageContent(pageId, saved), writeLivePage(pageId, saved)]);
-  return { pageId, content: saved };
+export async function handlePutPage(slug, body) {
+  if (!EDITABLE_PAGES.includes(slug)) return undefined; // 404
+  if (slug.startsWith("treatment-")) {
+    const content = normalizeTreatment(slug, body);
+    if (!content.name) return { error: "이름(name)은 필수입니다" };
+    await putPageContent(slug, content);
+    return content;
+  }
+  return { error: "지원하지 않는 페이지" };
 }

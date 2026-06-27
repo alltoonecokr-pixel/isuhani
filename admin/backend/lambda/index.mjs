@@ -96,20 +96,20 @@ export const handler = async (event) => {
       }
     }
 
-    // 페이지 콘텐츠 (진료영역 등 고정 섹션 페이지)
-    const pageSingle = path.match(/^\/api\/pages\/([a-z][a-z0-9-]{1,40})$/);
+    // 편집 가능 페이지 (진료영역 등)
+    const pageSingle = path.match(/^\/api\/pages\/([^/]+)$/);
     if (pageSingle) {
-      const pageId = pageSingle[1];
+      const slug = pageSingle[1];
       if (method === "GET") {
-        const r = await handleGetPage(pageId);
-        if (!r) return respond(404, { error: "unknown page" });
-        return respond(200, r);
+        const content = await handleGetPage(slug);
+        if (content === undefined) return respond(404, { error: "not found" });
+        return respond(200, { content }); // content=null → 아직 저장 전(시드 사용)
       }
       if (method === "PUT") {
-        const r = await handlePutPage(pageId, body);
-        if (!r) return respond(404, { error: "unknown page" });
-        if (r.error) return respond(400, r);
-        return respond(200, r);
+        const result = await handlePutPage(slug, body);
+        if (result === undefined) return respond(404, { error: "not found" });
+        if (result?.error) return respond(400, result);
+        return respond(200, result);
       }
     }
 
