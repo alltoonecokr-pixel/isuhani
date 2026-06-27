@@ -59,9 +59,21 @@ export function InlineEditor() {
     };
     const onClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (target?.closest?.("[data-cmsi]")) return;
+      if (target?.closest?.("[data-cmsi]")) return; // 편집 영역은 그대로 편집
       const a = target?.closest?.("a");
-      if (a && /^(tel:|mailto:)/.test(a.getAttribute("href") || "")) e.preventDefault();
+      if (!a) return;
+      const href = a.getAttribute("href") || "";
+      if (/^(tel:|mailto:)/.test(href)) { e.preventDefault(); return; }
+      // 같은 출처 이동은 "전체 새로고침"으로 강제 — Next SPA 이동은 편집 엔진을 다시 안 붙임.
+      try {
+        const u = new URL(a.href, origin);
+        if (u.origin === origin) {
+          e.preventDefault();
+          e.stopPropagation();
+          u.searchParams.set("__edit", "1");
+          window.location.assign(u.toString());
+        }
+      } catch { /* ignore */ }
     };
 
     document.addEventListener("input", onInput, true);
