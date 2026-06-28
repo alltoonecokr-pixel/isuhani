@@ -50,7 +50,7 @@ export function RichEditor({
       StarterKit.configure({
         heading: { levels: [2] },
       }),
-      ResizableImage.configure({ inline: false, allowBase64: false }),
+      ResizableImage.configure({ inline: false, allowBase64: false, uploadImage: onUploadImage }),
       Iframe,
       Placeholder.configure({
         placeholder: "내용을 입력하세요. 상단 도구로 소제목·사진·영상을 넣을 수 있습니다.",

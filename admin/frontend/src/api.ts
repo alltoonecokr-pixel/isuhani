@@ -188,6 +188,13 @@ export class CmsApi {
     return this.req("/api/sync-blog", { method: "POST" });
   }
 
+  replaceImage(srcUrl: string, base64: string, mimeType: string): Promise<{ ok: boolean; key: string }> {
+    return this.req("/api/replace-image", {
+      method: "POST",
+      body: JSON.stringify({ srcUrl, base64, mimeType }),
+    });
+  }
+
   deploy(): Promise<{ buildId: string }> {
     return this.req("/api/deploy", { method: "POST" });
   }

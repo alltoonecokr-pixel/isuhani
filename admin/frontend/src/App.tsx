@@ -340,6 +340,17 @@ export function App() {
     }
   };
 
+  const replaceImage = async (src: string, base64: string, mime: string): Promise<boolean> => {
+    try {
+      await apiRef.current.replaceImage(src, base64, mime);
+      toast("사진을 교체했습니다");
+      return true;
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "사진 교체 실패", "error");
+      return false;
+    }
+  };
+
   // ── 카테고리 ─────────────────────────────────────────────────────
   const saveCats = async (cats: string[]) => {
     try {
@@ -408,6 +419,7 @@ export function App() {
           onBack={() => setSection("journal")}
           onSaveAll={savePages}
           onReset={resetPage}
+          onReplaceImage={replaceImage}
         />
       ) : view === "list" ? (
         <ListView

@@ -778,3 +778,8 @@ a {
   pointer-events: none;
   font-family: var(--font-noto-kr), sans-serif;
 }
+
+/* 인라인 편집 — 본문 이미지 교체 */
+.cms-edit-mode img.cms-img-edit { cursor: pointer; transition: outline 0.12s, opacity 0.12s; }
+.cms-edit-mode img.cms-img-edit:hover { outline: 2px dashed #2d6e5a; outline-offset: 3px; }
+.cms-edit-mode img.cms-img-busy { opacity: 0.45; }

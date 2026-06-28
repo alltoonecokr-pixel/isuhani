@@ -12,6 +12,7 @@ type Props = {
   onBack: () => void;
   onSaveAll: (changes: ChangesByPage) => Promise<boolean>;
   onReset: (slug: string) => Promise<void>;
+  onReplaceImage: (src: string, base64: string, mime: string) => Promise<boolean>;
 };
 
 const startPath = (slug: string) =>
@@ -19,7 +20,7 @@ const startPath = (slug: string) =>
 
 const trunc = (s: string, n = 28) => (s.length > n ? s.slice(0, n) + "…" : s);
 
-export function InlinePageEditor({ startSlug, busy, onBack, onSaveAll, onReset }: Props) {
+export function InlinePageEditor({ startSlug, busy, onBack, onSaveAll, onReset, onReplaceImage }: Props) {
   const [ready, setReady] = useState(false);
   const [currentPage, setCurrentPage] = useState("");
   const [, bump] = useState(0);
@@ -43,6 +44,13 @@ export function InlinePageEditor({ startSlug, busy, onBack, onSaveAll, onReset }
       } else if (d.type === "change" && d.page && d.field != null) {
         (changesRef.current[d.page] ??= {})[String(d.field)] = { t: String(d.tag || ""), v: String(d.value ?? "") };
         bump((n) => n + 1);
+      } else if (d.type === "replaceImage" && d.src && d.base64) {
+        onReplaceImage(d.src, d.base64, d.mime || "image/jpeg").then((ok) => {
+          iframeRef.current?.contentWindow?.postMessage(
+            { source: "cms-host", type: ok ? "imageReplaced" : "imageFailed", src: d.src },
+            window.location.origin,
+          );
+        });
       }
     };
     window.addEventListener("message", onMessage);

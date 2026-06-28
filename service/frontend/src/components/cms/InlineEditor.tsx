@@ -47,6 +47,34 @@ export function InlineEditor() {
     });
     post({ type: "snapshot", payload: snapshot });
 
+    // ── 이미지 교체 ──────────────────────────────────────────────
+    // 본문(main) 안 우리 S3 이미지는 클릭하면 새 사진으로 교체(원 URL 유지, S3 객체만 덮어씀).
+    const isOurImg = (img: HTMLImageElement) => /amazonaws\.com\/images\//.test(img.src);
+    main?.querySelectorAll("img").forEach((img) => {
+      if (img.closest("[data-cms-skip]")) return;
+      if (isOurImg(img)) { img.classList.add("cms-img-edit"); img.title = "클릭해 사진 교체"; }
+    });
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/*";
+    fileInput.style.display = "none";
+    document.body.appendChild(fileInput);
+    let pendingImg: HTMLImageElement | null = null;
+    fileInput.addEventListener("change", () => {
+      const file = fileInput.files?.[0];
+      fileInput.value = "";
+      if (!file || !pendingImg) return;
+      const img = pendingImg;
+      const src = img.src.split("?")[0];
+      img.classList.add("cms-img-busy");
+      const reader = new FileReader();
+      reader.onload = () => {
+        const b64 = String(reader.result).split(",")[1] || "";
+        post({ type: "replaceImage", src, base64: b64, mime: file.type || "image/jpeg" });
+      };
+      reader.readAsDataURL(file);
+    });
+
     const onInput = (e: Event) => {
       const el = (e.target as HTMLElement)?.closest?.("[data-cmsi]") as HTMLElement | null;
       if (!el) return;
@@ -60,6 +88,8 @@ export function InlineEditor() {
     const onClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (target?.closest?.("[data-cmsi]")) return; // 편집 영역은 그대로 편집
+      const img = target?.closest?.("img.cms-img-edit") as HTMLImageElement | null;
+      if (img) { e.preventDefault(); e.stopPropagation(); pendingImg = img; fileInput.click(); return; }
       const a = target?.closest?.("a");
       if (!a) return;
       const href = a.getAttribute("href") || "";
@@ -76,15 +106,35 @@ export function InlineEditor() {
       } catch { /* ignore */ }
     };
 
+    // 부모(CMS)의 교체 결과 수신 → 해당 이미지 캐시버스트(즉시 새 사진 표시)
+    const onMessage = (ev: MessageEvent) => {
+      if (ev.origin !== origin) return;
+      const d = ev.data;
+      if (d?.source !== "cms-host") return;
+      if (d.type === "imageReplaced" && d.src) {
+        document.querySelectorAll<HTMLImageElement>("img.cms-img-edit").forEach((im) => {
+          if (im.src.split("?")[0] === d.src) {
+            im.src = d.src + "?v=" + Date.now();
+            im.classList.remove("cms-img-busy");
+          }
+        });
+      } else if (d.type === "imageFailed" && d.src) {
+        document.querySelectorAll<HTMLImageElement>("img.cms-img-busy").forEach((im) => im.classList.remove("cms-img-busy"));
+      }
+    };
+
     document.addEventListener("input", onInput, true);
     document.addEventListener("paste", onPaste, true);
     document.addEventListener("click", onClick, true);
+    window.addEventListener("message", onMessage);
     post({ type: "ready" });
 
     return () => {
       document.removeEventListener("input", onInput, true);
       document.removeEventListener("paste", onPaste, true);
       document.removeEventListener("click", onClick, true);
+      window.removeEventListener("message", onMessage);
+      fileInput.remove();
       document.body.classList.remove("cms-edit-mode");
     };
   }, []);

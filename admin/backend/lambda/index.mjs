@@ -13,7 +13,7 @@ import { handleList, handleCreate, handleUpdate, handleDelete } from "./handlers
 import { handleGetPage, handlePutPage, handleDeletePage } from "./handlers/pages.mjs";
 import { handleDeploy, handleBuildStatus } from "./handlers/deploy.mjs";
 import { handleSyncBlog } from "./handlers/sync.mjs";
-import { handleUpload } from "./handlers/media.mjs";
+import { handleUpload, handleReplaceImage } from "./handlers/media.mjs";
 import { getPost, getCategories, putCategories } from "./services/s3.mjs";
 import { respond } from "./utils/respond.mjs";
 
@@ -124,6 +124,8 @@ export const handler = async (event) => {
       return respond(201, await handleCreate(body));
     if (method === "POST" && path === "/api/upload")
       return respond(201, await handleUpload(body));
+    if (method === "POST" && path === "/api/replace-image")
+      return respond(200, await handleReplaceImage(body));
     if (method === "POST" && path === "/api/deploy")
       return respond(202, await handleDeploy());
     if (method === "POST" && path === "/api/sync-blog")

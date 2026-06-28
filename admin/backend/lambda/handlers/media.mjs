@@ -31,3 +31,24 @@ export async function handleUpload(payload) {
     size: buf.length,
   };
 }
+
+// 이미지 교체 — 본문/인덱스 변경 없이 기존 이미지 S3 객체만 새 사진으로 덮어쓴다.
+// (URL이 그대로라 본문·썸네일이 자동 반영. 다른 페이지·글 어디에서든 통용)
+export async function handleReplaceImage(payload) {
+  if (!payload.base64 || !payload.srcUrl) throw new Error("srcUrl/base64 required");
+  const m = String(payload.srcUrl).match(/amazonaws\.com\/(.+?)(?:\?|$)/);
+  const key = m ? decodeURIComponent(m[1]) : "";
+  if (!key.startsWith(IMAGE_PREFIX)) throw new Error("우리 이미지가 아닙니다");
+  const ext = (key.match(/\.([a-z0-9]+)$/i)?.[1] || "jpg").toLowerCase();
+  const buf = Buffer.from(payload.base64, "base64");
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: BUCKET,
+      Key: key,
+      Body: buf,
+      ContentType: payload.mimeType || `image/${ext}`,
+      CacheControl: "public, max-age=300", // 교체 후 빠르게 전파
+    }),
+  );
+  return { ok: true, key, size: buf.length };
+}

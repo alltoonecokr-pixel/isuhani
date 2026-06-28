@@ -1,16 +1,28 @@
 import { mergeAttributes } from "@tiptap/core";
-import Image from "@tiptap/extension-image";
+import Image, { type ImageOptions } from "@tiptap/extension-image";
+
+type ResizableImageOptions = ImageOptions & {
+  uploadImage: null | ((file: File) => Promise<string>);
+};
 import {
   NodeViewWrapper,
   ReactNodeViewRenderer,
   type NodeViewProps,
 } from "@tiptap/react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
-// 자유 크기조정 + 정렬 이미지.
+// 자유 크기조정 + 정렬 + 교체 이미지.
 // 저장 형태: <img src style="width:NN%" data-align="left|center|right">
 // (width 인라인 스타일 + data-align — 공개 사이트 sanitizeBody가 보존하도록 맞춤)
-export const ResizableImage = Image.extend({
+export const ResizableImage = Image.extend<ResizableImageOptions>({
+  addOptions() {
+    return {
+      ...this.parent?.(),
+      // 교체 업로드 함수 (RichEditor에서 주입) — (file) => Promise<url>
+      uploadImage: null,
+    };
+  },
+
   addAttributes() {
     return {
       ...this.parent?.(),
@@ -53,10 +65,29 @@ const ALIGNS = [
 ];
 
 function ResizableImageView(props: NodeViewProps) {
-  const { node, updateAttributes, selected, editor } = props;
+  const { node, updateAttributes, selected, editor, extension } = props;
   const width: string = node.attrs.width || "100%";
   const align: string = node.attrs.align || "center";
   const imgRef = useRef<HTMLImageElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [replacing, setReplacing] = useState(false);
+
+  const uploadImage: ((f: File) => Promise<string>) | null = extension.options.uploadImage;
+
+  const onPickReplace = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !uploadImage) return;
+    setReplacing(true);
+    try {
+      const url = await uploadImage(file);
+      updateAttributes({ src: url });
+    } catch {
+      /* 업로드 실패 — 상위 토스트로 알림됨 */
+    } finally {
+      setReplacing(false);
+    }
+  };
 
   // 우하단 핸들 드래그 → 콘텐츠 폭 대비 퍼센트로 폭 조정
   const startDrag = (e: React.MouseEvent) => {
@@ -123,7 +154,28 @@ function ResizableImageView(props: NodeViewProps) {
                   {a.label}
                 </button>
               ))}
+              {uploadImage && (
+                <>
+                  <span className="rz-bar-sep" />
+                  <button
+                    type="button"
+                    className="rz-replace"
+                    title="다른 사진으로 교체"
+                    disabled={replacing}
+                    onClick={() => fileRef.current?.click()}
+                  >
+                    {replacing ? "교체 중…" : "사진 교체"}
+                  </button>
+                </>
+              )}
             </div>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={onPickReplace}
+            />
           </>
         )}
       </div>

@@ -822,3 +822,7 @@ button.ghost.sm { font-size: 12px; padding: 5px 10px; }
 .sync-date { font-size: 11px; color: var(--ink-400); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .sync-title { color: var(--ink-900); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sync-cat { font-size: 11px; color: var(--accent); background: var(--accent-light); padding: 2px 7px; border-radius: 10px; white-space: nowrap; }
+
+/* 이미지 노드 — 사진 교체 버튼 */
+.rz-bar .rz-replace { color: var(--accent); font-weight: 700; padding: 0 8px; white-space: nowrap; }
+.rz-bar .rz-replace:disabled { opacity: .6; }
