@@ -24,6 +24,14 @@ export const DEFAULT_CATEGORIES = [
   "비만 · 다이어트",
 ];
 
+// 네이버에서 가져온 제목의 HTML 엔티티(&quot; &amp; &#39; 등)를 실제 문자로 복원
+export function decodeEntities(s: string): string {
+  if (!s || s.indexOf("&") === -1) return s;
+  const el = document.createElement("textarea");
+  el.innerHTML = s;
+  return el.value;
+}
+
 const LS = { url: "cms_url", user: "cms_user", pass: "cms_pass" } as const;
 
 // 옛 세션이 막힌 Lambda Function URL(.lambda-url.)을 저장해두면 글이 안 보임 →
@@ -131,12 +139,14 @@ export class CmsApi {
     });
   }
 
-  listPosts(): Promise<{ total: number; posts: PostIndexEntry[] }> {
-    return this.req("/api/posts");
+  async listPosts(): Promise<{ total: number; posts: PostIndexEntry[] }> {
+    const r = await this.req<{ total: number; posts: PostIndexEntry[] }>("/api/posts");
+    return { ...r, posts: (r.posts || []).map((p) => ({ ...p, title: decodeEntities(p.title) })) };
   }
 
-  getPost(logNo: string): Promise<FullPost> {
-    return this.req(`/api/posts/${logNo}`);
+  async getPost(logNo: string): Promise<FullPost> {
+    const p = await this.req<FullPost>(`/api/posts/${logNo}`);
+    return { ...p, title: decodeEntities(p.title) };
   }
 
   createPost(input: PostInput): Promise<FullPost> {

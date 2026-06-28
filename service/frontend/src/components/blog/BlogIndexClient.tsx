@@ -8,6 +8,7 @@ import { VideoSection, type VideoItem } from "./VideoSection";
 import { ClinicPromo } from "./ClinicPromo";
 import { NoticeStrip } from "./NoticeStrip";
 import { SeriesSection } from "./SeriesSection";
+import { decodeEntities } from "@/lib/blog/sanitize";
 
 export type IndexPost = {
   logNo: string;
@@ -41,7 +42,13 @@ export function BlogIndexClient({
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (!Array.isArray(data?.posts) || !data.posts.length) return;
-        setPosts(data.posts);
+        // live-index의 제목·발췌에 남은 HTML 엔티티(&quot; 등) 복원
+        const cleaned = (data.posts as IndexPost[]).map((p) => ({
+          ...p,
+          title: decodeEntities(p.title || ""),
+          excerpt: decodeEntities(p.excerpt || ""),
+        }));
+        setPosts(cleaned);
         const map = new Map<string, number>();
         for (const p of data.posts as IndexPost[]) {
           map.set(p.category, (map.get(p.category) || 0) + 1);
