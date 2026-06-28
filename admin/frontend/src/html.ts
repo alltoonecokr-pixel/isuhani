@@ -102,9 +102,13 @@ export function videoEmbed(url: string): string | null {
     /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/,
   );
   const vm = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+  // 네이버 TV: tv.naver.com/v/{번호} 또는 /embed/{번호}
+  const ntv = url.match(/tv\.naver\.com\/(?:v|embed)\/(\d+)/);
   if (yt)
     return `<iframe src="https://www.youtube.com/embed/${yt[1]}" frameborder="0" allowfullscreen></iframe>`;
   if (vm)
     return `<iframe src="https://player.vimeo.com/video/${vm[1]}" frameborder="0" allowfullscreen></iframe>`;
+  if (ntv)
+    return `<iframe src="https://tv.naver.com/embed/${ntv[1]}" frameborder="0" allowfullscreen></iframe>`;
   return null;
 }
