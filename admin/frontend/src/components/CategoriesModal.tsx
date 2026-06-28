@@ -9,6 +9,7 @@ type Props = {
 export function CategoriesModal({ categories, onSave, onClose }: Props) {
   const [cats, setCats] = useState<string[]>(categories);
   const [newCat, setNewCat] = useState("");
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
 
   const add = () => {
     const v = newCat.trim();
@@ -18,12 +19,15 @@ export function CategoriesModal({ categories, onSave, onClose }: Props) {
     }
   };
   const remove = (i: number) => setCats(cats.filter((_, idx) => idx !== i));
-  const move = (i: number, dir: -1 | 1) => {
-    const j = i + dir;
-    if (j < 0 || j >= cats.length) return;
-    const next = cats.slice();
-    [next[i], next[j]] = [next[j], next[i]];
-    setCats(next);
+
+  // 마우스로 끌어 순서 변경 — 드래그 중인 항목을 지나가는 줄 위치로 즉시 이동
+  const reorder = (from: number, to: number) => {
+    setCats((prev) => {
+      const next = prev.slice();
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return next;
+    });
   };
 
   return (
@@ -35,24 +39,33 @@ export function CategoriesModal({ categories, onSave, onClose }: Props) {
     >
       <div className="modal">
         <h3>카테고리 관리</h3>
+        <p style={{ margin: "2px 0 12px", fontSize: 12.5, color: "var(--ink-400)" }}>
+          줄을 마우스로 끌어서 순서를 바꿀 수 있어요.
+        </p>
         <div>
           {cats.map((c, i) => (
-            <div className="row-cat" key={`${c}-${i}`}>
+            <div
+              className={"row-cat" + (dragIdx === i ? " dragging" : "")}
+              key={c}
+              draggable
+              onDragStart={() => setDragIdx(i)}
+              onDragOver={(e) => {
+                e.preventDefault();
+                if (dragIdx === null || dragIdx === i) return;
+                reorder(dragIdx, i);
+                setDragIdx(i);
+              }}
+              onDrop={(e) => e.preventDefault()}
+              onDragEnd={() => setDragIdx(null)}
+            >
+              <span className="cat-grip" aria-hidden title="끌어서 순서 변경">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                  <circle cx="6" cy="3" r="1.4" /><circle cx="10" cy="3" r="1.4" />
+                  <circle cx="6" cy="8" r="1.4" /><circle cx="10" cy="8" r="1.4" />
+                  <circle cx="6" cy="13" r="1.4" /><circle cx="10" cy="13" r="1.4" />
+                </svg>
+              </span>
               <span className="name">{c}</span>
-              <button
-                className="ghost"
-                disabled={i === 0}
-                onClick={() => move(i, -1)}
-              >
-                ↑
-              </button>
-              <button
-                className="ghost"
-                disabled={i === cats.length - 1}
-                onClick={() => move(i, 1)}
-              >
-                ↓
-              </button>
               <button className="danger" onClick={() => remove(i)}>
                 삭제
               </button>

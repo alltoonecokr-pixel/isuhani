@@ -581,9 +581,13 @@ input:focus, select:focus, textarea:focus {
 /* 카테고리 */
 .add-row { display: flex; gap: 6px; margin-top: 12px; }
 .add-row input { flex: 1; }
-.row-cat { display: flex; align-items: center; gap: 6px; padding: 7px 0; border-top: 1px solid var(--ink-100); }
+.row-cat { display: flex; align-items: center; gap: 10px; padding: 9px 6px; border-top: 1px solid var(--ink-100); border-radius: 8px; background: var(--white); transition: background 0.12s, box-shadow 0.12s; }
 .row-cat:first-child { border-top: none; }
 .row-cat .name { flex: 1; font-size: 13.5px; color: var(--ink-700); }
+.row-cat .cat-grip { display: inline-flex; align-items: center; color: var(--ink-300); cursor: grab; }
+.row-cat:hover { background: var(--ink-50); }
+.row-cat:hover .cat-grip { color: var(--ink-500); }
+.row-cat.dragging { background: var(--white); box-shadow: 0 8px 24px -8px rgba(26,20,16,0.18); opacity: 0.92; cursor: grabbing; }
 
 /* ─── 가이드 투어 모달 ───────────────────────────────────────── */
 .modal.guide-tour {
