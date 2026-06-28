@@ -26,13 +26,11 @@ export const metadata: Metadata = {
 };
 
 /* ── 진료 카드 컬러 테마 ── */
+// 모노크롬 — 진료 구분은 색이 아니라 커스텀 아이콘으로. 브랜드 그린 단색으로 통일.
+const TREATMENT_TONE = { accent: "#2d6e5a", bg: "#eaf3ec" };
 const CARD_ACCENT: Record<string, { accent: string; bg: string }> = {
-  spine:    { accent: "#7a4c2e", bg: "#f0dece" },
-  women:    { accent: "#9e4568", bg: "#f0d5e4" },
-  children: { accent: "#3a7a56", bg: "#cce8d8" },
-  diet:     { accent: "#3a5e80", bg: "#ccdaee" },
-  health:   { accent: "#2d6b40", bg: "#c0e2cc" },
-  skin:     { accent: "#6e3898", bg: "#ddc8ea" },
+  spine: TREATMENT_TONE, women: TREATMENT_TONE, children: TREATMENT_TONE,
+  diet: TREATMENT_TONE, health: TREATMENT_TONE, skin: TREATMENT_TONE,
 };
 
 const TREATMENT_ICONS: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
