@@ -121,8 +121,8 @@ function JournalViewToggle({
   view,
   onPick,
 }: {
-  view: "card" | "list" | "gallery";
-  onPick: (v: "card" | "list" | "gallery") => void;
+  view: "card" | "list";
+  onPick: (v: "card" | "list") => void;
 }) {
   const opts = [
     {
@@ -132,10 +132,6 @@ function JournalViewToggle({
     {
       v: "list" as const, label: "리스트",
       icon: (<svg width="15" height="15" viewBox="0 0 16 16" fill="none"><line x1="2" y1="4" x2="14" y2="4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/><line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/><line x1="2" y1="12" x2="14" y2="12" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>),
-    },
-    {
-      v: "gallery" as const, label: "갤러리",
-      icon: (<svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="9" y="1.5" width="5.5" height="5.5" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="1.5" y="9" width="5.5" height="5.5" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="9" y="9" width="5.5" height="5.5" rx="1" stroke="currentColor" strokeWidth="1.3"/></svg>),
     },
   ];
   return (
@@ -184,13 +180,14 @@ function BlogIndexView({
   // v2 카드 그리드는 카드 자체가 패딩/높이를 가지므로 균일 gap을 쓴다.
   const gridGap = isV2 ? "gap-6" : "gap-x-8 gap-y-12";
 
-  // 방문자가 고르는 보기 방식 (네이버 블로그식) — localStorage에 기억. 건강저널(카테고리) 페이지에 적용.
-  const [view, setView] = useState<"card" | "list" | "gallery">("card");
+  // 방문자가 고르는 보기 방식 — localStorage에 기억. 건강저널(카테고리) 페이지에 적용.
+  // 카드(매거진) / 리스트(텍스트 중심) 두 가지. (갤러리는 카드와 겹쳐 제거)
+  const [view, setView] = useState<"card" | "list">("card");
   useEffect(() => {
     const v = localStorage.getItem("journalView");
-    if (v === "list" || v === "gallery" || v === "card") setView(v);
+    if (v === "list" || v === "card") setView(v);
   }, []);
-  const pickView = (v: "card" | "list" | "gallery") => {
+  const pickView = (v: "card" | "list") => {
     setView(v);
     try { localStorage.setItem("journalView", v); } catch { /* ignore */ }
   };
@@ -280,28 +277,6 @@ function BlogIndexView({
                       <h3 className="mt-1 font-serif text-[17px] md:text-[19px] font-bold text-ink-900 group-hover:text-herb-700 transition-colors leading-snug line-clamp-2">{p.title}</h3>
                       <div className="mt-1.5 text-[12px] text-ink-400 tabular-nums">{p.dateLabel}</div>
                     </div>
-                  </a>
-                ))}
-              </div>
-            )}
-
-            {view === "gallery" && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 md:gap-5">
-                {flatItems.map((p) => (
-                  <a key={p.logNo} href={`/${p.logNo}/`} className="group block">
-                    <div className="aspect-[4/3] overflow-hidden rounded-xl bg-ink-100">
-                      {p.thumbnail ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={p.thumbnail} alt={p.title} referrerPolicy="no-referrer" loading="lazy"
-                          className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-ink-50">
-                          <span className="font-serif text-4xl text-ink-200">醫</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="mt-2.5 text-[10px] tracking-[0.15em] uppercase text-herb-700 font-semibold">{p.category}</div>
-                    <h3 className="mt-1 text-[14px] md:text-[15px] font-bold font-serif text-ink-900 group-hover:text-herb-700 transition-colors leading-snug line-clamp-2">{p.title}</h3>
                   </a>
                 ))}
               </div>
