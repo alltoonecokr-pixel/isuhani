@@ -202,14 +202,8 @@ export default function HomePage() {
                 <Link
                   key={t.slug}
                   href={`/treatment/${t.slug}`}
-                  className={`group relative block rounded-3xl bg-white pt-7 pb-6 px-7 md:px-8 border border-ink-100 overflow-hidden hover:border-transparent hover:shadow-[0_16px_48px_-14px_rgba(26,20,16,0.14)] hover:-translate-y-1 transition-all duration-300 reveal-on-scroll reveal-stagger-${stagger}`}
+                  className={`group relative block rounded-3xl bg-white pt-7 pb-6 px-7 md:px-8 border border-ink-100 overflow-hidden hover:border-ink-200 hover:shadow-[0_16px_48px_-14px_rgba(26,20,16,0.12)] hover:-translate-y-1 transition-all duration-300 reveal-on-scroll reveal-stagger-${stagger}`}
                 >
-                  {/* 상단 액센트 라인 */}
-                  <div
-                    className="absolute top-0 left-0 right-0 h-[2.5px]"
-                    style={{ background: ca.accent }}
-                  />
-
                   {/* 아이콘 */}
                   <div
                     className="inline-flex items-center justify-center w-10 h-10 rounded-xl mb-5 group-hover:opacity-75 transition-opacity duration-300"
