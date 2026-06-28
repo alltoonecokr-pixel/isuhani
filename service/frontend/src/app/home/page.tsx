@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Phone, ArrowRight } from "lucide-react";
+import { Phone, ArrowRight, CalendarCheck, MessageCircle, MapPin, Youtube, Instagram } from "lucide-react";
 import { TREATMENT_LIST } from "@/data/treatments";
 import { getAllPosts, makeExcerpt, cleanImageUrl } from "@/lib/blog";
 import { SITE_URL } from "@/lib/site";
@@ -80,6 +80,22 @@ const HOURS: { day: string; time: string; note?: string; muted?: boolean }[] = [
   { day: "공휴일", time: "휴진", muted: true },
 ];
 
+// 히어로 채널 아이콘 (톡톡·플레이스·유튜브·인스타)
+function HeroChannel({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      title={label}
+      aria-label={label}
+      className="inline-flex items-center justify-center w-10 h-10 rounded-full border border-ink-200 text-ink-500 hover:bg-herb-700 hover:border-herb-700 hover:text-white transition-colors"
+    >
+      {children}
+    </a>
+  );
+}
+
 export default function HomePage() {
   const featured = getAllPosts()
     .filter((p) => p.body && p.thumbnail)
@@ -143,6 +159,31 @@ export default function HomePage() {
                 진료 영역 보기
                 <ArrowRight size={16} strokeWidth={2.3} />
               </Link>
+            </div>
+
+            {/* 예약 · 채널 바로가기 */}
+            <div className="mt-6 flex flex-wrap items-center gap-2.5 hero-rise-4">
+              <a
+                href="https://booking.naver.com/booking/13/bizes/331349?area=pll"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full border border-herb-200 bg-herb-50 px-4 py-2 text-[13.5px] font-bold text-herb-700 hover:bg-herb-700 hover:text-white hover:border-herb-700 transition-colors"
+              >
+                <CalendarCheck size={15} strokeWidth={2.2} />
+                네이버 예약
+              </a>
+              <HeroChannel href="https://talk.naver.com/ct/w4vt4b" label="네이버 톡톡">
+                <MessageCircle size={16} strokeWidth={2} />
+              </HeroChannel>
+              <HeroChannel href="https://map.naver.com/p/entry/place/13104608" label="네이버 플레이스(지도)">
+                <MapPin size={16} strokeWidth={2} />
+              </HeroChannel>
+              <HeroChannel href="https://www.youtube.com/@isu_hani" label="유튜브">
+                <Youtube size={16} strokeWidth={2} />
+              </HeroChannel>
+              <HeroChannel href="https://www.instagram.com/isuclinic/" label="인스타그램">
+                <Instagram size={16} strokeWidth={2} />
+              </HeroChannel>
             </div>
 
             <div className="mt-8 flex flex-wrap items-center gap-x-7 gap-y-2 text-[13px] text-ink-400 hero-rise-4">
