@@ -286,21 +286,22 @@ function BlogIndexView({
             )}
 
             {view === "gallery" && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 md:gap-5">
                 {flatItems.map((p) => (
                   <a key={p.logNo} href={`/${p.logNo}/`} className="group block">
-                    <div className="aspect-square overflow-hidden rounded-xl bg-ink-100">
+                    <div className="aspect-[4/3] overflow-hidden rounded-xl bg-ink-100 border border-ink-100 ring-1 ring-black/[0.02]">
                       {p.thumbnail ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={p.thumbnail} alt={p.title} referrerPolicy="no-referrer" loading="lazy"
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-ink-50">
                           <span className="font-serif text-4xl text-ink-200">醫</span>
                         </div>
                       )}
                     </div>
-                    <h3 className="mt-2 text-[13px] md:text-[14px] font-semibold text-ink-900 group-hover:text-herb-700 transition-colors leading-snug line-clamp-2">{p.title}</h3>
+                    <div className="mt-2.5 text-[10px] tracking-[0.15em] uppercase text-herb-700 font-semibold">{p.category}</div>
+                    <h3 className="mt-1 text-[14px] md:text-[15px] font-bold font-serif text-ink-900 group-hover:text-herb-700 transition-colors leading-snug line-clamp-2">{p.title}</h3>
                   </a>
                 ))}
               </div>
