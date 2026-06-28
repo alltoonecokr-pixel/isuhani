@@ -512,6 +512,9 @@ function BlogIndexView({
         <NoticeStrip posts={posts} />
         <section className="bg-white">
           <div className="max-w-container mx-auto px-4 md:px-8 py-10 md:py-14">
+            <div className="flex justify-end mb-5 md:mb-6">
+              <JournalViewToggle view={view} onPick={pickView} />
+            </div>
             {showHero && main && <CleanHero post={main} />}
             {showHero && pageItems.length > 0 && <GridDivider count={gridPosts.length} />}
             <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ${gridGap}`}>
