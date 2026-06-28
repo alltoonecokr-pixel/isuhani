@@ -12,13 +12,12 @@ type Props = {
 
 export function SettingsModal({ cfg, force, onSubmit, onClose, onGuide }: Props) {
   const [pass, setPass] = useState(cfg.pass);
-  const [user, setUser] = useState(cfg.user);
-  const [url, setUrl] = useState(cfg.url);
 
+  // 사용자명·API URL은 코드 기본값으로 고정 — 직원은 비밀번호만 입력하면 된다.
   const submit = () => {
     onSubmit({
-      url: url.trim().replace(/\/$/, ""),
-      user: user.trim() || "admin",
+      url: cfg.url.replace(/\/$/, ""),
+      user: cfg.user || "admin",
       pass,
     });
   };
@@ -64,35 +63,6 @@ export function SettingsModal({ cfg, force, onSubmit, onClose, onGuide }: Props)
             onKeyDown={(e) => e.key === "Enter" && submit()}
           />
         </div>
-        <details style={{ marginBottom: 6 }} open={!force}>
-          <summary
-            style={{
-              cursor: "pointer",
-              color: "var(--ink-500)",
-              fontSize: 13,
-              userSelect: "none",
-            }}
-          >
-            고급 설정
-          </summary>
-          <div style={{ marginTop: 12 }}>
-            <span className="ev-label">사용자명</span>
-            <input
-              type="text"
-              value={user}
-              onChange={(e) => setUser(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && submit()}
-            />
-          </div>
-          <div style={{ marginTop: 10 }}>
-            <span className="ev-label">CMS API URL</span>
-            <input
-              type="url"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-            />
-          </div>
-        </details>
         <div className="modal-actions">
           <button
             type="button"
