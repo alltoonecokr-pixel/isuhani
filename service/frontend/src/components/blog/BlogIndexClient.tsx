@@ -116,7 +116,34 @@ const PINNED_HERO_LOGNO = "224136780944"; // [공진단 FAQ] 공진단, 제대�
 
 // 순수 프레젠테이션 컴포넌트 — 상태(cat/q/page)를 props로 받는다.
 // useSearchParams를 쓰지 않으므로 서버(정적 export)에서도 그대로 렌더된다 = 이미지가 HTML에 포함.
-// 방문자용 보기 전환 (카드 / 리스트 / 갤러리)
+// 썸네일 — 사진이 없거나 깨졌을 때 이수한의원 로고로 대체
+const FALLBACK_THUMB = "/thumb-fallback.svg";
+function Thumb({
+  src,
+  alt,
+  className,
+}: {
+  src: string | null | undefined;
+  alt: string;
+  className?: string;
+}) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src || FALLBACK_THUMB}
+      alt={alt}
+      referrerPolicy="no-referrer"
+      loading="lazy"
+      className={className}
+      onError={(e) => {
+        const t = e.currentTarget;
+        if (!t.src.endsWith(FALLBACK_THUMB)) t.src = FALLBACK_THUMB;
+      }}
+    />
+  );
+}
+
+// 방문자용 보기 전환 (카드 / 리스트)
 function JournalViewToggle({
   view,
   onPick,
@@ -263,15 +290,11 @@ function BlogIndexView({
               <div className="divide-y divide-ink-100 border-y border-ink-100">
                 {flatItems.map((p) => (
                   <a key={p.logNo} href={`/${p.logNo}/`} className="group flex items-center gap-4 py-4">
-                    {p.thumbnail ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={p.thumbnail} alt="" referrerPolicy="no-referrer" loading="lazy"
-                        className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-lg bg-ink-100 shrink-0" />
-                    ) : (
-                      <div className="w-20 h-20 md:w-24 md:h-24 rounded-lg bg-ink-50 shrink-0 flex items-center justify-center">
-                        <span className="font-serif text-2xl text-ink-200">醫</span>
-                      </div>
-                    )}
+                    <Thumb
+                      src={p.thumbnail}
+                      alt={p.title}
+                      className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-lg bg-ink-100 shrink-0"
+                    />
                     <div className="min-w-0 flex-1">
                       <div className="text-[11px] tracking-[0.15em] uppercase text-herb-700 font-semibold">{p.category}</div>
                       <h3 className="mt-1 font-serif text-[17px] md:text-[19px] font-bold text-ink-900 group-hover:text-herb-700 transition-colors leading-snug line-clamp-2">{p.title}</h3>
@@ -622,6 +645,7 @@ function MainFeature({ post }: { post: IndexPost }) {
               src={post.thumbnail}
               alt={post.title}
               referrerPolicy="no-referrer"
+              onError={(e) => { const t = e.currentTarget; if (!t.src.endsWith(FALLBACK_THUMB)) t.src = FALLBACK_THUMB; }}
               className="w-full h-full object-cover"
               loading="eager"
               decoding="async"
@@ -659,6 +683,7 @@ function SubFeatureCard({ post, variant = "v1" }: { post: IndexPost; variant?: "
                             src={post.thumbnail}
               alt={post.title}
               referrerPolicy="no-referrer"
+              onError={(e) => { const t = e.currentTarget; if (!t.src.endsWith(FALLBACK_THUMB)) t.src = FALLBACK_THUMB; }}
               className="w-full h-full object-cover"
               loading="lazy"
             />
@@ -692,6 +717,7 @@ function SideListItem({ post }: { post: IndexPost }) {
                             src={post.thumbnail}
               alt={post.title}
               referrerPolicy="no-referrer"
+              onError={(e) => { const t = e.currentTarget; if (!t.src.endsWith(FALLBACK_THUMB)) t.src = FALLBACK_THUMB; }}
               className="w-full h-full object-cover"
               loading="lazy"
             />
@@ -763,6 +789,7 @@ function CategoryHero({ post }: { post: IndexPost }) {
               src={post.thumbnail}
               alt={post.title}
               referrerPolicy="no-referrer"
+              onError={(e) => { const t = e.currentTarget; if (!t.src.endsWith(FALLBACK_THUMB)) t.src = FALLBACK_THUMB; }}
               className="w-full h-full object-cover"
               loading="eager"
               decoding="async"
@@ -792,22 +819,9 @@ function RowCard({ post }: { post: IndexPost }) {
   return (
     <article className="group py-6 first:pt-0 last:pb-0">
       <Link href={`/${post.logNo}`} className="grid grid-cols-12 gap-5">
-        {post.thumbnail ? (
-          <div className="col-span-4 sm:col-span-3 aspect-[4/3] overflow-hidden bg-ink-50">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-                            src={post.thumbnail}
-              alt={post.title}
-              referrerPolicy="no-referrer"
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
-          </div>
-        ) : (
-          <div className="col-span-4 sm:col-span-3 aspect-[4/3] flex items-center justify-center bg-ink-50">
-            <span className="font-serif text-4xl font-black text-ink-200">醫</span>
-          </div>
-        )}
+        <div className="col-span-4 sm:col-span-3 aspect-[4/3] overflow-hidden bg-ink-50">
+          <Thumb src={post.thumbnail} alt={post.title} className="w-full h-full object-cover" />
+        </div>
         <div className="col-span-8 sm:col-span-9 self-center">
           <h3 className="font-serif text-[18px] md:text-[22px] font-black tracking-[-0.025em] text-ink-900 group-hover:text-herb-700 transition-colors leading-[1.25] line-clamp-2">
             {post.title}
@@ -858,6 +872,7 @@ function CategorySection({
                                 src={main.thumbnail}
                   alt={main.title}
                   referrerPolicy="no-referrer"
+                  onError={(e) => { const t = e.currentTarget; if (!t.src.endsWith(FALLBACK_THUMB)) t.src = FALLBACK_THUMB; }}
                   className="w-full h-full object-cover"
                   loading="lazy"
                 />
@@ -910,6 +925,7 @@ function CleanHero({ post }: { post: IndexPost }) {
               src={post.thumbnail}
               alt={post.title}
               referrerPolicy="no-referrer"
+              onError={(e) => { const t = e.currentTarget; if (!t.src.endsWith(FALLBACK_THUMB)) t.src = FALLBACK_THUMB; }}
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
               loading="eager"
               decoding="async"
@@ -952,22 +968,13 @@ function CleanCard({ post }: { post: IndexPost }) {
         href={`/${post.logNo}`}
         className="flex flex-col h-full rounded-xl bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.05),0_4px_16px_rgba(0,0,0,0.04)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.10)] transition-shadow duration-300"
       >
-        {post.thumbnail ? (
-          <div className="aspect-[16/10] overflow-hidden bg-ink-50">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={post.thumbnail}
-              alt={post.title}
-              referrerPolicy="no-referrer"
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-              loading="lazy"
-            />
-          </div>
-        ) : (
-          <div className="aspect-[16/10] flex items-center justify-center bg-herb-50">
-            <span className="font-serif text-5xl font-black text-herb-200">醫</span>
-          </div>
-        )}
+        <div className="aspect-[16/10] overflow-hidden bg-ink-50">
+          <Thumb
+            src={post.thumbnail}
+            alt={post.title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+          />
+        </div>
         <div className="flex flex-1 flex-col p-4 md:p-5">
           <CategoryChip label={post.category} />
           <h3 className="mt-2 font-serif text-[17px] font-bold tracking-[-0.02em] text-ink-900 group-hover:text-herb-700 transition-colors leading-[1.38] line-clamp-2">
@@ -991,22 +998,9 @@ function PostCard({ post, variant = "v1" }: { post: IndexPost; variant?: "v1" | 
   return (
     <article className="group">
       <Link href={`/${post.logNo}`} className="block">
-        {post.thumbnail ? (
-          <div className="aspect-[4/3] overflow-hidden mb-4 bg-ink-50">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-                            src={post.thumbnail}
-              alt={post.title}
-              referrerPolicy="no-referrer"
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
-          </div>
-        ) : (
-          <div className="aspect-[4/3] mb-4 flex items-center justify-center bg-ink-50">
-            <span className="font-serif text-6xl font-black text-ink-200">醫</span>
-          </div>
-        )}
+        <div className="aspect-[4/3] overflow-hidden mb-4 bg-ink-50">
+          <Thumb src={post.thumbnail} alt={post.title} className="w-full h-full object-cover" />
+        </div>
         <div className="text-[10px] tracking-[0.2em] uppercase text-herb-700 font-bold">
           {post.category}
         </div>

@@ -9,6 +9,12 @@ const SITEMAP = [
   { label: "건강 저널", href: "/journal" },
 ];
 
+const BOOKING_URL = "https://booking.naver.com/booking/13/bizes/331349?area=pll";
+const TALK_URL = "https://talk.naver.com/ct/w4vt4b";
+const PLACE_URL = "https://map.naver.com/p/entry/place/13104608";
+const YOUTUBE_URL = "https://www.youtube.com/@isu_hani";
+const INSTAGRAM_URL = "https://www.instagram.com/isuclinic/";
+
 export function Footer() {
   const year = new Date().getFullYear();
   return (
@@ -48,6 +54,34 @@ export function Footer() {
                 02-584-1075
               </span>
             </a>
+
+            {/* 예약 · 채널 바로가기 */}
+            <div className="mt-6 flex flex-wrap items-center gap-2.5">
+              <a
+                href={BOOKING_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full bg-herb-700 px-4 py-2 text-[13px] font-bold text-white hover:bg-herb-900 transition-colors"
+              >
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="3" width="12" height="11" rx="2" />
+                  <path d="M2 6.5h12M5 1.5v3M11 1.5v3M6 10l1.4 1.4L10 8.8" />
+                </svg>
+                네이버 예약
+              </a>
+              <SocialIcon href={TALK_URL} label="네이버 톡톡">
+                <svg width="17" height="17" viewBox="0 0 20 20" fill="currentColor"><path d="M10 3C5.9 3 2.5 5.7 2.5 9c0 2.1 1.4 4 3.5 5.1-.2.7-.6 1.9-.7 2.2-.1.4.1.4.3.3.2-.1 2.3-1.5 3.1-2.1.5.1 1 .1 1.3.1 4.1 0 7.5-2.7 7.5-6.6S14.1 3 10 3z"/></svg>
+              </SocialIcon>
+              <SocialIcon href={PLACE_URL} label="네이버 플레이스(지도)">
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M10 17.5s5.5-4.7 5.5-9A5.5 5.5 0 1 0 4.5 8.5c0 4.3 5.5 9 5.5 9z"/><circle cx="10" cy="8.3" r="1.9"/></svg>
+              </SocialIcon>
+              <SocialIcon href={YOUTUBE_URL} label="유튜브">
+                <svg width="17" height="17" viewBox="0 0 20 20" fill="currentColor"><path d="M18.2 6.4a2.1 2.1 0 0 0-1.5-1.5C15.4 4.6 10 4.6 10 4.6s-5.4 0-6.7.3A2.1 2.1 0 0 0 1.8 6.4C1.5 7.7 1.5 10 1.5 10s0 2.3.3 3.6a2.1 2.1 0 0 0 1.5 1.5c1.3.3 6.7.3 6.7.3s5.4 0 6.7-.3a2.1 2.1 0 0 0 1.5-1.5c.3-1.3.3-3.6.3-3.6s0-2.3-.3-3.6zM8.4 12.5v-5l4.3 2.5-4.3 2.5z"/></svg>
+              </SocialIcon>
+              <SocialIcon href={INSTAGRAM_URL} label="인스타그램">
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2.5" y="2.5" width="15" height="15" rx="4.5"/><circle cx="10" cy="10" r="3.6"/><circle cx="14.3" cy="5.7" r="1" fill="currentColor" stroke="none"/></svg>
+              </SocialIcon>
+            </div>
           </div>
 
           {/* 사이트맵 */}
@@ -140,5 +174,28 @@ function Row({
       </dt>
       <dd className={["text-ink-900", mono ? "tabular-nums" : ""].join(" ")}>{value}</dd>
     </div>
+  );
+}
+
+function SocialIcon({
+  href,
+  label,
+  children,
+}: {
+  href: string;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      title={label}
+      aria-label={label}
+      className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-ink-200 text-ink-500 hover:bg-herb-700 hover:border-herb-700 hover:text-white transition-colors"
+    >
+      {children}
+    </a>
   );
 }
