@@ -140,7 +140,7 @@ export function GuideModal({ onClose }: Props) {
       <div className="modal guide-tour">
         {/* 상단 헤더 */}
         <div className="gt-header">
-          <span className="gt-label">사용 가이드</span>
+          <span className="gt-label">설명서</span>
           <button className="gt-close" onClick={onClose} title="닫기">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M3 3L13 13M13 3L3 13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>

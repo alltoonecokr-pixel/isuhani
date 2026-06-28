@@ -79,7 +79,11 @@ export class CmsApi {
   }
 
   private authHeader(): string {
-    return "Basic " + btoa(`${this.cfg.user}:${this.cfg.pass}`);
+    // 한글·특수문자 비밀번호도 처리되도록 UTF-8 바이트로 인코딩한 뒤 base64 (btoa는 Latin1만 지원)
+    const bytes = new TextEncoder().encode(`${this.cfg.user}:${this.cfg.pass}`);
+    let bin = "";
+    for (const b of bytes) bin += String.fromCharCode(b);
+    return "Basic " + btoa(bin);
   }
 
   private async req<T>(path: string, opts: RequestInit = {}): Promise<T> {

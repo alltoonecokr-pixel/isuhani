@@ -108,6 +108,8 @@ export function App() {
       const cats = await api.getCategories();
       setCategories(cats.categories?.length ? cats.categories : DEFAULT_CATEGORIES);
       await loadPosts();
+      // 처음 접속하면 설명서 자동 표시 (한 번 본 뒤로는 [설명서] 버튼으로 다시 열 수 있음)
+      if (!localStorage.getItem("isuhani_guide_seen")) setGuideOpen(true);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "연결 실패";
       setStatus({ kind: "error", text: "연결 실패: " + msg });
@@ -395,7 +397,7 @@ export function App() {
           <button className="ghost sync" onClick={runSync} disabled={syncing} title="네이버 블로그의 새 글을 가져와 사이트에 게시">
             {syncing ? "동기화 중…" : "↻ 블로그 동기화"}
           </button>
-          <button className="ghost" onClick={() => setGuideOpen(true)}>안내</button>
+          <button className="ghost" onClick={() => setGuideOpen(true)}>설명서</button>
           <button
             className="ghost"
             onClick={async () => {
@@ -454,7 +456,7 @@ export function App() {
         />
       )}
       {catsOpen && <CategoriesModal categories={categories} onSave={saveCats} onClose={() => setCatsOpen(false)} />}
-      {guideOpen && <GuideModal onClose={() => setGuideOpen(false)} />}
+      {guideOpen && <GuideModal onClose={() => { setGuideOpen(false); localStorage.setItem("isuhani_guide_seen", "1"); }} />}
 
       <DeployProgress state={deploy} />
       <SyncModal state={sync} onClose={() => setSync((s) => ({ ...s, open: false }))} />
