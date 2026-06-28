@@ -33,5 +33,11 @@ export function pathToSlug(pathname: string): string {
   return p.replace(/^\//, "").replace(/\//g, "-");
 }
 
+// 텍스트 인라인 편집을 허용하는 페이지(저장 대상). 그 외(예: 블로그 글 /{logNo})는
+// 텍스트 편집을 켜지 않고 "사진 교체"만 허용한다. (저장 안 되는데 편집되는 척하는 혼란 방지)
+export function isTextEditablePage(slug: string): boolean {
+  return slug === "home" || slug === "visit-guide" || /^treatment-[a-z]+$/.test(slug);
+}
+
 export type FieldOverride = { t: string; v: string }; // 부모 tag, 텍스트
 export type PageOverrides = Record<string, FieldOverride>;

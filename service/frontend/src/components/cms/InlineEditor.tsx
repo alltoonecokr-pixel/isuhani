@@ -7,7 +7,7 @@
 // 공개 사이트(일반 방문)에서는 no-op — 적용은 InlineOverrides 담당.
 
 import { useEffect } from "react";
-import { textNodes, pathToSlug } from "@/lib/cmsFields";
+import { textNodes, pathToSlug, isTextEditablePage } from "@/lib/cmsFields";
 
 export function InlineEditor() {
   useEffect(() => {
@@ -19,6 +19,7 @@ export function InlineEditor() {
       window.parent?.postMessage({ source: "cms-inline", page, ...msg }, origin);
 
     document.body.classList.add("cms-edit-mode");
+    if (isTextEditablePage(page)) document.body.classList.add("cms-text");
 
     // 같은 출처 링크는 __edit=1 유지(편집 모드 끊김 방지)
     document.querySelectorAll<HTMLAnchorElement>("a[href]").forEach((a) => {
@@ -31,21 +32,24 @@ export function InlineEditor() {
     });
 
     const main = document.querySelector("main");
-    const nodes = textNodes(main);
+    // 텍스트 인라인 편집은 저장 대상 페이지에서만. 블로그 글 등은 사진 교체만 허용.
+    const textEditable = isTextEditablePage(page);
     const snapshot: Record<string, { t: string; v: string }> = {};
-    nodes.forEach((tn, i) => {
-      const parentTag = tn.parentElement?.tagName || "";
-      const span = document.createElement("span");
-      span.dataset.cmsi = String(i);
-      span.dataset.cmsTag = parentTag;
-      span.className = "cms-ed";
-      span.setAttribute("contenteditable", "true");
-      span.setAttribute("spellcheck", "false");
-      span.textContent = tn.nodeValue;
-      tn.parentNode?.replaceChild(span, tn);
-      snapshot[i] = { t: parentTag, v: span.textContent || "" };
-    });
-    post({ type: "snapshot", payload: snapshot });
+    if (textEditable) {
+      textNodes(main).forEach((tn, i) => {
+        const parentTag = tn.parentElement?.tagName || "";
+        const span = document.createElement("span");
+        span.dataset.cmsi = String(i);
+        span.dataset.cmsTag = parentTag;
+        span.className = "cms-ed";
+        span.setAttribute("contenteditable", "true");
+        span.setAttribute("spellcheck", "false");
+        span.textContent = tn.nodeValue;
+        tn.parentNode?.replaceChild(span, tn);
+        snapshot[i] = { t: parentTag, v: span.textContent || "" };
+      });
+    }
+    post({ type: "snapshot", payload: snapshot, textEditable });
 
     // ── 이미지 교체 ──────────────────────────────────────────────
     // 본문(main) 안 우리 S3 이미지는 클릭하면 새 사진으로 교체(원 URL 유지, S3 객체만 덮어씀).
@@ -135,7 +139,7 @@ export function InlineEditor() {
       document.removeEventListener("click", onClick, true);
       window.removeEventListener("message", onMessage);
       fileInput.remove();
-      document.body.classList.remove("cms-edit-mode");
+      document.body.classList.remove("cms-edit-mode", "cms-text");
     };
   }, []);
 

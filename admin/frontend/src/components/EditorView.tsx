@@ -38,8 +38,14 @@ export function EditorView({
 
   const markDirty = () => { setDirty(true); setSaved(false); };
 
+  // 네이버에서 가져온 글 — 편집기로 본문을 다시 저장하면 링크·뉴스카드가 손실될 수 있음
+  const isImported = post?.body_kind === "html";
+
   const submit = async (publish: boolean) => {
     if (!title.trim()) { toast("제목을 입력하세요", "error"); return; }
+    if (isImported && dirty && !window.confirm(
+      "이 글은 네이버에서 가져온 글입니다.\n본문을 다시 저장하면 일부 링크·뉴스카드가 사라질 수 있어요.\n제목·카테고리·발행일만 바꾸려면 본문은 건드리지 마세요.\n\n그래도 저장할까요?"
+    )) return;
     const input: PostInput = {
       title: title.trim(),
       addDate: isoToAddDate(date),
@@ -118,6 +124,14 @@ export function EditorView({
           </button>
         </div>
       </div>
+
+      {isImported && (
+        <div className="ev-import-warn">
+          네이버에서 가져온 글이에요. 제목·카테고리·발행일은 자유롭게 바꿔도 되지만,
+          본문을 직접 고쳐 저장하면 일부 링크·뉴스카드가 사라질 수 있습니다.
+          사진 교체는 상단 [페이지 편집]에서 글을 열어 사진을 클릭하면 안전하게 됩니다.
+        </div>
+      )}
 
       {/* 본문 */}
       <div className="ev-body">

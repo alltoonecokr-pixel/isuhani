@@ -826,3 +826,10 @@ button.ghost.sm { font-size: 12px; padding: 5px 10px; }
 /* 이미지 노드 — 사진 교체 버튼 */
 .rz-bar .rz-replace { color: var(--accent); font-weight: 700; padding: 0 8px; white-space: nowrap; }
 .rz-bar .rz-replace:disabled { opacity: .6; }
+
+/* 가져온 글 편집 경고 배너 */
+.ev-import-warn {
+  margin: 0; padding: 10px 22px;
+  background: #fff7ed; border-bottom: 1px solid #fed7aa;
+  color: #9a3412; font-size: 13px; line-height: 1.6;
+}

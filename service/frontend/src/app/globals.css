@@ -765,7 +765,7 @@ a {
 }
 /* 편집 중임을 알리는 은은한 상단 띠 */
 .cms-edit-mode::before {
-  content: "편집 모드 · 텍스트를 클릭해 수정하세요";
+  content: "편집 모드 — 사진을 클릭해 교체하세요";
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 2147483000;
@@ -777,6 +777,9 @@ a {
   padding: 5px 8px;
   pointer-events: none;
   font-family: var(--font-noto-kr), sans-serif;
+}
+.cms-edit-mode.cms-text::before {
+  content: "편집 모드 — 텍스트·사진을 클릭해 수정하세요";
 }
 
 /* 인라인 편집 — 본문 이미지 교체 */

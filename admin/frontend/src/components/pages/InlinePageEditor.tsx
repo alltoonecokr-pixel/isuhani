@@ -23,6 +23,7 @@ const trunc = (s: string, n = 28) => (s.length > n ? s.slice(0, n) + "…" : s);
 export function InlinePageEditor({ startSlug, busy, onBack, onSaveAll, onReset, onReplaceImage }: Props) {
   const [ready, setReady] = useState(false);
   const [currentPage, setCurrentPage] = useState("");
+  const [textMode, setTextMode] = useState(true);
   const [, bump] = useState(0);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [device, setDevice] = useState<"desktop" | "mobile">("desktop");
@@ -37,6 +38,7 @@ export function InlinePageEditor({ startSlug, busy, onBack, onSaveAll, onReset, 
       if (d?.source !== "cms-inline") return;
       if (d.type === "snapshot") {
         if (d.page) { setCurrentPage(d.page); snapsRef.current[d.page] = d.payload || {}; }
+        setTextMode(d.textEditable !== false);
         setReady(true);
       } else if (d.type === "ready") {
         if (d.page) setCurrentPage(d.page);
@@ -107,7 +109,9 @@ export function InlinePageEditor({ startSlug, busy, onBack, onSaveAll, onReset, 
         <div className="pg-editor-title">
           사이트 편집
           <span className="pg-slug">
-            {currentPage ? `현재: ${currentPage}` : "불러오는 중…"} · 텍스트 클릭해 수정 · 메뉴로 이동
+            {currentPage ? `현재: ${currentPage}` : "불러오는 중…"}
+            {textMode ? " · 텍스트·사진 클릭해 수정" : " · 이 페이지는 사진 교체만(글 본문은 글 편집에서)"}
+            {" · 메뉴로 이동"}
           </span>
         </div>
 
