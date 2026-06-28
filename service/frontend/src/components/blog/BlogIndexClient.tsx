@@ -116,6 +116,50 @@ const PINNED_HERO_LOGNO = "224136780944"; // [공진단 FAQ] 공진단, 제대�
 
 // 순수 프레젠테이션 컴포넌트 — 상태(cat/q/page)를 props로 받는다.
 // useSearchParams를 쓰지 않으므로 서버(정적 export)에서도 그대로 렌더된다 = 이미지가 HTML에 포함.
+// 방문자용 보기 전환 (카드 / 리스트 / 갤러리)
+function JournalViewToggle({
+  view,
+  onPick,
+}: {
+  view: "card" | "list" | "gallery";
+  onPick: (v: "card" | "list" | "gallery") => void;
+}) {
+  const opts = [
+    {
+      v: "card" as const, label: "카드",
+      icon: (<svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="2" width="13" height="5" rx="1.2" stroke="currentColor" strokeWidth="1.3"/><rect x="1.5" y="9" width="13" height="5" rx="1.2" stroke="currentColor" strokeWidth="1.3"/></svg>),
+    },
+    {
+      v: "list" as const, label: "리스트",
+      icon: (<svg width="15" height="15" viewBox="0 0 16 16" fill="none"><line x1="2" y1="4" x2="14" y2="4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/><line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/><line x1="2" y1="12" x2="14" y2="12" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>),
+    },
+    {
+      v: "gallery" as const, label: "갤러리",
+      icon: (<svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="9" y="1.5" width="5.5" height="5.5" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="1.5" y="9" width="5.5" height="5.5" rx="1" stroke="currentColor" strokeWidth="1.3"/><rect x="9" y="9" width="5.5" height="5.5" rx="1" stroke="currentColor" strokeWidth="1.3"/></svg>),
+    },
+  ];
+  return (
+    <div className="inline-flex items-center rounded-full border border-ink-200 bg-white p-0.5 shrink-0">
+      {opts.map((o) => (
+        <button
+          key={o.v}
+          type="button"
+          onClick={() => onPick(o.v)}
+          title={`${o.label}형으로 보기`}
+          aria-pressed={view === o.v}
+          className={
+            "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold transition-colors " +
+            (view === o.v ? "bg-herb-700 text-white" : "text-ink-500 hover:text-ink-900")
+          }
+        >
+          {o.icon}
+          <span className="hidden sm:inline">{o.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function BlogIndexView({
   posts,
   categories,
@@ -139,6 +183,17 @@ function BlogIndexView({
   const uiSuffix = isV2 ? "ui=v2" : "";
   // v2 카드 그리드는 카드 자체가 패딩/높이를 가지므로 균일 gap을 쓴다.
   const gridGap = isV2 ? "gap-6" : "gap-x-8 gap-y-12";
+
+  // 방문자가 고르는 보기 방식 (네이버 블로그식) — localStorage에 기억. 건강저널(카테고리) 페이지에 적용.
+  const [view, setView] = useState<"card" | "list" | "gallery">("card");
+  useEffect(() => {
+    const v = localStorage.getItem("journalView");
+    if (v === "list" || v === "gallery" || v === "card") setView(v);
+  }, []);
+  const pickView = (v: "card" | "list" | "gallery") => {
+    setView(v);
+    try { localStorage.setItem("journalView", v); } catch { /* ignore */ }
+  };
 
   const byCategory = useMemo(
     () =>
@@ -282,29 +337,86 @@ function BlogIndexView({
       const gridStart = (page - 1) * V2_PAGE_SIZE;
       const gridItems = catItems.slice(gridStart, gridStart + V2_PAGE_SIZE);
       const showHero = page === 1 && main;
+      // 리스트/갤러리 보기는 전체(메인 포함)를 평평하게 보여준다
+      const flatTotal = Math.max(1, Math.ceil(filtered.length / V2_PAGE_SIZE));
+      const flatItems = filtered.slice(gridStart, gridStart + V2_PAGE_SIZE);
+      const effTotal = view === "card" ? v2Total : flatTotal;
       return (
         <>
           <BlogCategoryBar active={activeCat} categories={categories} variant={variant} uiSuffix={uiSuffix} />
           <section className="bg-white">
             <div className="max-w-container mx-auto px-4 md:px-8 py-10 md:py-14">
-              <header className="mb-8 md:mb-10">
-                <h1 className="font-serif text-[32px] md:text-[44px] font-bold tracking-[-0.025em] text-ink-900 leading-[1.1]">
-                  {activeCat}
-                </h1>
-                <p className="mt-2 text-[15px] text-ink-500">{categoryTagline(activeCat)}</p>
+              <header className="mb-6 md:mb-8 flex items-end justify-between gap-4 flex-wrap">
+                <div>
+                  <h1 className="font-serif text-[32px] md:text-[44px] font-bold tracking-[-0.025em] text-ink-900 leading-[1.1]">
+                    {activeCat}
+                  </h1>
+                  <p className="mt-2 text-[15px] text-ink-500">{categoryTagline(activeCat)}</p>
+                </div>
+                <JournalViewToggle view={view} onPick={pickView} />
               </header>
-              {showHero && main && <CleanHero post={main} />}
-              {showHero && gridItems.length > 0 && <GridDivider count={catItems.length} />}
-              <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ${gridGap}`}>
-                {gridItems.map((p) => (
-                  <CleanCard key={p.logNo} post={p} />
-                ))}
-              </div>
-              {gridItems.length === 0 && !showHero && (
+
+              {view === "card" && (
+                <>
+                  {showHero && main && <CleanHero post={main} />}
+                  {showHero && gridItems.length > 0 && <GridDivider count={catItems.length} />}
+                  <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ${gridGap}`}>
+                    {gridItems.map((p) => (
+                      <CleanCard key={p.logNo} post={p} />
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {view === "list" && (
+                <div className="divide-y divide-ink-100 border-y border-ink-100">
+                  {flatItems.map((p) => (
+                    <a key={p.logNo} href={`/${p.logNo}/`} className="group flex items-center gap-4 py-4">
+                      {p.thumbnail ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={p.thumbnail} alt="" referrerPolicy="no-referrer" loading="lazy"
+                          className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-lg bg-ink-100 shrink-0" />
+                      ) : (
+                        <div className="w-20 h-20 md:w-24 md:h-24 rounded-lg bg-ink-50 shrink-0 flex items-center justify-center">
+                          <span className="font-serif text-2xl text-ink-200">醫</span>
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[11px] tracking-[0.15em] uppercase text-herb-700 font-semibold">{p.category}</div>
+                        <h3 className="mt-1 font-serif text-[17px] md:text-[19px] font-bold text-ink-900 group-hover:text-herb-700 transition-colors leading-snug line-clamp-2">{p.title}</h3>
+                        <div className="mt-1.5 text-[12px] text-ink-400 tabular-nums">{p.dateLabel}</div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              )}
+
+              {view === "gallery" && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+                  {flatItems.map((p) => (
+                    <a key={p.logNo} href={`/${p.logNo}/`} className="group block">
+                      <div className="aspect-square overflow-hidden rounded-xl bg-ink-100">
+                        {p.thumbnail ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={p.thumbnail} alt={p.title} referrerPolicy="no-referrer" loading="lazy"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-ink-50">
+                            <span className="font-serif text-4xl text-ink-200">醫</span>
+                          </div>
+                        )}
+                      </div>
+                      <h3 className="mt-2 text-[13px] md:text-[14px] font-semibold text-ink-900 group-hover:text-herb-700 transition-colors leading-snug line-clamp-2">{p.title}</h3>
+                    </a>
+                  ))}
+                </div>
+              )}
+
+              {((view === "card" && gridItems.length === 0 && !showHero) || (view !== "card" && flatItems.length === 0)) && (
                 <div className="text-center text-ink-500 py-16">글이 없습니다.</div>
               )}
-              {v2Total > 1 && (
-                <Pagination page={page} totalPages={v2Total} cat={activeCat} q={rawQuery} variant={variant} />
+              {effTotal > 1 && (
+                <Pagination page={page} totalPages={effTotal} cat={activeCat} q={rawQuery} variant={variant} />
               )}
             </div>
           </section>
