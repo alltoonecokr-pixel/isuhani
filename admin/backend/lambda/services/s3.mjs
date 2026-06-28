@@ -90,6 +90,15 @@ export async function objectExists(key) {
   }
 }
 
+export async function objectSize(key) {
+  try {
+    const r = await s3.send(new HeadObjectCommand({ Bucket: BUCKET, Key: key }));
+    return r.ContentLength || 0;
+  } catch {
+    return 0;
+  }
+}
+
 // ── 편집 가능 페이지 콘텐츠 (pages/{slug}.json, 데이터 버킷) ───────────────────
 
 export async function getPageContent(slug) {

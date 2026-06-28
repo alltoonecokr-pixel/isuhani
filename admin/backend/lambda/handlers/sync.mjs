@@ -4,7 +4,7 @@
 // 텍스트는 즉시 반영(빌드 불필요), 정적 SEO 페이지는 이후 발행 빌드로.
 
 import crypto from "node:crypto";
-import { putPost, putImage, objectExists, writeLivePost, readPostIndex } from "../services/s3.mjs";
+import { putPost, putImage, objectExists, objectSize, writeLivePost, readPostIndex } from "../services/s3.mjs";
 import { upsertIndexEntry, indexEntry } from "../services/indexer.mjs";
 import { toItem, putIndex } from "../services/dynamo.mjs";
 
@@ -79,17 +79,21 @@ const stripQ = (u) => u.split("?")[0];
 const keyOf = (s) => crypto.createHash("sha1").update(s).digest("hex").slice(0, 16);
 
 async function migrateImages(body, ogImage) {
-  const urls = new Set(body.match(IMG_RE) || []);
-  if (ogImage && ogImage.includes("pstatic")) urls.add(ogImage);
-  const s3Urls = [];
+  // 본문 등장 순서(DOM 순) 유지 — 알파벳 정렬은 썸네일을 엉뚱하게 잡음
+  const urls = [...new Set(body.match(IMG_RE) || [])];
+  if (ogImage && ogImage.includes("pstatic") && !urls.includes(ogImage)) urls.push(ogImage);
+  const items = []; // {s3Url, size}
   let body2 = body, og2 = ogImage;
-  for (const u of [...urls].sort()) {
+  for (const u of urls) {
     const stripped = stripQ(u);
     const ext = (stripped.match(/\.(jpg|jpeg|png|gif)$/i)?.[1] || "jpg").toLowerCase();
     const key = `images/legacy/${keyOf(stripped)}.${ext}`;
     const s3Url = `https://${DATA_BUCKET}.s3.${REGION}.amazonaws.com/${key}`;
+    let size = 0;
     try {
-      if (!(await objectExists(key))) {
+      if (await objectExists(key)) {
+        size = await objectSize(key);
+      } else {
         // 최고화질 우선(w3840) → 실패 시 점차 낮춰 폴백
         const cands = stripped.includes("pstatic") ? ["?type=w3840", "?type=w966", "?type=w773", ""] : [""];
         let buf = null;
@@ -97,6 +101,7 @@ async function migrateImages(body, ogImage) {
           try { buf = await fetchBytes(stripped + q); break; } catch { /* try next */ }
         }
         if (!buf) continue;
+        size = buf.length;
         const ct = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", gif: "image/gif" }[ext];
         await putImage(key, buf, ct);
       }
@@ -104,9 +109,11 @@ async function migrateImages(body, ogImage) {
     const pat = new RegExp(stripped.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '(\\?[^\\s"\'<>]*)?', "g");
     body2 = body2.replace(pat, s3Url);
     if (og2) og2 = og2.replace(pat, s3Url);
-    s3Urls.push(s3Url);
+    items.push({ s3Url, size });
   }
-  return { s3Urls, body2, og2 };
+  // 썸네일(images[0])은 가장 큰(=고화질) 이미지로
+  items.sort((a, b) => b.size - a.size);
+  return { s3Urls: items.map((i) => i.s3Url), body2, og2 };
 }
 
 async function buildPost(logno, rssCat) {
