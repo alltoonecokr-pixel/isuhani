@@ -37,11 +37,14 @@ const TREATMENT_ICONS: Record<string, IconType> = {
   skin:     DropLeafIcon,
 };
 
-// 모노크롬 — 드롭다운 진료 아이콘도 브랜드 그린 단색 (구분은 아이콘 모양으로)
-const TREATMENT_TONE = { bg: "#eaf3ec", fg: "#2d6e5a" };
+// 유형별 색 — 약초·흙 톤 한 계열 (홈 카드·진료 상세와 동일 팔레트)
 const TREATMENT_ACCENT: Record<string, { bg: string; fg: string }> = {
-  spine: TREATMENT_TONE, women: TREATMENT_TONE, children: TREATMENT_TONE,
-  diet: TREATMENT_TONE, health: TREATMENT_TONE, skin: TREATMENT_TONE,
+  spine:    { bg: "#f1e4da", fg: "#a05c3a" },
+  women:    { bg: "#f3e4e2", fg: "#b06a6a" },
+  children: { bg: "#dceee2", fg: "#4a8e62" },
+  diet:     { bg: "#ebeede", fg: "#7c8a44" },
+  health:   { bg: "#e0efe7", fg: "#2d6e5a" },
+  skin:     { bg: "#f3ecda", fg: "#ab863c" },
 };
 
 type TreatmentItem = MenuItem & { slug: string };

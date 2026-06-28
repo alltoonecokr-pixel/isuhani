@@ -17,20 +17,34 @@ type Theme = {
   chipText: string;
 };
 
-// 모노크롬 — 진료별로 색을 달리하지 않고 브랜드 그린 단색으로 통일.
-// (구분은 색이 아니라 각 진료의 커스텀 일러스트가 담당)
-const GREEN_THEME: Theme = {
-  heroBg: "linear-gradient(135deg, #f7faf7 0%, #e6f0e9 100%)",
-  softCircle: "#d6e8db",
-  accent: "#2d6e5a",
-  chipBg: "#eaf3ec",
-  chipText: "#1f5a48",
-};
+// 유형별 색 — 약초·흙 톤 한 계열 (홈 카드·드롭다운과 동일 팔레트). 무지개가 아닌 조화로운 구분.
 const THEMES: Record<string, Theme> = {
-  spine: GREEN_THEME, women: GREEN_THEME, children: GREEN_THEME,
-  diet: GREEN_THEME, health: GREEN_THEME, skin: GREEN_THEME,
+  spine: {
+    heroBg: "linear-gradient(135deg, #fbf6f1 0%, #f1e4da 100%)",
+    softCircle: "#ead6c5", accent: "#a05c3a", chipBg: "#f1e4da", chipText: "#7e4327",
+  },
+  women: {
+    heroBg: "linear-gradient(135deg, #fbf4f3 0%, #f3e4e2 100%)",
+    softCircle: "#efd9d5", accent: "#b06a6a", chipBg: "#f3e4e2", chipText: "#8c4a4a",
+  },
+  children: {
+    heroBg: "linear-gradient(135deg, #f4faf6 0%, #dceee2 100%)",
+    softCircle: "#cfe7d6", accent: "#4a8e62", chipBg: "#dceee2", chipText: "#2f6b46",
+  },
+  diet: {
+    heroBg: "linear-gradient(135deg, #f8f9ef 0%, #ebeede 100%)",
+    softCircle: "#e2e6cf", accent: "#7c8a44", chipBg: "#ebeede", chipText: "#59662f",
+  },
+  health: {
+    heroBg: "linear-gradient(135deg, #f4faf6 0%, #e0efe7 100%)",
+    softCircle: "#d6e8db", accent: "#2d6e5a", chipBg: "#e0efe7", chipText: "#1f5a48",
+  },
+  skin: {
+    heroBg: "linear-gradient(135deg, #faf6ea 0%, #f3ecda 100%)",
+    softCircle: "#ece0c6", accent: "#ab863c", chipBg: "#f3ecda", chipText: "#84602a",
+  },
 };
-const DEFAULT_THEME = GREEN_THEME;
+const DEFAULT_THEME = THEMES.health;
 
 /* 히어로 배경 파티클 정의 */
 const PARTICLES = [

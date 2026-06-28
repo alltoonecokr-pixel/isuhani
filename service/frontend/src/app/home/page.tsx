@@ -26,11 +26,14 @@ export const metadata: Metadata = {
 };
 
 /* ── 진료 카드 컬러 테마 ── */
-// 모노크롬 — 진료 구분은 색이 아니라 커스텀 아이콘으로. 브랜드 그린 단색으로 통일.
-const TREATMENT_TONE = { accent: "#2d6e5a", bg: "#eaf3ec" };
+// 유형별 색 — 한의원(약초·흙) 톤 한 계열로 조화. 그린·세이지·올리브·테라코타·더스티로즈·오커.
 const CARD_ACCENT: Record<string, { accent: string; bg: string }> = {
-  spine: TREATMENT_TONE, women: TREATMENT_TONE, children: TREATMENT_TONE,
-  diet: TREATMENT_TONE, health: TREATMENT_TONE, skin: TREATMENT_TONE,
+  spine:    { accent: "#a05c3a", bg: "#f1e4da" }, // 테라코타
+  women:    { accent: "#b06a6a", bg: "#f3e4e2" }, // 더스티 로즈
+  children: { accent: "#4a8e62", bg: "#dceee2" }, // 새싹 그린
+  diet:     { accent: "#7c8a44", bg: "#ebeede" }, // 올리브
+  health:   { accent: "#2d6e5a", bg: "#e0efe7" }, // 브랜드 그린
+  skin:     { accent: "#ab863c", bg: "#f3ecda" }, // 오커(따뜻한 골드)
 };
 
 const TREATMENT_ICONS: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
