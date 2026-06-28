@@ -66,6 +66,20 @@ export function RichEditor({
         void doUpload(file);
         return true;
       },
+      // YouTube·Vimeo 링크를 그냥 붙여넣으면 자동으로 영상으로 바꿔준다
+      handlePaste(view, event) {
+        const text = (event.clipboardData?.getData("text/plain") || "").trim();
+        if (!/^https?:\/\/\S+$/.test(text)) return false;
+        const embed = videoEmbed(text);
+        if (!embed) return false;
+        const src = embed.match(/src="([^"]+)"/)?.[1];
+        const nodeType = view.state.schema.nodes.iframe;
+        if (!src || !nodeType) return false;
+        event.preventDefault();
+        const node = nodeType.create({ src });
+        view.dispatch(view.state.tr.replaceSelectionWith(node).scrollIntoView());
+        return true;
+      },
     },
   });
 

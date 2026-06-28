@@ -71,7 +71,7 @@ const STEPS = [
   },
   {
     title: "임시저장 vs 발행",
-    desc: "[임시 저장]은 홈페이지에 올리지 않고 초안으로 보관합니다. [발행하기]를 눌러야 실제 홈페이지에 게시됩니다. 발행 후 홈페이지 반영까지는 약 2~5분이 걸립니다.",
+    desc: "[임시 저장]은 홈페이지에 올리지 않고 초안으로 보관합니다. [발행하기]를 눌러야 실제 홈페이지에 게시됩니다. 발행 후 홈페이지 반영까지는 1~5초가 소요됩니다.",
     icon: (
       <svg viewBox="0 0 72 72" fill="none" className="guide-icon">
         <rect x="8" y="8" width="56" height="56" rx="10" fill="var(--accent-light)" stroke="var(--accent-border)" strokeWidth="1.5"/>
