@@ -80,21 +80,17 @@ const HOURS: { day: string; time: string; note?: string; muted?: boolean }[] = [
   { day: "공휴일", time: "휴진", muted: true },
 ];
 
-// 히어로 채널 아이콘 (톡톡·플레이스·유튜브·인스타) — 호버 시 설명 툴팁(시니어 친화)
+// 히어로 채널 (톡톡·플레이스·유튜브·인스타) — 아이콘 + 항상 보이는 글자 라벨(시니어 친화)
 function HeroChannel({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={label}
-      className="group relative inline-flex items-center justify-center w-10 h-10 rounded-full border border-ink-200 text-ink-500 hover:bg-herb-700 hover:border-herb-700 hover:text-white transition-colors"
+      className="inline-flex items-center gap-1.5 rounded-full border border-ink-200 px-3.5 py-2 text-[13.5px] font-semibold text-ink-600 hover:bg-herb-700 hover:border-herb-700 hover:text-white transition-colors"
     >
       {children}
-      <span className="pointer-events-none absolute bottom-full left-1/2 mb-2.5 -translate-x-1/2 whitespace-nowrap rounded-lg bg-ink-900 px-3 py-2 text-[13px] font-semibold text-white opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.4)] z-30">
-        {label}
-        <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-[5px] border-transparent border-t-ink-900" />
-      </span>
+      <span>{label}</span>
     </a>
   );
 }
@@ -175,16 +171,16 @@ export default function HomePage() {
                 <CalendarCheck size={15} strokeWidth={2.2} />
                 네이버 예약
               </a>
-              <HeroChannel href="https://talk.naver.com/ct/w4vt4b" label="네이버 톡톡으로 문의하기">
+              <HeroChannel href="https://talk.naver.com/ct/w4vt4b" label="톡톡 문의">
                 <MessageCircle size={16} strokeWidth={2} />
               </HeroChannel>
-              <HeroChannel href="https://map.naver.com/p/entry/place/13104608" label="네이버 지도에서 길찾기">
+              <HeroChannel href="https://map.naver.com/p/entry/place/13104608" label="오시는 길">
                 <MapPin size={16} strokeWidth={2} />
               </HeroChannel>
-              <HeroChannel href="https://www.youtube.com/@isu_hani" label="이수한의원 유튜브 보기">
+              <HeroChannel href="https://www.youtube.com/@isu_hani" label="유튜브">
                 <Youtube size={16} strokeWidth={2} />
               </HeroChannel>
-              <HeroChannel href="https://www.instagram.com/isuclinic/" label="이수한의원 인스타그램 보기">
+              <HeroChannel href="https://www.instagram.com/isuclinic/" label="인스타그램">
                 <Instagram size={16} strokeWidth={2} />
               </HeroChannel>
             </div>

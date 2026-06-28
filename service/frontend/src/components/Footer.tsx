@@ -69,16 +69,16 @@ export function Footer() {
                 </svg>
                 네이버 예약
               </a>
-              <SocialIcon href={TALK_URL} label="네이버 톡톡으로 문의하기">
+              <SocialIcon href={TALK_URL} label="톡톡 문의">
                 <svg width="17" height="17" viewBox="0 0 20 20" fill="currentColor"><path d="M10 3C5.9 3 2.5 5.7 2.5 9c0 2.1 1.4 4 3.5 5.1-.2.7-.6 1.9-.7 2.2-.1.4.1.4.3.3.2-.1 2.3-1.5 3.1-2.1.5.1 1 .1 1.3.1 4.1 0 7.5-2.7 7.5-6.6S14.1 3 10 3z"/></svg>
               </SocialIcon>
-              <SocialIcon href={PLACE_URL} label="네이버 지도에서 길찾기">
+              <SocialIcon href={PLACE_URL} label="오시는 길">
                 <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M10 17.5s5.5-4.7 5.5-9A5.5 5.5 0 1 0 4.5 8.5c0 4.3 5.5 9 5.5 9z"/><circle cx="10" cy="8.3" r="1.9"/></svg>
               </SocialIcon>
-              <SocialIcon href={YOUTUBE_URL} label="이수한의원 유튜브 보기">
+              <SocialIcon href={YOUTUBE_URL} label="유튜브">
                 <svg width="17" height="17" viewBox="0 0 20 20" fill="currentColor"><path d="M18.2 6.4a2.1 2.1 0 0 0-1.5-1.5C15.4 4.6 10 4.6 10 4.6s-5.4 0-6.7.3A2.1 2.1 0 0 0 1.8 6.4C1.5 7.7 1.5 10 1.5 10s0 2.3.3 3.6a2.1 2.1 0 0 0 1.5 1.5c1.3.3 6.7.3 6.7.3s5.4 0 6.7-.3a2.1 2.1 0 0 0 1.5-1.5c.3-1.3.3-3.6.3-3.6s0-2.3-.3-3.6zM8.4 12.5v-5l4.3 2.5-4.3 2.5z"/></svg>
               </SocialIcon>
-              <SocialIcon href={INSTAGRAM_URL} label="이수한의원 인스타그램 보기">
+              <SocialIcon href={INSTAGRAM_URL} label="인스타그램">
                 <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2.5" y="2.5" width="15" height="15" rx="4.5"/><circle cx="10" cy="10" r="3.6"/><circle cx="14.3" cy="5.7" r="1" fill="currentColor" stroke="none"/></svg>
               </SocialIcon>
             </div>
@@ -191,14 +191,10 @@ function SocialIcon({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={label}
-      className="group relative inline-flex items-center justify-center w-9 h-9 rounded-full border border-ink-200 text-ink-500 hover:bg-herb-700 hover:border-herb-700 hover:text-white transition-colors"
+      className="inline-flex items-center gap-1.5 rounded-full border border-ink-200 px-3.5 py-2 text-[13px] font-semibold text-ink-600 hover:bg-herb-700 hover:border-herb-700 hover:text-white transition-colors"
     >
       {children}
-      <span className="pointer-events-none absolute bottom-full left-1/2 mb-2.5 -translate-x-1/2 whitespace-nowrap rounded-lg bg-ink-900 px-3 py-2 text-[13px] font-semibold text-white opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.4)] z-30">
-        {label}
-        <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-[5px] border-transparent border-t-ink-900" />
-      </span>
+      <span>{label}</span>
     </a>
   );
 }
