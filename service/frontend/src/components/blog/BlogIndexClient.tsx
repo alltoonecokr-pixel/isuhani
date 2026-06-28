@@ -243,6 +243,79 @@ function BlogIndexView({
     );
   }
 
+  // 리스트/갤러리 보기 — 전체·카테고리 공통 (검색 제외). 카드 보기는 아래 매거진/그리드.
+  if (!isSearch && view !== "card") {
+    const flatTotal = Math.max(1, Math.ceil(filtered.length / V2_PAGE_SIZE));
+    const flatItems = filtered.slice((page - 1) * V2_PAGE_SIZE, (page - 1) * V2_PAGE_SIZE + V2_PAGE_SIZE);
+    return (
+      <>
+        <BlogCategoryBar active={activeCat} categories={categories} variant={variant} uiSuffix={uiSuffix} />
+        <section className="bg-white">
+          <div className="max-w-container mx-auto px-4 md:px-8 py-10 md:py-14">
+            <header className="mb-6 md:mb-8 flex items-end justify-between gap-4 flex-wrap">
+              <div>
+                <h1 className="font-serif text-[32px] md:text-[44px] font-bold tracking-[-0.025em] text-ink-900 leading-[1.1]">
+                  {activeCat === "전체" ? "건강 저널" : activeCat}
+                </h1>
+                <p className="mt-2 text-[15px] text-ink-500">{filtered.length}편</p>
+              </div>
+              <JournalViewToggle view={view} onPick={pickView} />
+            </header>
+
+            {view === "list" && (
+              <div className="divide-y divide-ink-100 border-y border-ink-100">
+                {flatItems.map((p) => (
+                  <a key={p.logNo} href={`/${p.logNo}/`} className="group flex items-center gap-4 py-4">
+                    {p.thumbnail ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={p.thumbnail} alt="" referrerPolicy="no-referrer" loading="lazy"
+                        className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-lg bg-ink-100 shrink-0" />
+                    ) : (
+                      <div className="w-20 h-20 md:w-24 md:h-24 rounded-lg bg-ink-50 shrink-0 flex items-center justify-center">
+                        <span className="font-serif text-2xl text-ink-200">醫</span>
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[11px] tracking-[0.15em] uppercase text-herb-700 font-semibold">{p.category}</div>
+                      <h3 className="mt-1 font-serif text-[17px] md:text-[19px] font-bold text-ink-900 group-hover:text-herb-700 transition-colors leading-snug line-clamp-2">{p.title}</h3>
+                      <div className="mt-1.5 text-[12px] text-ink-400 tabular-nums">{p.dateLabel}</div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            )}
+
+            {view === "gallery" && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+                {flatItems.map((p) => (
+                  <a key={p.logNo} href={`/${p.logNo}/`} className="group block">
+                    <div className="aspect-square overflow-hidden rounded-xl bg-ink-100">
+                      {p.thumbnail ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={p.thumbnail} alt={p.title} referrerPolicy="no-referrer" loading="lazy"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-ink-50">
+                          <span className="font-serif text-4xl text-ink-200">醫</span>
+                        </div>
+                      )}
+                    </div>
+                    <h3 className="mt-2 text-[13px] md:text-[14px] font-semibold text-ink-900 group-hover:text-herb-700 transition-colors leading-snug line-clamp-2">{p.title}</h3>
+                  </a>
+                ))}
+              </div>
+            )}
+
+            {flatItems.length === 0 && <div className="text-center text-ink-500 py-16">글이 없습니다.</div>}
+            {flatTotal > 1 && (
+              <Pagination page={page} totalPages={flatTotal} cat={activeCat} q={rawQuery} variant={variant} />
+            )}
+          </div>
+        </section>
+      </>
+    );
+  }
+
   // 메인 + 카테고리 페이지 — 3-column 영문 사이트 톤
   const isHome = activeCat === "전체";
   // 홈 첫 화면 우선순위: ① 건강 칼럼(노화·근감소증·통증·산후조리 등)
@@ -337,10 +410,7 @@ function BlogIndexView({
       const gridStart = (page - 1) * V2_PAGE_SIZE;
       const gridItems = catItems.slice(gridStart, gridStart + V2_PAGE_SIZE);
       const showHero = page === 1 && main;
-      // 리스트/갤러리 보기는 전체(메인 포함)를 평평하게 보여준다
-      const flatTotal = Math.max(1, Math.ceil(filtered.length / V2_PAGE_SIZE));
-      const flatItems = filtered.slice(gridStart, gridStart + V2_PAGE_SIZE);
-      const effTotal = view === "card" ? v2Total : flatTotal;
+      // (리스트/갤러리 보기는 위 공통 분기에서 처리됨 — 여기는 카드 보기)
       return (
         <>
           <BlogCategoryBar active={activeCat} categories={categories} variant={variant} uiSuffix={uiSuffix} />
@@ -355,68 +425,18 @@ function BlogIndexView({
                 </div>
                 <JournalViewToggle view={view} onPick={pickView} />
               </header>
-
-              {view === "card" && (
-                <>
-                  {showHero && main && <CleanHero post={main} />}
-                  {showHero && gridItems.length > 0 && <GridDivider count={catItems.length} />}
-                  <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ${gridGap}`}>
-                    {gridItems.map((p) => (
-                      <CleanCard key={p.logNo} post={p} />
-                    ))}
-                  </div>
-                </>
-              )}
-
-              {view === "list" && (
-                <div className="divide-y divide-ink-100 border-y border-ink-100">
-                  {flatItems.map((p) => (
-                    <a key={p.logNo} href={`/${p.logNo}/`} className="group flex items-center gap-4 py-4">
-                      {p.thumbnail ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={p.thumbnail} alt="" referrerPolicy="no-referrer" loading="lazy"
-                          className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-lg bg-ink-100 shrink-0" />
-                      ) : (
-                        <div className="w-20 h-20 md:w-24 md:h-24 rounded-lg bg-ink-50 shrink-0 flex items-center justify-center">
-                          <span className="font-serif text-2xl text-ink-200">醫</span>
-                        </div>
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <div className="text-[11px] tracking-[0.15em] uppercase text-herb-700 font-semibold">{p.category}</div>
-                        <h3 className="mt-1 font-serif text-[17px] md:text-[19px] font-bold text-ink-900 group-hover:text-herb-700 transition-colors leading-snug line-clamp-2">{p.title}</h3>
-                        <div className="mt-1.5 text-[12px] text-ink-400 tabular-nums">{p.dateLabel}</div>
-                      </div>
-                    </a>
-                  ))}
-                </div>
-              )}
-
-              {view === "gallery" && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-                  {flatItems.map((p) => (
-                    <a key={p.logNo} href={`/${p.logNo}/`} className="group block">
-                      <div className="aspect-square overflow-hidden rounded-xl bg-ink-100">
-                        {p.thumbnail ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={p.thumbnail} alt={p.title} referrerPolicy="no-referrer" loading="lazy"
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-ink-50">
-                            <span className="font-serif text-4xl text-ink-200">醫</span>
-                          </div>
-                        )}
-                      </div>
-                      <h3 className="mt-2 text-[13px] md:text-[14px] font-semibold text-ink-900 group-hover:text-herb-700 transition-colors leading-snug line-clamp-2">{p.title}</h3>
-                    </a>
-                  ))}
-                </div>
-              )}
-
-              {((view === "card" && gridItems.length === 0 && !showHero) || (view !== "card" && flatItems.length === 0)) && (
+              {showHero && main && <CleanHero post={main} />}
+              {showHero && gridItems.length > 0 && <GridDivider count={catItems.length} />}
+              <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ${gridGap}`}>
+                {gridItems.map((p) => (
+                  <CleanCard key={p.logNo} post={p} />
+                ))}
+              </div>
+              {gridItems.length === 0 && !showHero && (
                 <div className="text-center text-ink-500 py-16">글이 없습니다.</div>
               )}
-              {effTotal > 1 && (
-                <Pagination page={page} totalPages={effTotal} cat={activeCat} q={rawQuery} variant={variant} />
+              {v2Total > 1 && (
+                <Pagination page={page} totalPages={v2Total} cat={activeCat} q={rawQuery} variant={variant} />
               )}
             </div>
           </section>
@@ -539,6 +559,9 @@ function BlogIndexView({
       <NoticeStrip posts={posts} />
       <section className="bg-white">
         <div className="max-w-container mx-auto px-4 md:px-8 py-8 md:py-10">
+          <div className="flex justify-end mb-5 md:mb-6">
+            <JournalViewToggle view={view} onPick={pickView} />
+          </div>
           <div className="grid lg:grid-cols-12 gap-x-8 gap-y-8">
             <aside className="hidden lg:block lg:col-span-3">
               <div className="divide-y divide-ink-200 border-y border-ink-200">
