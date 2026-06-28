@@ -101,6 +101,32 @@ const STEPS = [
       </svg>
     ),
   },
+  {
+    title: "블로그 동기화",
+    desc: "네이버 블로그에 새로 올린 글을 사이트로 가져오는 기능입니다. 상단 [↻ 블로그 동기화]를 누르면 새 글을 자동으로 찾아 글·사진을 그대로 옮겨와 게시합니다. 새 글이 없으면 '이미 최신 상태'라고 알려줍니다. 사진이 많은 글은 시간이 걸려 한 번 더 눌러 이어받을 수 있고, 가져온 글은 목록 맨 위에 나타납니다. 직접 글을 쓸 필요 없이 블로그만 관리하면 사이트가 따라옵니다.",
+    icon: (
+      <svg viewBox="0 0 72 72" fill="none" className="guide-icon">
+        <rect x="8" y="8" width="56" height="56" rx="10" fill="var(--accent-light)" stroke="var(--accent-border)" strokeWidth="1.5"/>
+        <path d="M24 30a13 13 0 0 1 23-5" fill="none" stroke="var(--accent)" strokeWidth="2.4" strokeLinecap="round"/>
+        <path d="M48 42a13 13 0 0 1-23 5" fill="none" stroke="var(--accent)" strokeWidth="2.4" strokeLinecap="round"/>
+        <path d="M47 18v8h-8z" fill="var(--accent)"/>
+        <path d="M25 54v-8h8z" fill="var(--accent)"/>
+      </svg>
+    ),
+  },
+  {
+    title: "페이지 편집",
+    desc: "상단 [페이지 편집]을 누르면 실제 사이트 화면이 그대로 뜨고, 고치고 싶은 글자를 클릭해 바로 수정할 수 있습니다(병원 소개·진료 영역·첫 방문 등). 메뉴로 페이지를 옮겨다니며 고치고, [저장]을 누르면 즉시 반영됩니다. 실수했으면 [원래대로]로 되돌릴 수 있습니다.",
+    icon: (
+      <svg viewBox="0 0 72 72" fill="none" className="guide-icon">
+        <rect x="8" y="8" width="56" height="56" rx="10" fill="var(--accent-light)" stroke="var(--accent-border)" strokeWidth="1.5"/>
+        <rect x="16" y="18" width="40" height="30" rx="4" fill="white" stroke="var(--ink-200)" strokeWidth="1.4"/>
+        <line x1="22" y1="26" x2="40" y2="26" stroke="var(--ink-300)" strokeWidth="1.6" strokeLinecap="round"/>
+        <line x1="22" y1="32" x2="34" y2="32" stroke="var(--ink-300)" strokeWidth="1.4" strokeLinecap="round"/>
+        <path d="M44 44l12-12 5 5-12 12-6 1z" fill="var(--accent)" opacity=".22" stroke="var(--accent)" strokeWidth="1.6" strokeLinejoin="round"/>
+      </svg>
+    ),
+  },
 ];
 
 export function GuideModal({ onClose }: Props) {

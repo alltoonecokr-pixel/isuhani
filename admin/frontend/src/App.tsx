@@ -19,6 +19,7 @@ import {
   initialDeploy,
   type DeployState,
 } from "./components/DeployProgress";
+import { SyncModal, initialSync, type SyncState } from "./components/SyncModal";
 
 const PHASE_PCT: Record<string, number> = {
   SUBMITTED: 12, QUEUED: 20, PROVISIONING: 30, DOWNLOAD_SOURCE: 40,
@@ -60,6 +61,7 @@ export function App() {
   const [editorKey, setEditorKey] = useState(0);
 
   const [syncing, setSyncing] = useState(false);
+  const [sync, setSync] = useState<SyncState>(initialSync);
 
   // 상단 모드: 글 관리 vs 페이지 편집. 진료영역 콘텐츠는 API에서 로드, 없으면 시드.
   const [section, setSection] = useState<"journal" | "pages">("journal");
@@ -310,21 +312,17 @@ export function App() {
   // ── 블로그 동기화 (네이버 새 글 가져오기 + 발행) ──────────────────
   const runSync = async () => {
     setSyncing(true);
-    toast("네이버 블로그 확인 중…");
+    setSync({ open: true, phase: "running", imported: [], found: 0, newCount: 0 });
     try {
       const r = await apiRef.current.syncBlog();
-      if (r.imported.length === 0) {
-        toast(r.new > 0 ? "가져오기 실패 — 다시 시도해 주세요" : "새 글 없음 · 이미 최신 상태");
-      } else {
-        const more = r.new > r.imported.length ? " (더 있음 — 다시 눌러 계속)" : "";
-        toast(`새 글 ${r.imported.length}편 가져옴${more} · 발행 중…`);
+      setSync({ open: true, phase: "result", imported: r.imported, found: r.found, newCount: r.new });
+      if (r.imported.length > 0) {
         await loadPosts().catch(() => {});
-        void runDeploy();
+        void runDeploy(); // 정적 SEO 페이지 생성
       }
     } catch {
-      // 글이 많거나 사진이 많으면 시간이 걸려 응답이 끊길 수 있음 — 일부 반영됐을 수 있어 재시도 안내
       await loadPosts().catch(() => {});
-      toast("시간이 걸렸어요 — 목록 확인 후 한 번 더 눌러 이어주세요");
+      setSync({ open: true, phase: "error", imported: [], found: 0, newCount: 0 });
     } finally {
       setSyncing(false);
     }
@@ -447,6 +445,7 @@ export function App() {
       {guideOpen && <GuideModal onClose={() => setGuideOpen(false)} />}
 
       <DeployProgress state={deploy} />
+      <SyncModal state={sync} onClose={() => setSync((s) => ({ ...s, open: false }))} />
 
       <div className={["toast", toastState.show ? "show" : "", toastState.kind].filter(Boolean).join(" ")}>
         {toastState.msg}

@@ -806,3 +806,19 @@ button.ghost.sm { font-size: 12px; padding: 5px 10px; }
 
 .top-actions .ghost.sync { color: var(--accent); font-weight: 600; }
 .top-actions .ghost.sync:hover:not(:disabled) { background: var(--accent-light); }
+
+/* ── 블로그 동기화 모달 ── */
+.sync-modal { max-width: 520px; }
+.sync-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.sync-head h3 { margin: 0; }
+.sync-spin { font-size: 20px; color: var(--accent); display: inline-block; }
+.sync-spin.on { animation: sync-rot 0.9s linear infinite; }
+@keyframes sync-rot { to { transform: rotate(360deg); } }
+.sync-msg { color: var(--ink-600, var(--ink-700)); font-size: 14px; line-height: 1.7; margin: 0 0 14px; }
+.sync-msg b { color: var(--accent); }
+.sync-list { max-height: 280px; overflow-y: auto; border: 1px solid var(--ink-200); border-radius: var(--r-md); }
+.sync-row { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; padding: 9px 12px; border-top: 1px solid var(--ink-100); font-size: 13px; }
+.sync-row:first-child { border-top: none; }
+.sync-date { font-size: 11px; color: var(--ink-400); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sync-title { color: var(--ink-900); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sync-cat { font-size: 11px; color: var(--accent); background: var(--accent-light); padding: 2px 7px; border-radius: 10px; white-space: nowrap; }
