@@ -33,14 +33,8 @@ function checkAuth(headers) {
 }
 
 function unauthorized() {
-  return {
-    statusCode: 401,
-    headers: {
-      "content-type": "application/json; charset=utf-8",
-      "www-authenticate": 'Basic realm="이수한의원 CMS"',
-    },
-    body: JSON.stringify({ error: "인증이 필요합니다" }),
-  };
+  // www-authenticate 헤더를 붙이면 브라우저가 기본 인증 팝업을 띄운다 → 앱 자체 로그인 모달을 쓰도록 제거.
+  return respond(401, { error: "인증이 필요합니다" });
 }
 
 // ── 라우터 ───────────────────────────────────────────────────────────────────
