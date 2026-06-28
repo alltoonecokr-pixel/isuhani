@@ -289,7 +289,7 @@ function BlogIndexView({
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 md:gap-5">
                 {flatItems.map((p) => (
                   <a key={p.logNo} href={`/${p.logNo}/`} className="group block">
-                    <div className="aspect-[4/3] overflow-hidden rounded-xl bg-ink-100 border border-ink-100 ring-1 ring-black/[0.02]">
+                    <div className="aspect-[4/3] overflow-hidden rounded-xl bg-ink-100">
                       {p.thumbnail ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={p.thumbnail} alt={p.title} referrerPolicy="no-referrer" loading="lazy"
