@@ -92,7 +92,7 @@ export default function AskPage() {
       {/* ── HERO + 채팅 ── */}
       <section className="relative overflow-hidden bg-paper-50 border-b border-ink-100">
         <div
-          className="pointer-events-none absolute -top-40 left-1/2 h-[42rem] w-[42rem] -translate-x-1/2 rounded-full opacity-50 blur-3xl"
+          className="glow-breathe pointer-events-none absolute -top-40 left-1/2 h-[42rem] w-[42rem] -translate-x-1/2 rounded-full opacity-50 blur-3xl"
           style={{ background: "radial-gradient(circle, rgba(111,176,122,0.18) 0%, rgba(111,176,122,0) 65%)" }}
         />
         <div className="relative max-w-container mx-auto px-5 md:px-8 pt-14 md:pt-20 pb-14 md:pb-20">
@@ -122,7 +122,7 @@ export default function AskPage() {
       {/* ── 페르소나 ── */}
       <section className="max-w-container mx-auto px-5 md:px-8 py-20 md:py-28">
         <div className="reveal-on-scroll flex flex-col items-center gap-6 rounded-3xl bg-paper-50 px-8 py-14 text-center md:flex-row md:gap-10 md:px-16 md:text-left">
-          <div className="shrink-0 rounded-full bg-white p-5 shadow-[0_8px_28px_-10px_rgba(26,20,16,0.18)]">
+          <div className="ssu-float shrink-0 rounded-full bg-white p-5 shadow-[0_8px_28px_-10px_rgba(26,20,16,0.18)]">
             <SsuMascot size={84} variant="wave" />
           </div>
           <div>
@@ -290,14 +290,14 @@ export default function AskPage() {
       <section className="max-w-container mx-auto px-5 md:px-8 py-24 md:py-32">
         <div className="reveal-on-scroll relative overflow-hidden rounded-[2.5rem] bg-ink-900 px-8 py-16 text-center md:py-20">
           <div
-            className="pointer-events-none absolute -bottom-32 left-1/2 h-[28rem] w-[28rem] -translate-x-1/2 rounded-full opacity-50 blur-3xl"
+            className="glow-breathe pointer-events-none absolute -bottom-32 left-1/2 h-[28rem] w-[28rem] -translate-x-1/2 rounded-full opacity-50 blur-3xl"
             style={{
               background:
                 "radial-gradient(circle, rgba(111,176,122,0.45) 0%, rgba(111,176,122,0) 65%)",
             }}
           />
           <div className="relative">
-            <SsuMascot size={64} className="mx-auto" variant="wave" />
+            <SsuMascot size={64} className="mx-auto ssu-float" variant="wave" />
             <h2 className="mt-6 font-serif text-[28px] md:text-[40px] font-bold tracking-[-0.025em] text-white leading-[1.2]">
               지금 쑤에게 물어보세요
             </h2>

@@ -81,13 +81,13 @@ export function SsuMascot({
           <circle cx="51" cy="46.5" r="0.9" fill="#fdfbf5" />
         </>
       ) : (
-        <>
+        <g className="ssu-eyes">
           <ellipse cx="30" cy="48" rx="2.6" ry="3.6" fill="#1a1410" />
           <ellipse cx="50" cy="48" rx="2.6" ry="3.6" fill="#1a1410" />
           {/* 눈 하이라이트 */}
           <circle cx="31" cy="46.5" r="0.9" fill="#fdfbf5" />
           <circle cx="51" cy="46.5" r="0.9" fill="#fdfbf5" />
-        </>
+        </g>
       )}
 
       {/* 입 — 동그란 미소 */}
@@ -100,8 +100,8 @@ export function SsuMascot({
       />
 
       {/* 작은 디테일 — 머리 위 별 (반짝임) */}
-      <circle cx="58" cy="22" r="1.2" fill="#0a4a45" opacity="0.5" />
-      <circle cx="20" cy="30" r="0.9" fill="#0a4a45" opacity="0.4" />
+      <circle className="ssu-twinkle" cx="58" cy="22" r="1.2" fill="#0a4a45" opacity="0.5" />
+      <circle className="ssu-twinkle-2" cx="20" cy="30" r="0.9" fill="#0a4a45" opacity="0.4" />
     </svg>
   );
 }

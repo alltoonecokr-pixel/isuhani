@@ -786,3 +786,25 @@ a {
 .cms-edit-mode img.cms-img-edit { cursor: pointer; transition: outline 0.12s, opacity 0.12s; }
 .cms-edit-mode img.cms-img-edit:hover { outline: 2px dashed #2d6e5a; outline-offset: 3px; }
 .cms-edit-mode img.cms-img-busy { opacity: 0.45; }
+
+/* ── 쑤 상담 — 모션 디테일 (살아있는 마스코트 + 숨쉬는 글로우) ── */
+@keyframes ssu-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.ssu-float { animation: ssu-float 4.8s ease-in-out infinite; will-change: transform; }
+
+@keyframes ssu-blink { 0%, 91%, 100% { transform: scaleY(1); } 95.5% { transform: scaleY(0.1); } }
+.ssu-eyes { animation: ssu-blink 6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+
+@keyframes ssu-twinkle { 0%, 100% { opacity: 0.22; } 50% { opacity: 0.7; } }
+.ssu-twinkle { animation: ssu-twinkle 3.2s ease-in-out infinite; }
+.ssu-twinkle-2 { animation: ssu-twinkle 3.2s ease-in-out infinite; animation-delay: 1.3s; }
+
+/* 좌우 중앙정렬(-translate-x-1/2)을 유지하며 은은하게 호흡 */
+@keyframes glow-breathe {
+  0%, 100% { opacity: 0.4; transform: translateX(-50%) scale(1); }
+  50% { opacity: 0.62; transform: translateX(-50%) scale(1.07); }
+}
+.glow-breathe { animation: glow-breathe 7.5s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ssu-float, .ssu-eyes, .ssu-twinkle, .ssu-twinkle-2, .glow-breathe { animation: none !important; }
+}
