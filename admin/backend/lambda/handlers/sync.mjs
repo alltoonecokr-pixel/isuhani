@@ -90,9 +90,13 @@ async function migrateImages(body, ogImage) {
     const s3Url = `https://${DATA_BUCKET}.s3.${REGION}.amazonaws.com/${key}`;
     try {
       if (!(await objectExists(key))) {
-        const dl = stripped.includes("pstatic") ? `${stripped}?type=w966` : stripped;
-        let buf;
-        try { buf = await fetchBytes(dl); } catch { buf = await fetchBytes(stripped); }
+        // 최고화질 우선(w3840) → 실패 시 점차 낮춰 폴백
+        const cands = stripped.includes("pstatic") ? ["?type=w3840", "?type=w966", "?type=w773", ""] : [""];
+        let buf = null;
+        for (const q of cands) {
+          try { buf = await fetchBytes(stripped + q); break; } catch { /* try next */ }
+        }
+        if (!buf) continue;
         const ct = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", gif: "image/gif" }[ext];
         await putImage(key, buf, ct);
       }

@@ -128,15 +128,16 @@ def migrate_images(body, og_image):
         ext = (re.search(r"\.(jpg|jpeg|png|gif)$", stripped, re.I) or [None, "jpg"])[1].lower()
         key = f"images/legacy/{key_of(stripped)}.{ext}"
         s3_url = f"https://{DATA_BUCKET}.s3.{REGION}.amazonaws.com/{key}"
-        # 다운로드(최고화질) + 업로드
-        dl = stripped + "?type=w966" if "pstatic" in stripped else stripped
-        try:
-            data = fetch(dl)
-        except Exception:
+        # 다운로드(최고화질 w3840 → 폴백) + 업로드
+        cands = ["?type=w3840", "?type=w966", "?type=w773", ""] if "pstatic" in stripped else [""]
+        data = None
+        for q in cands:
             try:
-                data = fetch(stripped)
+                data = fetch(stripped + q); break
             except Exception:
                 continue
+        if data is None:
+            continue
         if APPLY:
             ct = {"jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png", "gif": "image/gif"}[ext]
             s3.put_object(Bucket=DATA_BUCKET, Key=key, Body=data, ContentType=ct)
