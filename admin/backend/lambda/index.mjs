@@ -12,6 +12,7 @@
 import { handleList, handleCreate, handleUpdate, handleDelete } from "./handlers/posts.mjs";
 import { handleGetPage, handlePutPage, handleDeletePage } from "./handlers/pages.mjs";
 import { handleDeploy, handleBuildStatus } from "./handlers/deploy.mjs";
+import { handleSyncBlog } from "./handlers/sync.mjs";
 import { handleUpload } from "./handlers/media.mjs";
 import { getPost, getCategories, putCategories } from "./services/s3.mjs";
 import { respond } from "./utils/respond.mjs";
@@ -125,6 +126,8 @@ export const handler = async (event) => {
       return respond(201, await handleUpload(body));
     if (method === "POST" && path === "/api/deploy")
       return respond(202, await handleDeploy());
+    if (method === "POST" && path === "/api/sync-blog")
+      return respond(200, await handleSyncBlog());
 
     // 카테고리 수정 (인증 후)
     if (method === "PUT" && path === "/api/categories") {

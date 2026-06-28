@@ -59,6 +59,8 @@ export function App() {
   const [editingPost, setEditingPost] = useState<FullPost | null>(null);
   const [editorKey, setEditorKey] = useState(0);
 
+  const [syncing, setSyncing] = useState(false);
+
   // 상단 모드: 글 관리 vs 페이지 편집. 진료영역 콘텐츠는 API에서 로드, 없으면 시드.
   const [section, setSection] = useState<"journal" | "pages">("journal");
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
@@ -305,6 +307,29 @@ export function App() {
     }
   };
 
+  // ── 블로그 동기화 (네이버 새 글 가져오기 + 발행) ──────────────────
+  const runSync = async () => {
+    setSyncing(true);
+    toast("네이버 블로그 확인 중…");
+    try {
+      const r = await apiRef.current.syncBlog();
+      if (r.imported.length === 0) {
+        toast(r.new > 0 ? "가져오기 실패 — 다시 시도해 주세요" : "새 글 없음 · 이미 최신 상태");
+      } else {
+        const more = r.new > r.imported.length ? " (더 있음 — 다시 눌러 계속)" : "";
+        toast(`새 글 ${r.imported.length}편 가져옴${more} · 발행 중…`);
+        await loadPosts().catch(() => {});
+        void runDeploy();
+      }
+    } catch {
+      // 글이 많거나 사진이 많으면 시간이 걸려 응답이 끊길 수 있음 — 일부 반영됐을 수 있어 재시도 안내
+      await loadPosts().catch(() => {});
+      toast("시간이 걸렸어요 — 목록 확인 후 한 번 더 눌러 이어주세요");
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const resetPage = async (slug: string) => {
     setBusy(true);
     try {
@@ -358,6 +383,9 @@ export function App() {
             <span className={"dot " + status.kind} />
             {status.text}
           </span>
+          <button className="ghost sync" onClick={runSync} disabled={syncing} title="네이버 블로그의 새 글을 가져와 사이트에 게시">
+            {syncing ? "동기화 중…" : "↻ 블로그 동기화"}
+          </button>
           <button className="ghost" onClick={() => setGuideOpen(true)}>안내</button>
           <button
             className="ghost"

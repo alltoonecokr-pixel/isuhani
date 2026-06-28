@@ -74,6 +74,22 @@ export async function deletePost(logNo) {
   );
 }
 
+// 이미지 이관용 — 데이터 버킷에 이미지 바이트 업로드 (public-read는 버킷 정책으로 처리됨)
+export async function putImage(key, body, contentType) {
+  await s3.send(
+    new PutObjectCommand({ Bucket: BUCKET, Key: key, Body: body, ContentType: contentType }),
+  );
+}
+
+export async function objectExists(key) {
+  try {
+    await s3.send(new HeadObjectCommand({ Bucket: BUCKET, Key: key }));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // ── 편집 가능 페이지 콘텐츠 (pages/{slug}.json, 데이터 버킷) ───────────────────
 
 export async function getPageContent(slug) {

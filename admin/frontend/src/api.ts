@@ -180,6 +180,14 @@ export class CmsApi {
     return this.req(`/api/pages/${slug}`, { method: "DELETE" });
   }
 
+  syncBlog(): Promise<{
+    found: number;
+    new: number;
+    imported: { logNo: string; title: string; date: string; category: string; images: number }[];
+  }> {
+    return this.req("/api/sync-blog", { method: "POST" });
+  }
+
   deploy(): Promise<{ buildId: string }> {
     return this.req("/api/deploy", { method: "POST" });
   }
