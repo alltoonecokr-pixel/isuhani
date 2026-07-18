@@ -2,6 +2,8 @@
 
 const HTML_ENTITIES = {
   "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&#39;": "'", "&nbsp;": " ",
+  "&middot;": "·", "&hellip;": "…", "&ndash;": "–", "&mdash;": "—",
+  "&lsquo;": "‘", "&rsquo;": "’", "&ldquo;": "“", "&rdquo;": "”",
 };
 
 // HTML 엔티티 디코딩. 네이버 export는 URL을 &#x3D; / &amp; 로 인코딩해 저장하는 경우가 있어,

@@ -43,6 +43,7 @@ function buildPostFromInput(input, logNo, existing = null) {
     categoryNo: existing?.categoryNo || "",
     parentCategoryNo: existing?.parentCategoryNo || "",
     url: existing?.url || "",
+    blog: existing?.blog || "",
     blocks,
     body,
     body_kind: bodyKind,
@@ -62,6 +63,11 @@ function buildPostFromInput(input, logNo, existing = null) {
   };
 }
 
+// 원본 블로그 ID — 신규 동기화 글은 post.blog, 과거 글은 url의 blogId로 판별
+function blogIdOf(post) {
+  return post.blog || post.url?.match(/blogId=([A-Za-z0-9_-]+)/)?.[1] || "isuhani";
+}
+
 // 즉시 발행용 공개 본문 엔트리 (프론트 LiveArticle 가 읽는 형태)
 function liveEntry(post) {
   return {
@@ -72,7 +78,7 @@ function liveEntry(post) {
     date: parseAddDate(post.addDate),
     body: post.body ?? null,
     ogImage: post?.meta?.ogImage ?? null,
-    externalUrl: `https://blog.naver.com/isuhani/${post.logNo}`,
+    externalUrl: `https://blog.naver.com/${blogIdOf(post)}/${post.logNo}`,
     updatedAt: new Date().toISOString(),
   };
 }

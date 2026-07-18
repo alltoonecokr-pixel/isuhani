@@ -7,6 +7,14 @@ const HTML_ENTITIES: Record<string, string> = {
   "&quot;": '"',
   "&#39;": "'",
   "&nbsp;": " ",
+  "&middot;": "·",
+  "&hellip;": "…",
+  "&ndash;": "–",
+  "&mdash;": "—",
+  "&lsquo;": "‘",
+  "&rsquo;": "’",
+  "&ldquo;": "“",
+  "&rdquo;": "”",
 };
 
 /**

@@ -18,6 +18,7 @@ export type RawPost = {
   categoryNo?: string;
   parentCategoryNo?: string;
   url?: string;
+  blog?: string;
   body: string | null;
   body_kind?: string | null;
   images?: string[];
@@ -64,6 +65,11 @@ const PARENT_CATEGORY_MAP: Record<string, string> = {
   "11": "비만 · 다이어트", "32": "건강관리",
   "38": "BLOG", "42": "여가 · 여행",
 };
+
+// 원본 블로그 ID — 동기화 글은 blog 필드, 과거 글은 url의 blogId로 판별
+function blogIdOf(post: RawPost): string {
+  return post.blog || post.url?.match(/blogId=([A-Za-z0-9_-]+)/)?.[1] || "isuhani";
+}
 
 function categoryName(post: RawPost): string {
   if (post.meta?.category) return post.meta.category;
@@ -118,7 +124,7 @@ export function getAllPosts(): BlogPost[] {
           thumbnail: extractThumbnail(raw.body, raw.meta?.ogImage),
           ogDesc: raw.meta?.ogDesc || null,
           images: raw.images || [],
-          externalUrl: `https://blog.naver.com/isuhani/${raw.logNo}`,
+          externalUrl: `https://blog.naver.com/${blogIdOf(raw)}/${raw.logNo}`,
           summary: (raw.meta as Record<string, unknown>)?.summary as string[] | null ?? null,
         } as BlogPost;
       } catch {

@@ -8,7 +8,8 @@ import { putPost, putImage, objectExists, objectSize, writeLivePost, readPostInd
 import { upsertIndexEntry, indexEntry } from "../services/indexer.mjs";
 import { toItem, putIndex } from "../services/dynamo.mjs";
 
-const BLOG = "isuhani";
+// 병원 운영 블로그 2개 — isuhani(공식) + metroparis(남성역엔 이수한의원)
+const BLOGS = ["isuhani", "metroparis"];
 const REGION = process.env.AWS_REGION || "ap-northeast-2";
 const DATA_BUCKET = process.env.BUCKET;
 const UA = { "user-agent": "Mozilla/5.0 (Macintosh) AppleWebKit/537.36 Chrome/120 Safari/537.36" };
@@ -116,31 +117,42 @@ async function migrateImages(body, ogImage) {
   return { s3Urls: items.map((i) => i.s3Url), body2, og2 };
 }
 
-async function buildPost(logno, rssCat) {
-  const html = await fetchText(`https://blog.naver.com/PostView.naver?blogId=${BLOG}&logNo=${logno}`);
+// RSS pubDate(RFC822, +0900) → "YYYY. M. D." 라벨. 페이지 파싱은 스킨에 따라
+// 엉뚱한 날짜를 잡을 수 있어(metroparis 2022 오파싱) RSS를 우선한다.
+function rssDateLabel(pubDate) {
+  if (!pubDate) return "";
+  const t = Date.parse(pubDate);
+  if (Number.isNaN(t)) return "";
+  const d = new Date(t + 9 * 3600 * 1000);
+  return `${d.getUTCFullYear()}. ${d.getUTCMonth() + 1}. ${d.getUTCDate()}.`;
+}
+
+async function buildPost(blog, logno, rssCat, rssDate) {
+  const html = await fetchText(`https://blog.naver.com/PostView.naver?blogId=${blog}&logNo=${logno}`);
   const title = og(html, "title");
   const body = extractBody(html);
   if (!title || !body) return null;
-  const addDate = addDateOf(html);
+  const addDate = rssDateLabel(rssDate) || addDateOf(html);
   const ogImg = og(html, "image");
   const desc = og(html, "description");
   const { s3Urls, body2, og2 } = await migrateImages(body, ogImg);
   return {
-    logNo: logno, title, addDate, categoryNo: "", parentCategoryNo: "",
-    url: `https://blog.naver.com/PostView.naver?blogId=${BLOG}&logNo=${logno}`,
+    logNo: logno, blog, title, addDate, categoryNo: "", parentCategoryNo: "",
+    url: `https://blog.naver.com/PostView.naver?blogId=${blog}&logNo=${logno}`,
     blocks: [], body: body2, body_kind: "html", images: s3Urls,
     meta: { ogTitle: title, ogDesc: desc, ogImage: og2 || null, category: normCat(rssCat), date: isoDateOf(addDate) },
   };
 }
 
-async function rssItems() {
-  const x = await fetchText(`https://rss.blog.naver.com/${BLOG}.xml`);
+async function rssItems(blog) {
+  const x = await fetchText(`https://rss.blog.naver.com/${blog}.xml`);
   const out = [];
   for (const it of x.match(/<item>[\s\S]*?<\/item>/g) || []) {
     const link = it.match(/<link>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/link>/);
     const cat = it.match(/<category>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/category>/);
+    const pd = it.match(/<pubDate>([^<]+)<\/pubDate>/);
     const m = link?.[1].match(/\/(\d{10,})/);
-    if (m) out.push({ logNo: m[1], cat: cat ? decode(cat[1].trim()) : "" });
+    if (m) out.push({ blog, logNo: m[1], cat: cat ? decode(cat[1].trim()) : "", pubDate: pd?.[1] || "" });
   }
   return out;
 }
@@ -148,13 +160,18 @@ async function rssItems() {
 export async function handleSyncBlog() {
   const idx = await readPostIndex();
   const have = new Set((idx.posts || []).map((p) => String(p.logNo)));
-  const items = await rssItems();
+  const items = [];
+  for (const blog of BLOGS) {
+    try { items.push(...await rssItems(blog)); } catch { /* 블로그 하나 실패해도 나머지 진행 */ }
+  }
+  // 최신 글부터 가져오도록 두 블로그를 섞어 logNo(발행순) 내림차순 정렬
+  items.sort((a, b) => Number(b.logNo) - Number(a.logNo));
   const todo = items.filter((it) => !have.has(it.logNo)).slice(0, MAX_PER_RUN);
 
   const imported = [];
-  for (const { logNo, cat } of todo) {
+  for (const { blog, logNo, cat, pubDate } of todo) {
     let post;
-    try { post = await buildPost(logNo, cat); } catch { post = null; }
+    try { post = await buildPost(blog, logNo, cat, pubDate); } catch { post = null; }
     if (!post) continue;
     await putPost(post);
     await upsertIndexEntry(post);
@@ -162,10 +179,10 @@ export async function handleSyncBlog() {
     await writeLivePost({
       logNo: post.logNo, title: post.title, category: post.meta.category,
       dateLabel: post.addDate, date: post.meta.date, body: post.body,
-      ogImage: post.meta.ogImage, externalUrl: `https://blog.naver.com/${BLOG}/${post.logNo}`,
+      ogImage: post.meta.ogImage, externalUrl: `https://blog.naver.com/${blog}/${post.logNo}`,
       updatedAt: new Date().toISOString(),
     });
-    imported.push({ logNo: post.logNo, title: post.title, date: post.meta.date, category: post.meta.category, images: post.images.length });
+    imported.push({ logNo: post.logNo, blog, title: post.title, date: post.meta.date, category: post.meta.category, images: post.images.length });
   }
   return { found: items.length, new: todo.length, imported };
 }
