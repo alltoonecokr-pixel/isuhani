@@ -33,17 +33,18 @@ export function EditorView({
   const [date, setDate]         = useState(post?.meta?.date || isoToday());
   const [bodyHtml, setBodyHtml] = useState(cleanForEditor(post?.body || "<p></p>"));
   const [dirty, setDirty]       = useState(false);
+  const [bodyDirty, setBodyDirty] = useState(false);
   const [saved, setSaved]       = useState(false);
   const [showPreview, setShowPreview] = useState(true);
 
   const markDirty = () => { setDirty(true); setSaved(false); };
 
-  // 네이버에서 가져온 글 — 편집기로 본문을 다시 저장하면 링크·뉴스카드가 손실될 수 있음
+  // 네이버에서 가져온 글 — 본문을 직접 편집하면 링크·뉴스카드가 손실될 수 있음
   const isImported = post?.body_kind === "html";
 
   const submit = async (publish: boolean) => {
     if (!title.trim()) { toast("제목을 입력하세요", "error"); return; }
-    if (isImported && dirty && !window.confirm(
+    if (isImported && bodyDirty && !window.confirm(
       "이 글은 네이버에서 가져온 글입니다.\n본문을 다시 저장하면 일부 링크·뉴스카드가 사라질 수 있어요.\n제목·카테고리·발행일만 바꾸려면 본문은 건드리지 마세요.\n\n그래도 저장할까요?"
     )) return;
     const input: PostInput = {
@@ -54,6 +55,7 @@ export function EditorView({
     };
     await onSave(input, publish);
     setDirty(false);
+    setBodyDirty(false);
     setSaved(true);
   };
 
@@ -174,7 +176,7 @@ export function EditorView({
             {/* 리치 에디터 */}
             <RichEditor
               initialHtml={bodyHtml}
-              onChange={(html) => { setBodyHtml(html); markDirty(); }}
+              onChange={(html) => { setBodyHtml(html); markDirty(); setBodyDirty(true); }}
               onUploadImage={onUploadImage}
               toast={toast}
             />

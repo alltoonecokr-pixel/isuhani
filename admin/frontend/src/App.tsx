@@ -217,8 +217,8 @@ export function App() {
         }
       }
       if (publish) {
-        toast("발행 시작 — 사이트 반영까지 약 2~3분");
-        void runDeploy();
+        toast("발행되었습니다");
+        void runDeploySilent();
         await loadPosts();
         goToList();
       } else {
@@ -289,6 +289,11 @@ export function App() {
     } catch (e) {
       setDeploy((d) => ({ ...d, title: "발행 실패", step: e instanceof Error ? e.message : "오류" }));
     }
+  };
+
+  // UI 없이 백그라운드에서만 CodeBuild 트리거 (SEO 정적 페이지 갱신용)
+  const runDeploySilent = async () => {
+    try { await apiRef.current.deploy(); } catch { /* silent */ }
   };
 
   // ── 페이지 편집 (인라인) ─────────────────────────────────────────
