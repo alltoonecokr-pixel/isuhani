@@ -127,12 +127,12 @@ function rssDateLabel(pubDate) {
   return `${d.getUTCFullYear()}. ${d.getUTCMonth() + 1}. ${d.getUTCDate()}.`;
 }
 
-async function buildPost(blog, logno, rssCat, rssDate) {
+async function buildPost(blog, logno, rssCat, dateLabel) {
   const html = await fetchText(`https://blog.naver.com/PostView.naver?blogId=${blog}&logNo=${logno}`);
   const title = og(html, "title");
   const body = extractBody(html);
   if (!title || !body) return null;
-  const addDate = rssDateLabel(rssDate) || addDateOf(html);
+  const addDate = dateLabel || addDateOf(html);
   const ogImg = og(html, "image");
   const desc = og(html, "description");
   const { s3Urls, body2, og2 } = await migrateImages(body, ogImg);
@@ -157,21 +157,11 @@ async function rssItems(blog) {
   return out;
 }
 
-export async function handleSyncBlog() {
-  const idx = await readPostIndex();
-  const have = new Set((idx.posts || []).map((p) => String(p.logNo)));
-  const items = [];
-  for (const blog of BLOGS) {
-    try { items.push(...await rssItems(blog)); } catch { /* 블로그 하나 실패해도 나머지 진행 */ }
-  }
-  // 최신 글부터 가져오도록 두 블로그를 섞어 logNo(발행순) 내림차순 정렬
-  items.sort((a, b) => Number(b.logNo) - Number(a.logNo));
-  const todo = items.filter((it) => !have.has(it.logNo)).slice(0, MAX_PER_RUN);
-
+async function importPosts(todo) {
   const imported = [];
-  for (const { blog, logNo, cat, pubDate } of todo) {
+  for (const { blog, logNo, cat, dateLabel } of todo) {
     let post;
-    try { post = await buildPost(blog, logNo, cat, pubDate); } catch { post = null; }
+    try { post = await buildPost(blog, logNo, cat, dateLabel); } catch { post = null; }
     if (!post) continue;
     await putPost(post);
     await upsertIndexEntry(post);
@@ -184,5 +174,54 @@ export async function handleSyncBlog() {
     });
     imported.push({ logNo: post.logNo, blog, title: post.title, date: post.meta.date, category: post.meta.category, images: post.images.length });
   }
+  return imported;
+}
+
+// 글 목록 API 한 페이지 (RSS 밖 과거 글 백필용). 작은따옴표 이스케이프가
+// JSON 표준이 아니라 파싱 전 정리한다.
+async function listPage(blog, page) {
+  const txt = await fetchText(
+    `https://blog.naver.com/PostTitleListAsync.naver?blogId=${blog}&currentPage=${page}&countPerPage=30`);
+  const j = JSON.parse(txt.replace(/\\'/g, "'"));
+  return {
+    total: Number(j.totalCount || 0),
+    list: (j.postList || []).map((p) => ({ logNo: String(p.logNo), addDate: String(p.addDate || "") })),
+  };
+}
+
+// 백필 — 글 목록 API로 전체 logNo를 열거해 인덱스에 없는 과거 글을 수입.
+// '1시간 전' 같은 상대 날짜(최근 글)는 RSS 동기화 경로가 처리하므로 건너뜀.
+async function handleBackfill(blog) {
+  const idx = await readPostIndex();
+  const have = new Set((idx.posts || []).map((p) => String(p.logNo)));
+  const first = await listPage(blog, 1);
+  const all = [...first.list];
+  const pages = Math.min(Math.ceil(first.total / 30), 100);
+  for (let p = 2; p <= pages; p++) all.push(...(await listPage(blog, p)).list);
+  const missing = all.filter((it) =>
+    !have.has(it.logNo) && /\d{4}\.\s*\d{1,2}\.\s*\d{1,2}/.test(it.addDate));
+  const todo = missing.slice(0, MAX_PER_RUN).map((it) => ({
+    blog, logNo: it.logNo, cat: "", dateLabel: it.addDate.trim(),
+  }));
+  const imported = await importPosts(todo);
+  return { total: first.total, missing: missing.length, new: todo.length, imported };
+}
+
+export async function handleSyncBlog(opts = {}) {
+  if (opts?.mode === "backfill") return handleBackfill(opts.blog || "metroparis");
+
+  const idx = await readPostIndex();
+  const have = new Set((idx.posts || []).map((p) => String(p.logNo)));
+  const items = [];
+  for (const blog of BLOGS) {
+    try { items.push(...await rssItems(blog)); } catch { /* 블로그 하나 실패해도 나머지 진행 */ }
+  }
+  // 최신 글부터 가져오도록 두 블로그를 섞어 logNo(발행순) 내림차순 정렬
+  items.sort((a, b) => Number(b.logNo) - Number(a.logNo));
+  const todo = items
+    .filter((it) => !have.has(it.logNo))
+    .slice(0, MAX_PER_RUN)
+    .map((it) => ({ blog: it.blog, logNo: it.logNo, cat: it.cat, dateLabel: rssDateLabel(it.pubDate) }));
+  const imported = await importPosts(todo);
   return { found: items.length, new: todo.length, imported };
 }

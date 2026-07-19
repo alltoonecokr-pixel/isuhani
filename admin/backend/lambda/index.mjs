@@ -123,7 +123,7 @@ export const handler = async (event) => {
     if (method === "POST" && path === "/api/deploy")
       return respond(202, await handleDeploy());
     if (method === "POST" && path === "/api/sync-blog")
-      return respond(200, await handleSyncBlog());
+      return respond(200, await handleSyncBlog(body));
 
     // 카테고리 수정 (인증 후)
     if (method === "PUT" && path === "/api/categories") {
