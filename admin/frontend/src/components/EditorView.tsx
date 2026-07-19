@@ -32,10 +32,27 @@ export function EditorView({
   const [category, setCategory] = useState(wantCat);
   const [date, setDate]         = useState(post?.meta?.date || isoToday());
   const [bodyHtml, setBodyHtml] = useState(cleanForEditor(post?.body || "<p></p>"));
+  const [thumbnail, setThumbnail] = useState<string | null>(post?.meta?.thumbnail ?? null);
+  const [thumbPickerOpen, setThumbPickerOpen] = useState(false);
   const [dirty, setDirty]       = useState(false);
   const [bodyDirty, setBodyDirty] = useState(false);
   const [saved, setSaved]       = useState(false);
   const [showPreview, setShowPreview] = useState(true);
+
+  // 본문 속 이미지 후보 (등장 순서 유지, 중복 제거)
+  const thumbCandidates = useMemo(() => {
+    const urls: string[] = [];
+    for (const m of bodyHtml.matchAll(/<img[^>]+src="([^"]+)"/g)) {
+      if (!urls.includes(m[1])) urls.push(m[1]);
+    }
+    const og = post?.meta?.ogImage;
+    if (og && !urls.includes(og)) urls.push(og);
+    return urls;
+  }, [bodyHtml, post?.meta?.ogImage]);
+
+  // 자동 선택 시 실제로 쓰이는 썸네일 (인덱서 규칙과 동일: images[0] → 본문 첫 이미지 → og)
+  const autoThumb = post?.images?.[0] || thumbCandidates[0] || null;
+  const effectiveThumb = thumbnail || autoThumb;
 
   const markDirty = () => { setDirty(true); setSaved(false); };
 
@@ -51,7 +68,9 @@ export function EditorView({
       title: title.trim(),
       addDate: isoToAddDate(date),
       category,
-      body: cleanForSave(bodyHtml),
+      thumbnail,
+      // 본문은 실제로 고쳤을 때만 전송 — 네이버 글을 불필요하게 재저장하지 않음
+      ...(bodyDirty || !post ? { body: cleanForSave(bodyHtml) } : {}),
     };
     await onSave(input, publish);
     setDirty(false);
@@ -170,6 +189,57 @@ export function EditorView({
                     onChange={(v) => { setDate(v); markDirty(); }}
                   />
                 </div>
+              </div>
+
+              {/* 대표 이미지 (썸네일) */}
+              <div className="ev-thumb">
+                <span className="ev-label">대표 이미지 (목록 썸네일)</span>
+                <div className="ev-thumb-row">
+                  {effectiveThumb ? (
+                    <img className="ev-thumb-cur" src={effectiveThumb} alt="대표 이미지" />
+                  ) : (
+                    <div className="ev-thumb-none">이미지 없음</div>
+                  )}
+                  <div className="ev-thumb-info">
+                    <span className="ev-thumb-mode">
+                      {thumbnail ? "직접 지정됨" : "자동 (본문 이미지)"}
+                    </span>
+                    <div className="ev-thumb-actions">
+                      <button
+                        type="button"
+                        onClick={() => setThumbPickerOpen((v) => !v)}
+                        disabled={thumbCandidates.length === 0}
+                        title={thumbCandidates.length === 0 ? "본문에 이미지가 없어요" : "본문 이미지 중에서 선택"}
+                      >
+                        {thumbPickerOpen ? "선택 닫기" : "이미지 선택"}
+                      </button>
+                      {thumbnail && (
+                        <button
+                          type="button"
+                          className="ghost"
+                          onClick={() => { setThumbnail(null); markDirty(); }}
+                        >
+                          자동으로 되돌리기
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {thumbPickerOpen && (
+                  <div className="ev-thumb-grid">
+                    {thumbCandidates.map((u) => (
+                      <button
+                        type="button"
+                        key={u}
+                        className={"ev-thumb-cell" + (u === effectiveThumb ? " on" : "")}
+                        onClick={() => { setThumbnail(u); setThumbPickerOpen(false); markDirty(); }}
+                        title="이 이미지를 대표 이미지로"
+                      >
+                        <img src={u} alt="" loading="lazy" />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 

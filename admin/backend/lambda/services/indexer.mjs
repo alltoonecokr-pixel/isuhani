@@ -20,6 +20,7 @@ export function categoryOf(post) {
 export function thumbnailOf(post) {
   // 썸네일 URL은 index.json/live-index.json에 저장돼 React src로 직접 쓰이므로
   // (HTML 파싱을 안 거침) 네이버 엔티티 인코딩(&#x3D; 등)을 반드시 풀어준다.
+  if (post?.meta?.thumbnail) return cleanImageUrl(decodeEntities(post.meta.thumbnail));
   if (post?.images && post.images.length > 0) return decodeEntities(post.images[0]);
   const body = post?.body;
   if (body) {

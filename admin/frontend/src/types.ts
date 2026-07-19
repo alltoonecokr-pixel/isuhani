@@ -25,6 +25,7 @@ export type FullPost = {
     date?: string; // ISO
     ogDesc?: string | null;
     ogImage?: string | null;
+    thumbnail?: string | null; // 직접 지정한 대표 이미지 (null=자동)
   };
 };
 
@@ -33,7 +34,8 @@ export type PostInput = {
   title: string;
   addDate: string;
   category: string;
-  body: string;
+  body?: string; // 생략 시 기존 본문 유지 (네이버 글 안전 저장)
+  thumbnail?: string | null; // 대표 이미지 지정 (null=자동 선택으로 복귀)
 };
 
 export type BuildStatus = {

@@ -28,6 +28,7 @@ export type RawPost = {
     ogImage?: string;
     category?: string | null;
     date?: string | null;
+    thumbnail?: string | null;
   };
 };
 
@@ -121,7 +122,9 @@ export function getAllPosts(): BlogPost[] {
           category: categoryName(raw),
           body: raw.body,
           ogImage: cleanImageUrl(raw.meta?.ogImage) || null,
-          thumbnail: extractThumbnail(raw.body, raw.meta?.ogImage),
+          thumbnail: raw.meta?.thumbnail
+            ? cleanImageUrl(raw.meta.thumbnail)
+            : extractThumbnail(raw.body, raw.meta?.ogImage),
           ogDesc: raw.meta?.ogDesc || null,
           images: raw.images || [],
           externalUrl: `https://blog.naver.com/${blogIdOf(raw)}/${raw.logNo}`,

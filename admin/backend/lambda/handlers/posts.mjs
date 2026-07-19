@@ -58,6 +58,9 @@ function buildPostFromInput(input, logNo, existing = null) {
       category: input.category ?? existing?.meta?.category ?? fallbackCategory,
       ogDesc: input.excerpt ?? existing?.meta?.ogDesc ?? null,
       ogImage: existing?.meta?.ogImage ?? null,
+      thumbnail: input.thumbnail !== undefined
+        ? (input.thumbnail || null)
+        : existing?.meta?.thumbnail ?? null,
       date: parseAddDate(addDate) || isoDate(now),
     },
   };
