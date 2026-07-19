@@ -5,6 +5,7 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import { getAllPosts, getCategories, getPostByLogNo, makeExcerpt, sanitizeBody, extractFAQs, extractSummaryPoints } from "@/lib/blog";
 import { BlogCategoryBar } from "@/components/blog/BlogCategoryBar";
 import { ArticleBodyLive } from "@/components/blog/ArticleBodyLive";
+import { ArticleCTA, ArticleStickyCTA } from "@/components/blog/ArticleCTA";
 import { SITE_URL } from "@/lib/site";
 
 const DEFAULT_OG = `${SITE_URL}/og.png`;
@@ -270,6 +271,8 @@ export default function PostPage({ params }: { params: { logNo: string } }) {
           </div>
         </div>
 
+        <ArticleCTA />
+
         {treatmentLink && (
           <div className="border-t border-ink-200 bg-ink-50">
             <div className="max-w-4xl mx-auto px-5 md:px-8 py-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -333,7 +336,10 @@ export default function PostPage({ params }: { params: { logNo: string } }) {
             </div>
           </section>
         )}
+        {/* 모바일 고정 바에 본문 마지막이 가리지 않도록 여백 */}
+        <div className="h-16 md:hidden" aria-hidden="true" />
       </article>
+      <ArticleStickyCTA />
     </>
   );
 }

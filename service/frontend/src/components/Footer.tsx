@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BOOKING_URL, TALK_URL, PLACE_URL } from "@/lib/site";
 
 const SITEMAP = [
   { label: "병원 소개", href: "/home" },
@@ -9,9 +10,6 @@ const SITEMAP = [
   { label: "건강 저널", href: "/journal" },
 ];
 
-const BOOKING_URL = "https://booking.naver.com/booking/13/bizes/331349?area=pll";
-const TALK_URL = "https://talk.naver.com/ct/w4vt4b";
-const PLACE_URL = "https://map.naver.com/p/entry/place/13104608";
 const YOUTUBE_URL = "https://www.youtube.com/@isu_hani";
 const INSTAGRAM_URL = "https://www.instagram.com/isuclinic/";
 

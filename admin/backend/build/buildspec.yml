@@ -36,7 +36,8 @@ phases:
   build:
     commands:
       - echo "▸ next build (static export)"
-      - cd service/frontend && rm -rf .next out && NEXT_EXPORT=1 npm run build && cd ../..
+      # GA4/Clarity ID는 페이지에 노출되는 공개값 — 빌드에 없으면 발행 때마다 측정 코드가 빠진다
+      - cd service/frontend && rm -rf .next out && NEXT_EXPORT=1 NEXT_PUBLIC_GA_ID=G-72JPJQR1Y3 NEXT_PUBLIC_CLARITY_ID=x9ec111qal npm run build && cd ../..
       - test -d service/frontend/out || (echo "out/ 누락" && exit 1)
 
   post_build:

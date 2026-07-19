@@ -40,6 +40,17 @@ function unauthorized() {
 // ── 라우터 ───────────────────────────────────────────────────────────────────
 
 export const handler = async (event) => {
+  // EventBridge Scheduler 직접 호출 — 매일 블로그 동기화 + 새 글 있으면 자동 발행
+  if (event?.scheduled === "sync-blog") {
+    const result = await handleSyncBlog();
+    let build = null;
+    if (result.imported.length > 0) {
+      try { build = await handleDeploy(); } catch { /* 빌드 실패해도 동기화 결과는 유효 */ }
+    }
+    console.log("scheduled sync:", JSON.stringify({ new: result.new, buildId: build?.buildId || null }));
+    return { ...result, buildId: build?.buildId || null };
+  }
+
   const method = event.requestContext?.http?.method || event.httpMethod || "GET";
   const path = event.requestContext?.http?.path || event.rawPath || "/";
   const headers = Object.fromEntries(
