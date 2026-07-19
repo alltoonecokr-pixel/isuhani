@@ -184,8 +184,7 @@ export function ChatDock() {
               aria-hidden
               className="absolute inset-0"
               style={{
-                background:
-                  "linear-gradient(135deg, #053330 0%, #0a4a45 60%, #0f5d56 100%)",
+                background: "#0a4a45",
               }}
             />
             {/* 미세 그레인 */}

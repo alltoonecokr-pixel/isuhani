@@ -241,7 +241,7 @@ a {
   height: 3px;
   transform-origin: left center;
   transform: scaleX(0);
-  background: linear-gradient(to right, #2d6e5a, #7ec8a0);
+  background: #2d6e5a;
   z-index: 300;
   animation: reading-fill linear;
   animation-timeline: scroll(root block);

@@ -7,7 +7,7 @@ import { SITE_URL } from "@/lib/site";
 export const metadata: Metadata = {
   title: "건강 저널 | 이수한의원",
   description:
-    "이수한의원 원장님들이 직접 쓰는 건강 칼럼과 진료 사례 1,042편. 공진단 FAQ, 근감소증, 산후조리, 어린이 성장 등.",
+    "이수한의원 원장님들이 직접 쓰는 건강 칼럼과 진료 사례 1,400여 편. 공진단 FAQ, 근감소증, 산후조리, 어린이 성장 등.",
   alternates: { canonical: `${SITE_URL}/journal` },
 };
 

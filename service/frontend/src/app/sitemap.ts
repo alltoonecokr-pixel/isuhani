@@ -27,7 +27,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "monthly" as const,
   }));
 
-  // 글 1,042개 — 발행일 기준 신선도 priority 동적 계산
+  // 글 전체 — 발행일 기준 신선도 priority 동적 계산
   const now = Date.now();
   const MS_PER_DAY = 86_400_000;
   const posts: MetadataRoute.Sitemap = getAllPosts().map((p) => {

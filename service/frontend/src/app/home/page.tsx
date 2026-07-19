@@ -69,10 +69,13 @@ const DOCTORS = [
   },
 ];
 
+// 빌드 시점의 실제 글 수 — 매일 자동 발행 빌드에서 함께 갱신된다
+const POST_COUNT = getAllPosts().length.toLocaleString("ko-KR");
+
 const HERO_STATS = [
   { value: "25년",    label: "한자리 진료",   sub: "사당동 254-5, 그 자리" },
   { value: "원장 3인", label: "직접 진료",     sub: "전문 분야별 매칭" },
-  { value: "1,042편", label: "건강 칼럼",     sub: "원장 직필 Q&A" },
+  { value: `${POST_COUNT}편`, label: "건강 칼럼", sub: "원장 직필 Q&A" },
   { value: "주 7일",  label: "야간·주말 포함", sub: "평일 8시, 주말 3시" },
 ];
 
@@ -379,7 +382,7 @@ export default function HomePage() {
                 계속 쓰고 있어요.
               </h2>
               <p className="mt-4 text-[14.5px] leading-[1.78] text-ink-400 max-w-sm">
-                25년간 환자분들이 가장 많이 묻는 이야기 1,042편이에요.
+                25년간 환자분들이 가장 많이 묻는 이야기 {POST_COUNT}편이에요.
                 한 편만 읽고 오셔도 진료가 한결 편해져요.
               </p>
             </div>
@@ -387,7 +390,7 @@ export default function HomePage() {
               href="/journal"
               className="hidden md:inline-flex items-center gap-1.5 text-[14px] font-bold text-ink-900 hover:text-herb-700 border-b border-ink-300 hover:border-herb-700 pb-0.5 transition-colors shrink-0"
             >
-              저널 1,042편 전체 보기
+              저널 {POST_COUNT}편 전체 보기
               <ArrowRight size={14} />
             </Link>
           </div>
@@ -431,7 +434,7 @@ export default function HomePage() {
 
           <div className="mt-10 md:hidden">
             <Link href="/journal" className="inline-flex items-center gap-1.5 text-[14px] font-bold text-ink-900 border-b border-ink-300 pb-0.5">
-              저널 1,042편 전체 보기 <ArrowRight size={14} />
+              저널 {POST_COUNT}편 전체 보기 <ArrowRight size={14} />
             </Link>
           </div>
         </div>
