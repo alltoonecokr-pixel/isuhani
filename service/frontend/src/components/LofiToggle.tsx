@@ -94,7 +94,8 @@ export function LofiToggle() {
         aria-label={on ? "배경음악 끄기" : "잔잔한 배경음악 켜기"}
         title={on ? "배경음악 끄기" : "잔잔한 배경음악 켜기"}
         className={[
-          "fixed bottom-5 left-5 z-30 inline-flex items-center",
+          // 모바일: 하단 고정 CTA 바(글·홈)를 피해 위로, 데스크톱: 좌하단 그대로
+          "fixed bottom-20 left-4 md:bottom-5 md:left-5 z-30 inline-flex items-center",
           /* 모바일: 아이콘 전용 원형 / 데스크톱: 텍스트 포함 pill */
           "md:gap-2 md:pl-3 md:pr-4 md:py-2.5 md:text-[13px] md:font-semibold md:tracking-[-0.01em]",
           "p-2.5 rounded-full",
