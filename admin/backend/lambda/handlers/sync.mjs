@@ -191,7 +191,7 @@ async function listPage(blog, page) {
 
 // 백필 — 글 목록 API로 전체 logNo를 열거해 인덱스에 없는 과거 글을 수입.
 // '1시간 전' 같은 상대 날짜(최근 글)는 RSS 동기화 경로가 처리하므로 건너뜀.
-async function handleBackfill(blog) {
+async function handleBackfill(blog, max = MAX_PER_RUN) {
   const idx = await readPostIndex();
   const have = new Set((idx.posts || []).map((p) => String(p.logNo)));
   const first = await listPage(blog, 1);
@@ -200,7 +200,7 @@ async function handleBackfill(blog) {
   for (let p = 2; p <= pages; p++) all.push(...(await listPage(blog, p)).list);
   const missing = all.filter((it) =>
     !have.has(it.logNo) && /\d{4}\.\s*\d{1,2}\.\s*\d{1,2}/.test(it.addDate));
-  const todo = missing.slice(0, MAX_PER_RUN).map((it) => ({
+  const todo = missing.slice(0, max).map((it) => ({
     blog, logNo: it.logNo, cat: "", dateLabel: it.addDate.trim(),
   }));
   const imported = await importPosts(todo);
@@ -208,7 +208,9 @@ async function handleBackfill(blog) {
 }
 
 export async function handleSyncBlog(opts = {}) {
-  if (opts?.mode === "backfill") return handleBackfill(opts.blog || "metroparis");
+  if (opts?.mode === "backfill")
+    // 이미지 많은 과거 글은 API Gateway 29초 제한에 걸리므로 호출측에서 max 축소 가능
+    return handleBackfill(opts.blog || "metroparis", Math.max(1, Math.min(Number(opts.max) || MAX_PER_RUN, MAX_PER_RUN)));
 
   const idx = await readPostIndex();
   const have = new Set((idx.posts || []).map((p) => String(p.logNo)));
