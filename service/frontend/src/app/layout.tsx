@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     template: "%s | 이수한의원",
   },
   description:
-    "남성역 1번 출구 앞, 39년의 시간이 쌓아온 정성 진료. 원장 3인이 직접 쓰는 건강 칼럼 1,042편 · 추나요법, 디스크치료, 체형교정, 산후조리, 어린이 성장클리닉, 공진단.",
+    "남성역 1번 출구 앞, 39년의 시간이 쌓아온 정성 진료. 원장 3인이 직접 쓰는 건강 칼럼 1,400여 편 · 추나요법, 디스크치료, 체형교정, 산후조리, 어린이 성장클리닉, 공진단.",
   keywords: [
     "이수한의원",
     "남성역 한의원",
@@ -68,14 +68,14 @@ export const metadata: Metadata = {
     siteName: "이수한의원",
     title: "이수한의원 — 매일의 건강 이야기, Since 1986",
     description:
-      "남성역 1번 출구 앞, 원장 3인이 직접 쓰는 건강 칼럼 1,042편. 추나요법, 산후조리, 어린이 성장, 공진단까지.",
+      "남성역 1번 출구 앞, 원장 3인이 직접 쓰는 건강 칼럼 1,400여 편. 추나요법, 산후조리, 어린이 성장, 공진단까지.",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "이수한의원 — 매일의 건강 이야기" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "이수한의원 — 매일의 건강 이야기, Since 1986",
     description:
-      "남성역 1번 출구 앞, 원장 3인이 직접 쓰는 건강 칼럼 1,042편. 추나요법, 산후조리, 어린이 성장, 공진단까지.",
+      "남성역 1번 출구 앞, 원장 3인이 직접 쓰는 건강 칼럼 1,400여 편. 추나요법, 산후조리, 어린이 성장, 공진단까지.",
     images: ["/og.png"],
   },
   robots: { index: true, follow: true },
@@ -96,8 +96,12 @@ const jsonLd = {
   url: SITE_URL,
   sameAs: [
     "https://blog.naver.com/isuhani",
-    "https://map.naver.com/p/search/이수한의원",
+    "https://blog.naver.com/metroparis",
+    "https://map.naver.com/p/entry/place/13104608",
+    "https://www.youtube.com/@isu_hani",
+    "https://www.instagram.com/isuclinic/",
   ],
+  foundingDate: "1986",
   telephone: "+82-2-584-1075",
   email: "isuhani@naver.com",
   address: {
@@ -138,7 +142,7 @@ const jsonLd = {
     latitude: 37.4884,
     longitude: 126.9817,
   },
-  hasMap: "https://map.naver.com/p/search/이수한의원",
+  hasMap: "https://map.naver.com/p/entry/place/13104608",
   areaServed: {
     "@type": "City",
     name: "서울특별시 동작구",
@@ -183,6 +187,8 @@ export default function RootLayout({
       <head>
         {/* AI 크롤러용 llms.txt 디스커버리 링크 */}
         <link rel="alternate" type="text/plain" href="/llms.txt" />
+        {/* 건강 칼럼 RSS — 신규 글 디스커버리 */}
+        <link rel="alternate" type="application/rss+xml" title="이수한의원 건강 칼럼" href="/feed.xml" />
         {/* Naver 이미지 CDN preconnect — 썸네일 로드 시간 ~150ms 단축 */}
         <link rel="preconnect" href="https://postfiles.pstatic.net" crossOrigin="" />
         <link rel="preconnect" href="https://blogfiles.pstatic.net" crossOrigin="" />
